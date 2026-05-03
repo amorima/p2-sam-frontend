@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { format } from "date-fns";
-import type { Mail } from "~/types";
+import { format } from 'date-fns'
+import type { Mail } from '~/types'
 
 defineProps<{
-  mail: Mail;
-}>();
+  mail: Mail
+}>()
 
-const emits = defineEmits(["close"]);
+const emits = defineEmits(['close'])
 
 const dropdownItems = [
   [
     {
-      label: "Marcar como não lida",
-      icon: "i-lucide-check-circle",
+      label: 'Marcar como não lida',
+      icon: 'i-lucide-check-circle'
     },
     {
-      label: "Marcar como importante",
-      icon: "i-lucide-triangle-alert",
-    },
+      label: 'Marcar como importante',
+      icon: 'i-lucide-triangle-alert'
+    }
   ],
   [
     {
-      label: "Destacar",
-      icon: "i-lucide-star",
-    },
-  ],
-];
+      label: 'Destacar',
+      icon: 'i-lucide-star'
+    }
+  ]
+]
 </script>
 
 <template>

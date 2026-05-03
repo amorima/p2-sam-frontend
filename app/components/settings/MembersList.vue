@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from "@nuxt/ui";
-import type { Member } from "~/types";
+import type { DropdownMenuItem } from '@nuxt/ui'
+import type { Member } from '~/types'
 
 defineProps<{
-  members: Member[];
-}>();
+  members: Member[]
+}>()
 
 const items = [
   {
-    label: "Editar membro",
-    onSelect: () => console.log("Editar membro"),
+    label: 'Editar membro',
+    onSelect: () => console.log('Editar membro')
   },
   {
-    label: "Remover membro",
-    color: "error" as const,
-    onSelect: () => console.log("Remover membro"),
-  },
-] satisfies DropdownMenuItem[];
+    label: 'Remover membro',
+    color: 'error' as const,
+    onSelect: () => console.log('Remover membro')
+  }
+] satisfies DropdownMenuItem[]
 </script>
 
 <template>
@@ -44,7 +44,7 @@ const items = [
           :model-value="member.role"
           :items="[
             { label: 'Membro', value: 'member' },
-            { label: 'Proprietário', value: 'owner' },
+            { label: 'Proprietário', value: 'owner' }
           ]"
           color="neutral"
           :ui="{ value: 'capitalize' }"

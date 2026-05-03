@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormError } from "@nuxt/ui";
+import * as z from 'zod'
+import type { FormError } from '@nuxt/ui'
 
 const passwordSchema = z.object({
-  current: z.string().min(8, "Tem de ter pelo menos 8 caracteres"),
-  new: z.string().min(8, "Tem de ter pelo menos 8 caracteres"),
-});
+  current: z.string().min(8, 'Tem de ter pelo menos 8 caracteres'),
+  new: z.string().min(8, 'Tem de ter pelo menos 8 caracteres')
+})
 
-type PasswordSchema = z.output<typeof passwordSchema>;
+type PasswordSchema = z.output<typeof passwordSchema>
 
 const password = reactive<Partial<PasswordSchema>>({
-  current: "",
-  new: "",
-});
+  current: '',
+  new: ''
+})
 
 const validate = (state: Partial<PasswordSchema>): FormError[] => {
-  const errors: FormError[] = [];
+  const errors: FormError[] = []
   if (state.current && state.new && state.current === state.new) {
     errors.push({
-      name: "new",
-      message: "As palavras-passe têm de ser diferentes",
-    });
+      name: 'new',
+      message: 'As palavras-passe têm de ser diferentes'
+    })
   }
-  return errors;
-};
+  return errors
+}
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
-  collapsed?: boolean;
-}>();
+  collapsed?: boolean
+}>()
 </script>
 
 <template>
@@ -16,12 +16,12 @@ defineProps<{
       src="/logo_small.svg"
       alt="SAM"
       class="h-8 w-8 object-contain"
-    />
+    >
     <img
       v-else
       src="/logo_big.svg"
       alt="SAM"
       class="h-8 w-auto object-contain"
-    />
+    >
   </NuxtLink>
 </template>

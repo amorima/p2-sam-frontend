@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
 const schema = z.object({
-  name: z.string().min(2, "Demasiado curto"),
-  email: z.string().email("Email inválido"),
-});
-const open = ref(false);
+  name: z.string().min(2, 'Demasiado curto'),
+  email: z.string().email('Email inválido')
+})
+const open = ref(false)
 
-type Schema = z.output<typeof schema>;
+type Schema = z.output<typeof schema>
 
 const state = reactive<Partial<Schema>>({
-  name: "",
-  email: "",
-});
+  name: '',
+  email: ''
+})
 
-const toast = useToast();
+const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   toast.add({
-    title: "Sucesso",
+    title: 'Sucesso',
     description: `Novo utilizador ${event.data.name} adicionado`,
-    color: "success",
-  });
-  open.value = false;
+    color: 'success'
+  })
+  open.value = false
 }
 </script>
 

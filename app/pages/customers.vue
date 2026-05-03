@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
 import { getPaginationRowModel } from "@tanstack/table-core";
-import type { Row, SortingState } from "@tanstack/table-core";
+import type { Column, Row, SortingState, Table } from "@tanstack/table-core";
 import type { User } from "~/types";
 
 const UAvatar = resolveComponent("UAvatar");
@@ -10,8 +10,20 @@ const UBadge = resolveComponent("UBadge");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 const UCheckbox = resolveComponent("UCheckbox");
 
+type HideableColumnItem = {
+  label: string;
+  type: "checkbox";
+  checked: boolean;
+  onUpdateChecked: (checked: boolean) => void;
+  onSelect: (e?: Event) => void;
+};
+
+type CustomersTableRef = {
+  tableApi?: Table<User>;
+};
+
 const toast = useToast();
-const table = useTemplateRef("table");
+const table = useTemplateRef<CustomersTableRef>("table");
 
 const globalFilter = ref("");
 const columnVisibility = ref();
@@ -34,7 +46,7 @@ function getColumnLabel(columnId: string) {
   );
 }
 
-function renderSortableHeader(column: any, label: string) {
+function renderSortableHeader(column: Column<User, unknown>, label: string) {
   const isSorted = column.getIsSorted();
 
   return h(UButton, {
@@ -50,6 +62,24 @@ function renderSortableHeader(column: any, label: string) {
     onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
   });
 }
+
+const hideableColumns = computed<HideableColumnItem[]>(() => {
+  return (table.value?.tableApi?.getAllColumns() ?? [])
+    .filter((column: Column<User, unknown>) => column.getCanHide())
+    .map((column: Column<User, unknown>) => ({
+      label: getColumnLabel(column.id),
+      type: "checkbox" as const,
+      checked: column.getIsVisible(),
+      onUpdateChecked(checked: boolean) {
+        table.value?.tableApi
+          ?.getColumn(column.id)
+          ?.toggleVisibility(!!checked);
+      },
+      onSelect(e?: Event) {
+        e?.preventDefault();
+      },
+    }));
+});
 
 function getRowItems(row: Row<User>) {
   return [
@@ -244,27 +274,7 @@ const pagination = ref({
             </UButton>
           </CustomersDeleteModal>
 
-          <UDropdownMenu
-            :items="
-              table?.tableApi
-                ?.getAllColumns()
-                .filter((column: any) => column.getCanHide())
-                .map((column: any) => ({
-                  label: getColumnLabel(column.id),
-                  type: 'checkbox' as const,
-                  checked: column.getIsVisible(),
-                  onUpdateChecked(checked: boolean) {
-                    table?.tableApi
-                      ?.getColumn(column.id)
-                      ?.toggleVisibility(!!checked);
-                  },
-                  onSelect(e?: Event) {
-                    e?.preventDefault();
-                  },
-                }))
-            "
-            :content="{ align: 'end' }"
-          >
+          <UDropdownMenu :items="hideableColumns" :content="{ align: 'end' }">
             <UButton
               label="Colunas"
               color="neutral"

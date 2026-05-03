@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from "@nuxt/ui";
+import type { NavigationMenuItem } from '@nuxt/ui'
 
 const links = [
   [
     {
-      label: "Geral",
-      icon: "i-lucide-user",
-      to: "/settings",
-      exact: true,
+      label: 'Geral',
+      icon: 'i-lucide-user',
+      to: '/settings',
+      exact: true
     },
     {
-      label: "Membros",
-      icon: "i-lucide-users",
-      to: "/settings/members",
+      label: 'Membros',
+      icon: 'i-lucide-users',
+      to: '/settings/members'
     },
     {
-      label: "Notificações",
-      icon: "i-lucide-bell",
-      to: "/settings/notifications",
+      label: 'Notificações',
+      icon: 'i-lucide-bell',
+      to: '/settings/notifications'
     },
     {
-      label: "Segurança",
-      icon: "i-lucide-shield",
-      to: "/settings/security",
-    },
+      label: 'Segurança',
+      icon: 'i-lucide-shield',
+      to: '/settings/security'
+    }
   ],
   [
     {
-      label: "Documentação",
-      icon: "i-lucide-book-open",
-      to: "https://ui.nuxt.com/docs/getting-started/installation/nuxt",
-      target: "_blank",
-    },
-  ],
-] satisfies NavigationMenuItem[][];
+      label: 'Documentação',
+      icon: 'i-lucide-book-open',
+      to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
+      target: '_blank'
+    }
+  ]
+] satisfies NavigationMenuItem[][]
 </script>
 
 <template>

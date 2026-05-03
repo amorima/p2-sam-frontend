@@ -4,54 +4,54 @@ const state = reactive<{ [key: string]: boolean }>({
   desktop: false,
   product_updates: true,
   weekly_digest: false,
-  important_updates: true,
-});
+  important_updates: true
+})
 
 const sections = [
   {
-    title: "Canais de notificação",
-    description: "Onde te podemos notificar?",
+    title: 'Canais de notificação',
+    description: 'Onde te podemos notificar?',
     fields: [
       {
-        name: "email",
-        label: "Email",
-        description: "Recebe um resumo diário por email.",
+        name: 'email',
+        label: 'Email',
+        description: 'Recebe um resumo diário por email.'
       },
       {
-        name: "desktop",
-        label: "Computador",
-        description: "Recebe notificações no computador.",
-      },
-    ],
+        name: 'desktop',
+        label: 'Computador',
+        description: 'Recebe notificações no computador.'
+      }
+    ]
   },
   {
-    title: "Atualizações da conta",
-    description: "Recebe atualizações sobre a conta.",
+    title: 'Atualizações da conta',
+    description: 'Recebe atualizações sobre a conta.',
     fields: [
       {
-        name: "weekly_digest",
-        label: "Resumo semanal",
-        description: "Recebe um resumo semanal das novidades.",
+        name: 'weekly_digest',
+        label: 'Resumo semanal',
+        description: 'Recebe um resumo semanal das novidades.'
       },
       {
-        name: "product_updates",
-        label: "Atualizações do produto",
+        name: 'product_updates',
+        label: 'Atualizações do produto',
         description:
-          "Recebe um email mensal com novas funcionalidades e atualizações.",
+          'Recebe um email mensal com novas funcionalidades e atualizações.'
       },
       {
-        name: "important_updates",
-        label: "Atualizações importantes",
+        name: 'important_updates',
+        label: 'Atualizações importantes',
         description:
-          "Recebe emails sobre atualizações importantes, como correções de segurança, manutenção, etc.",
-      },
-    ],
-  },
-];
+          'Recebe emails sobre atualizações importantes, como correções de segurança, manutenção, etc.'
+      }
+    ]
+  }
+]
 
 async function onChange() {
   // Do something with data
-  console.log(state);
+  console.log(state)
 }
 </script>
 
