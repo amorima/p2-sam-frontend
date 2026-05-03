@@ -5,6 +5,7 @@ import {
   eachMonthOfInterval,
   format,
 } from "date-fns";
+import { pt } from "date-fns/locale";
 import {
   VisXYContainer,
   VisLine,
@@ -60,7 +61,7 @@ const total = computed(() =>
   data.value.reduce((acc: number, { amount }) => acc + amount, 0),
 );
 
-const formatNumber = new Intl.NumberFormat("en", {
+const formatNumber = new Intl.NumberFormat("pt-PT", {
   style: "currency",
   currency: "EUR",
   maximumFractionDigits: 0,
@@ -68,9 +69,9 @@ const formatNumber = new Intl.NumberFormat("en", {
 
 const formatDate = (date: Date): string => {
   return {
-    daily: format(date, "d MMM"),
-    weekly: format(date, "d MMM"),
-    monthly: format(date, "MMM yyy"),
+    daily: format(date, "d MMM", { locale: pt }),
+    weekly: format(date, "d MMM", { locale: pt }),
+    monthly: format(date, "MMM yyyy", { locale: pt }),
   }[props.period];
 };
 

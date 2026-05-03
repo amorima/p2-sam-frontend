@@ -11,6 +11,8 @@ const links = [
     {
       label: "Início",
       icon: "i-lucide-house",
+      to: "/",
+      exact: true,
       onSelect: () => {
         open.value = false;
       },
@@ -110,16 +112,16 @@ const links = [
 const groups = computed(() => [
   {
     id: "links",
-    label: "Go to",
+    label: "Ir para",
     items: links.flat(),
   },
   {
     id: "code",
-    label: "Code",
+    label: "Código",
     items: [
       {
         id: "source",
-        label: "View page source",
+        label: "Ver o código da página",
         icon: "i-simple-icons-github",
         to: `https://github.com/nuxt-ui-templates/dashboard/blob/main/app/pages${route.path === "/" ? "/index" : route.path}.vue`,
         target: "_blank",
@@ -136,12 +138,12 @@ onMounted(async () => {
 
   toast.add({
     title:
-      "We use first-party cookies to enhance your experience on our website.",
+      "Usamos cookies próprios para melhorar a tua experiência no nosso sítio.",
     duration: 0,
     close: false,
     actions: [
       {
-        label: "Accept",
+        label: "Aceitar",
         color: "neutral",
         variant: "outline",
         onClick: () => {
@@ -149,7 +151,7 @@ onMounted(async () => {
         },
       },
       {
-        label: "Opt out",
+        label: "Recusar",
         color: "neutral",
         variant: "ghost",
       },

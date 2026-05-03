@@ -3,8 +3,8 @@ import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
 const schema = z.object({
-  name: z.string().min(2, "Too short"),
-  email: z.string().email("Invalid email"),
+  name: z.string().min(2, "Demasiado curto"),
+  email: z.string().email("Email inválido"),
 });
 const open = ref(false);
 
