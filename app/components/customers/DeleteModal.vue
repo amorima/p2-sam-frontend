@@ -1,9 +1,12 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
-  count?: number
-}>(), {
-  count: 0
-})
+withDefaults(
+  defineProps<{
+    count?: number
+  }>(),
+  {
+    count: 0
+  }
+)
 
 const open = ref(false)
 
@@ -16,21 +19,21 @@ async function onSubmit() {
 <template>
   <UModal
     v-model:open="open"
-    :title="`Delete ${count} customer${count > 1 ? 's' : ''}`"
-    :description="`Are you sure, this action cannot be undone.`"
+    :title="`Eliminar ${count} utilizador${count > 1 ? 'es' : ''}`"
+    :description="`Tens a certeza? Esta ação não pode ser anulada.`"
   >
     <slot />
 
     <template #body>
       <div class="flex justify-end gap-2">
         <UButton
-          label="Cancel"
+          label="Cancelar"
           color="neutral"
           variant="subtle"
           @click="open = false"
         />
         <UButton
-          label="Delete"
+          label="Eliminar"
           color="error"
           variant="solid"
           loading-auto

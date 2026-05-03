@@ -7,35 +7,47 @@ const state = reactive<{ [key: string]: boolean }>({
   important_updates: true
 })
 
-const sections = [{
-  title: 'Notification channels',
-  description: 'Where can we notify you?',
-  fields: [{
-    name: 'email',
-    label: 'Email',
-    description: 'Receive a daily email digest.'
-  }, {
-    name: 'desktop',
-    label: 'Desktop',
-    description: 'Receive desktop notifications.'
-  }]
-}, {
-  title: 'Account updates',
-  description: 'Receive updates about Nuxt UI.',
-  fields: [{
-    name: 'weekly_digest',
-    label: 'Weekly digest',
-    description: 'Receive a weekly digest of news.'
-  }, {
-    name: 'product_updates',
-    label: 'Product updates',
-    description: 'Receive a monthly email with all new features and updates.'
-  }, {
-    name: 'important_updates',
-    label: 'Important updates',
-    description: 'Receive emails about important updates like security fixes, maintenance, etc.'
-  }]
-}]
+const sections = [
+  {
+    title: 'Canais de notificação',
+    description: 'Onde te podemos notificar?',
+    fields: [
+      {
+        name: 'email',
+        label: 'Email',
+        description: 'Recebe um resumo diário por email.'
+      },
+      {
+        name: 'desktop',
+        label: 'Computador',
+        description: 'Recebe notificações no computador.'
+      }
+    ]
+  },
+  {
+    title: 'Atualizações da conta',
+    description: 'Recebe atualizações sobre a conta.',
+    fields: [
+      {
+        name: 'weekly_digest',
+        label: 'Resumo semanal',
+        description: 'Recebe um resumo semanal das novidades.'
+      },
+      {
+        name: 'product_updates',
+        label: 'Atualizações do produto',
+        description:
+          'Recebe um email mensal com novas funcionalidades e atualizações.'
+      },
+      {
+        name: 'important_updates',
+        label: 'Atualizações importantes',
+        description:
+          'Recebe emails sobre atualizações importantes, como correções de segurança, manutenção, etc.'
+      }
+    ]
+  }
+]
 
 async function onChange() {
   // Do something with data
@@ -61,10 +73,7 @@ async function onChange() {
         :description="field.description"
         class="flex items-center justify-between not-last:pb-4 gap-2"
       >
-        <USwitch
-          v-model="state[field.name]"
-          @update:model-value="onChange"
-        />
+        <USwitch v-model="state[field.name]" @update:model-value="onChange" />
       </UFormField>
     </UPageCard>
   </div>

@@ -3,8 +3,8 @@ import * as z from 'zod'
 import type { FormError } from '@nuxt/ui'
 
 const passwordSchema = z.object({
-  current: z.string().min(8, 'Must be at least 8 characters'),
-  new: z.string().min(8, 'Must be at least 8 characters')
+  current: z.string().min(8, 'Tem de ter pelo menos 8 caracteres'),
+  new: z.string().min(8, 'Tem de ter pelo menos 8 caracteres')
 })
 
 type PasswordSchema = z.output<typeof passwordSchema>
@@ -17,7 +17,10 @@ const password = reactive<Partial<PasswordSchema>>({
 const validate = (state: Partial<PasswordSchema>): FormError[] => {
   const errors: FormError[] = []
   if (state.current && state.new && state.current === state.new) {
-    errors.push({ name: 'new', message: 'Passwords must be different' })
+    errors.push({
+      name: 'new',
+      message: 'As palavras-passe têm de ser diferentes'
+    })
   }
   return errors
 }
@@ -25,8 +28,8 @@ const validate = (state: Partial<PasswordSchema>): FormError[] => {
 
 <template>
   <UPageCard
-    title="Password"
-    description="Confirm your current password before setting a new one."
+    title="Palavra-passe"
+    description="Confirma a tua palavra-passe atual antes de definires uma nova."
     variant="subtle"
   >
     <UForm
@@ -39,7 +42,7 @@ const validate = (state: Partial<PasswordSchema>): FormError[] => {
         <UInput
           v-model="password.current"
           type="password"
-          placeholder="Current password"
+          placeholder="Palavra-passe atual"
           class="w-full"
         />
       </UFormField>
@@ -48,22 +51,22 @@ const validate = (state: Partial<PasswordSchema>): FormError[] => {
         <UInput
           v-model="password.new"
           type="password"
-          placeholder="New password"
+          placeholder="Nova palavra-passe"
           class="w-full"
         />
       </UFormField>
 
-      <UButton label="Update" class="w-fit" type="submit" />
+      <UButton label="Atualizar" class="w-fit" type="submit" />
     </UForm>
   </UPageCard>
 
   <UPageCard
-    title="Account"
-    description="No longer want to use our service? You can delete your account here. This action is not reversible. All information related to this account will be deleted permanently."
+    title="Conta"
+    description="Já não queres usar o nosso serviço? Podes eliminar a tua conta aqui. Esta ação não pode ser revertida. Todas as informações associadas a esta conta serão eliminadas permanentemente."
     class="bg-gradient-to-tl from-error/10 from-5% to-default"
   >
     <template #footer>
-      <UButton label="Delete account" color="error" />
+      <UButton label="Eliminar conta" color="error" />
     </template>
   </UPageCard>
 </template>

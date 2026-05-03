@@ -1,6 +1,19 @@
 <script setup lang="ts">
-import { eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, format } from 'date-fns'
-import { VisXYContainer, VisLine, VisAxis, VisArea, VisCrosshair, VisTooltip } from '@unovis/vue'
+import {
+  eachDayOfInterval,
+  eachWeekOfInterval,
+  eachMonthOfInterval,
+  format
+} from 'date-fns'
+import { pt } from 'date-fns/locale'
+import {
+  VisXYContainer,
+  VisLine,
+  VisAxis,
+  VisArea,
+  VisCrosshair,
+  VisTooltip
+} from '@unovis/vue'
 import type { Period, Range } from '~/types'
 
 const cardRef = useTemplateRef<HTMLElement | null>('cardRef')
@@ -19,32 +32,47 @@ const { width } = useElementSize(cardRef)
 
 const data = ref<DataRecord[]>([])
 
-watch([() => props.period, () => props.range], () => {
-  const dates = ({
-    daily: eachDayOfInterval,
-    weekly: eachWeekOfInterval,
-    monthly: eachMonthOfInterval
-  } as Record<Period, typeof eachDayOfInterval>)[props.period](props.range)
+watch(
+  [() => props.period, () => props.range],
+  () => {
+    const dates = (
+      {
+        daily: eachDayOfInterval,
+        weekly: eachWeekOfInterval,
+        monthly: eachMonthOfInterval
+      } as Record<Period, typeof eachDayOfInterval>
+    )[props.period](props.range)
 
-  const min = 1000
-  const max = 10000
+    const min = 1000
+    const max = 10000
 
-  data.value = dates.map(date => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
-}, { immediate: true })
+    data.value = dates.map(date => ({
+      date,
+      amount: Math.floor(Math.random() * (max - min + 1)) + min
+    }))
+  },
+  { immediate: true }
+)
 
 const x = (_: DataRecord, i: number) => i
 const y = (d: DataRecord) => d.amount
 
-const total = computed(() => data.value.reduce((acc: number, { amount }) => acc + amount, 0))
+const total = computed(() =>
+  data.value.reduce((acc: number, { amount }) => acc + amount, 0)
+)
 
-const formatNumber = new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format
+const formatNumber = new Intl.NumberFormat('pt-PT', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0
+}).format
 
 const formatDate = (date: Date): string => {
-  return ({
-    daily: format(date, 'd MMM'),
-    weekly: format(date, 'd MMM'),
-    monthly: format(date, 'MMM yyy')
-  })[props.period]
+  return {
+    daily: format(date, 'd MMM', { locale: pt }),
+    weekly: format(date, 'd MMM', { locale: pt }),
+    monthly: format(date, 'MMM yyyy', { locale: pt })
+  }[props.period]
 }
 
 const xTicks = (i: number) => {
@@ -55,11 +83,15 @@ const xTicks = (i: number) => {
   return formatDate(data.value[i].date)
 }
 
-const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amount)}`
+const template = (d: DataRecord) =>
+  `${formatDate(d.date)}: ${formatNumber(d.amount)}`
 </script>
 
 <template>
-  <UCard ref="cardRef" :ui="{ root: 'overflow-visible', body: '!px-0 !pt-0 !pb-3' }">
+  <UCard
+    ref="cardRef"
+    :ui="{ root: 'overflow-visible', body: '!px-0 !pt-0 !pb-3' }"
+  >
     <template #header>
       <div>
         <p class="text-xs text-muted uppercase mb-1.5">
@@ -77,11 +109,7 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
       class="h-96"
       :width="width"
     >
-      <VisLine
-        :x="x"
-        :y="y"
-        color="var(--ui-primary)"
-      />
+      <VisLine :x="x" :y="y" color="var(--ui-primary)" />
       <VisArea
         :x="x"
         :y="y"
@@ -89,16 +117,9 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
         :opacity="0.1"
       />
 
-      <VisAxis
-        type="x"
-        :x="x"
-        :tick-format="xTicks"
-      />
+      <VisAxis type="x" :x="x" :tick-format="xTicks" />
 
-      <VisCrosshair
-        color="var(--ui-primary)"
-        :template="template"
-      />
+      <VisCrosshair color="var(--ui-primary)" :template="template" />
 
       <VisTooltip />
     </VisXYContainer>

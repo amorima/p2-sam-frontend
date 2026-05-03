@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
 
-const color = computed(() => colorMode.value === 'dark' ? '#1b1718' : 'white')
+const color = computed(() =>
+  colorMode.value === 'dark' ? '#1b1718' : 'white'
+)
 
 useHead({
   meta: [
@@ -9,16 +11,15 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     { key: 'theme-color', name: 'theme-color', content: color }
   ],
-  link: [
-    { rel: 'icon', href: '/favicon.ico' }
-  ],
+  link: [{ rel: 'icon', href: '/favicon.ico' }],
   htmlAttrs: {
-    lang: 'en'
+    lang: 'pt-PT'
   }
 })
 
-const title = 'Nuxt Dashboard Template'
-const description = 'A professional dashboard template built with Nuxt UI, featuring multiple pages, data visualization, and comprehensive management capabilities for creating powerful admin interfaces.'
+const title = 'Sistema de Apoio Municipal'
+const description
+  = 'Painel de administração do Sistema de Apoio Municipal, com várias páginas, visualização de dados e ferramentas de gestão para criar interfaces de administração completas.'
 
 useSeoMeta({
   title,

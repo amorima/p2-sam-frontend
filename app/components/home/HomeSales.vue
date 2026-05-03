@@ -18,28 +18,34 @@ const sampleEmails = [
   'ethan.harris@example.com'
 ]
 
-const { data } = await useAsyncData('sales', async () => {
-  const sales: Sale[] = []
-  const currentDate = new Date()
+const { data } = await useAsyncData(
+  'sales',
+  async () => {
+    const sales: Sale[] = []
+    const currentDate = new Date()
 
-  for (let i = 0; i < 5; i++) {
-    const hoursAgo = randomInt(0, 48)
-    const date = new Date(currentDate.getTime() - hoursAgo * 3600000)
+    for (let i = 0; i < 5; i++) {
+      const hoursAgo = randomInt(0, 48)
+      const date = new Date(currentDate.getTime() - hoursAgo * 3600000)
 
-    sales.push({
-      id: (4600 - i).toString(),
-      date: date.toISOString(),
-      status: randomFrom(['paid', 'failed', 'refunded']),
-      email: randomFrom(sampleEmails),
-      amount: randomInt(100, 1000)
-    })
+      sales.push({
+        id: (4600 - i).toString(),
+        date: date.toISOString(),
+        status: randomFrom(['paid', 'failed', 'refunded']),
+        email: randomFrom(sampleEmails),
+        amount: randomInt(100, 1000)
+      })
+    }
+
+    return sales.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
+  },
+  {
+    watch: [() => props.period, () => props.range],
+    default: () => []
   }
-
-  return sales.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-}, {
-  watch: [() => props.period, () => props.range],
-  default: () => []
-})
+)
 
 const columns: TableColumn<Sale>[] = [
   {
@@ -49,9 +55,9 @@ const columns: TableColumn<Sale>[] = [
   },
   {
     accessorKey: 'date',
-    header: 'Date',
+    header: 'Data',
     cell: ({ row }) => {
-      return new Date(row.getValue('date')).toLocaleString('en-US', {
+      return new Date(row.getValue('date')).toLocaleString('pt-PT', {
         day: 'numeric',
         month: 'short',
         hour: '2-digit',
@@ -62,7 +68,7 @@ const columns: TableColumn<Sale>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: 'Estado',
     cell: ({ row }) => {
       const color = {
         paid: 'success' as const,
@@ -70,8 +76,16 @@ const columns: TableColumn<Sale>[] = [
         refunded: 'neutral' as const
       }[row.getValue('status') as string]
 
-      return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-        row.getValue('status')
+      const statusLabel = {
+        paid: 'Pago',
+        failed: 'Falhado',
+        refunded: 'Reembolsado'
+      }[row.getValue('status') as string]
+
+      return h(
+        UBadge,
+        { class: 'capitalize', variant: 'subtle', color },
+        () => statusLabel
       )
     }
   },
@@ -81,11 +95,11 @@ const columns: TableColumn<Sale>[] = [
   },
   {
     accessorKey: 'amount',
-    header: () => h('div', { class: 'text-right' }, 'Amount'),
+    header: () => h('div', { class: 'text-right' }, 'Valor'),
     cell: ({ row }) => {
       const amount = Number.parseFloat(row.getValue('amount'))
 
-      const formatted = new Intl.NumberFormat('en-US', {
+      const formatted = new Intl.NumberFormat('pt-PT', {
         style: 'currency',
         currency: 'EUR'
       }).format(amount)

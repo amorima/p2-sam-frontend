@@ -9,7 +9,7 @@ export interface User {
   email: string
   avatar?: AvatarProps
   status: UserStatus
-  location: string
+  actorType: 'Mecenas' | 'Negócio' | 'Instituição' | 'Cidadão'
 }
 
 export interface Mail {

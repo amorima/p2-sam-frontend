@@ -1,68 +1,27 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui'
-
 defineProps<{
   collapsed?: boolean
 }>()
-
-const teams = ref([{
-  label: 'Nuxt',
-  avatar: {
-    src: 'https://github.com/nuxt.png',
-    alt: 'Nuxt'
-  }
-}, {
-  label: 'NuxtHub',
-  avatar: {
-    src: 'https://github.com/nuxt-hub.png',
-    alt: 'NuxtHub'
-  }
-}, {
-  label: 'NuxtLabs',
-  avatar: {
-    src: 'https://github.com/nuxtlabs.png',
-    alt: 'NuxtLabs'
-  }
-}])
-const selectedTeam = ref(teams.value[0])
-
-const items = computed<DropdownMenuItem[][]>(() => {
-  return [teams.value.map(team => ({
-    ...team,
-    onSelect() {
-      selectedTeam.value = team
-    }
-  })), [{
-    label: 'Create team',
-    icon: 'i-lucide-circle-plus'
-  }, {
-    label: 'Manage teams',
-    icon: 'i-lucide-cog'
-  }]]
-})
 </script>
 
 <template>
-  <UDropdownMenu
-    :items="items"
-    :content="{ align: 'center', collisionPadding: 12 }"
-    :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }"
+  <NuxtLink
+    to="/"
+    class="flex w-full items-center justify-center rounded-md transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+    :class="collapsed ? 'p-2' : 'p-3'"
+    aria-label="Ir para a homepage"
   >
-    <UButton
-      v-bind="{
-        ...selectedTeam,
-        label: collapsed ? undefined : selectedTeam?.label,
-        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
-      }"
-      color="neutral"
-      variant="ghost"
-      block
-      :square="collapsed"
-      class="data-[state=open]:bg-elevated"
-      :class="[!collapsed && 'py-2']"
-      :ui="{
-        trailingIcon: 'text-dimmed'
-      }"
-    />
-  </UDropdownMenu>
+    <img
+      v-if="collapsed"
+      src="/logo_small.svg"
+      alt="SAM"
+      class="h-8 w-8 object-contain"
+    >
+    <img
+      v-else
+      src="/logo_big.svg"
+      alt="SAM"
+      class="h-8 w-auto object-contain"
+    >
+  </NuxtLink>
 </template>
