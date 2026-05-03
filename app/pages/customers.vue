@@ -1,66 +1,66 @@
 <script setup lang="ts">
-import type { TableColumn } from "@nuxt/ui";
-import { getPaginationRowModel } from "@tanstack/table-core";
-import type { Column, Row, SortingState, Table } from "@tanstack/table-core";
-import type { User } from "~/types";
+import type { TableColumn } from '@nuxt/ui'
+import { getPaginationRowModel } from '@tanstack/table-core'
+import type { Column, Row, SortingState, Table } from '@tanstack/table-core'
+import type { User } from '~/types'
 
-const UAvatar = resolveComponent("UAvatar");
-const UButton = resolveComponent("UButton");
-const UBadge = resolveComponent("UBadge");
-const UDropdownMenu = resolveComponent("UDropdownMenu");
-const UCheckbox = resolveComponent("UCheckbox");
+const UAvatar = resolveComponent('UAvatar')
+const UButton = resolveComponent('UButton')
+const UBadge = resolveComponent('UBadge')
+const UDropdownMenu = resolveComponent('UDropdownMenu')
+const UCheckbox = resolveComponent('UCheckbox')
 
 type HideableColumnItem = {
-  label: string;
-  type: "checkbox";
-  checked: boolean;
-  onUpdateChecked: (checked: boolean) => void;
-  onSelect: (e?: Event) => void;
-};
+  label: string
+  type: 'checkbox'
+  checked: boolean
+  onUpdateChecked: (checked: boolean) => void
+  onSelect: (e?: Event) => void
+}
 
 type CustomersTableRef = {
-  tableApi?: Table<User>;
-};
+  tableApi?: Table<User>
+}
 
-const toast = useToast();
-const table = useTemplateRef<CustomersTableRef>("table");
+const toast = useToast()
+const table = useTemplateRef<CustomersTableRef>('table')
 
-const globalFilter = ref("");
-const columnVisibility = ref();
-const rowSelection = ref({ 1: true });
-const sorting = ref<SortingState>([]);
+const globalFilter = ref('')
+const columnVisibility = ref()
+const rowSelection = ref({ 1: true })
+const sorting = ref<SortingState>([])
 
-const { data, status } = await useFetch<User[]>("/api/customers", {
-  lazy: true,
-});
+const { data, status } = await useFetch<User[]>('/api/customers', {
+  lazy: true
+})
 
 function getColumnLabel(columnId: string) {
   return (
     {
-      id: "ID",
-      name: "Nome",
-      email: "Email",
-      actorType: "Tipo",
-      status: "Estado",
+      id: 'ID',
+      name: 'Nome',
+      email: 'Email',
+      actorType: 'Tipo',
+      status: 'Estado'
     }[columnId] || columnId
-  );
+  )
 }
 
 function renderSortableHeader(column: Column<User, unknown>, label: string) {
-  const isSorted = column.getIsSorted();
+  const isSorted = column.getIsSorted()
 
   return h(UButton, {
-    color: "neutral",
-    variant: "ghost",
+    color: 'neutral',
+    variant: 'ghost',
     label,
     icon: isSorted
-      ? isSorted === "asc"
-        ? "i-lucide-arrow-up-narrow-wide"
-        : "i-lucide-arrow-down-wide-narrow"
-      : "i-lucide-arrow-up-down",
-    class: "-mx-2.5",
-    onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-  });
+      ? isSorted === 'asc'
+        ? 'i-lucide-arrow-up-narrow-wide'
+        : 'i-lucide-arrow-down-wide-narrow'
+      : 'i-lucide-arrow-up-down',
+    class: '-mx-2.5',
+    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+  })
 }
 
 const hideableColumns = computed<HideableColumnItem[]>(() => {
@@ -68,166 +68,166 @@ const hideableColumns = computed<HideableColumnItem[]>(() => {
     .filter((column: Column<User, unknown>) => column.getCanHide())
     .map((column: Column<User, unknown>) => ({
       label: getColumnLabel(column.id),
-      type: "checkbox" as const,
+      type: 'checkbox' as const,
       checked: column.getIsVisible(),
       onUpdateChecked(checked: boolean) {
         table.value?.tableApi
           ?.getColumn(column.id)
-          ?.toggleVisibility(!!checked);
+          ?.toggleVisibility(!!checked)
       },
       onSelect(e?: Event) {
-        e?.preventDefault();
-      },
-    }));
-});
+        e?.preventDefault()
+      }
+    }))
+})
 
 function getRowItems(row: Row<User>) {
   return [
     {
-      type: "label",
-      label: "Ações",
+      type: 'label',
+      label: 'Ações'
     },
     {
-      label: "Copiar ID do utilizador",
-      icon: "i-lucide-copy",
+      label: 'Copiar ID do utilizador',
+      icon: 'i-lucide-copy',
       onSelect() {
-        navigator.clipboard.writeText(row.original.id.toString());
+        navigator.clipboard.writeText(row.original.id.toString())
         toast.add({
-          title: "Copiado para a área de transferência",
-          description: "O ID do utilizador foi copiado.",
-        });
-      },
+          title: 'Copiado para a área de transferência',
+          description: 'O ID do utilizador foi copiado.'
+        })
+      }
     },
     {
-      type: "separator",
+      type: 'separator'
     },
     {
-      label: "Ver detalhes do utilizador",
-      icon: "i-lucide-list",
+      label: 'Ver detalhes do utilizador',
+      icon: 'i-lucide-list'
     },
     {
-      label: "Eliminar utilizador",
-      icon: "i-lucide-trash",
-      color: "error",
+      label: 'Eliminar utilizador',
+      icon: 'i-lucide-trash',
+      color: 'error',
       onSelect() {
         toast.add({
-          title: "Utilizador eliminado",
-          description: "O utilizador foi eliminado.",
-        });
-      },
-    },
-  ];
+          title: 'Utilizador eliminado',
+          description: 'O utilizador foi eliminado.'
+        })
+      }
+    }
+  ]
 }
 
 const columns: TableColumn<User>[] = [
   {
-    id: "select",
+    id: 'select',
     header: ({ table }) =>
       h(UCheckbox, {
-        modelValue: table.getIsSomePageRowsSelected()
-          ? "indeterminate"
+        'modelValue': table.getIsSomePageRowsSelected()
+          ? 'indeterminate'
           : table.getIsAllPageRowsSelected(),
-        "onUpdate:modelValue": (value: boolean | "indeterminate") =>
+        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
           table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: "Selecionar tudo",
+        'ariaLabel': 'Selecionar tudo'
       }),
     cell: ({ row }) =>
       h(UCheckbox, {
-        modelValue: row.getIsSelected(),
-        "onUpdate:modelValue": (value: boolean | "indeterminate") =>
+        'modelValue': row.getIsSelected(),
+        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
           row.toggleSelected(!!value),
-        ariaLabel: "Selecionar linha",
-      }),
+        'ariaLabel': 'Selecionar linha'
+      })
   },
   {
-    accessorKey: "id",
-    header: ({ column }) => renderSortableHeader(column, "ID"),
+    accessorKey: 'id',
+    header: ({ column }) => renderSortableHeader(column, 'ID')
   },
   {
-    accessorKey: "name",
-    header: ({ column }) => renderSortableHeader(column, "Nome"),
+    accessorKey: 'name',
+    header: ({ column }) => renderSortableHeader(column, 'Nome'),
     cell: ({ row }) => {
-      return h("div", { class: "flex items-center gap-3" }, [
+      return h('div', { class: 'flex items-center gap-3' }, [
         h(UAvatar, {
           ...row.original.avatar,
-          size: "lg",
+          size: 'lg'
         }),
-        h("div", undefined, [
-          h("p", { class: "font-medium text-highlighted" }, row.original.name),
-          h("p", { class: "" }, `@${row.original.name}`),
-        ]),
-      ]);
-    },
+        h('div', undefined, [
+          h('p', { class: 'font-medium text-highlighted' }, row.original.name),
+          h('p', { class: '' }, `@${row.original.name}`)
+        ])
+      ])
+    }
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => renderSortableHeader(column, "Email"),
+    accessorKey: 'email',
+    header: ({ column }) => renderSortableHeader(column, 'Email')
   },
   {
-    accessorKey: "actorType",
-    header: ({ column }) => renderSortableHeader(column, "Tipo"),
+    accessorKey: 'actorType',
+    header: ({ column }) => renderSortableHeader(column, 'Tipo'),
     cell: ({ row }) =>
       h(
         UBadge,
-        { variant: "subtle", color: "neutral" },
-        () => row.original.actorType,
-      ),
+        { variant: 'subtle', color: 'neutral' },
+        () => row.original.actorType
+      )
   },
   {
-    accessorKey: "status",
-    header: ({ column }) => renderSortableHeader(column, "Estado"),
-    filterFn: "equals",
+    accessorKey: 'status',
+    header: ({ column }) => renderSortableHeader(column, 'Estado'),
+    filterFn: 'equals',
     cell: ({ row }) => {
       const color = {
-        subscribed: "success" as const,
-        unsubscribed: "error" as const,
-        bounced: "warning" as const,
-      }[row.original.status];
+        subscribed: 'success' as const,
+        unsubscribed: 'error' as const,
+        bounced: 'warning' as const
+      }[row.original.status]
 
       const statusLabel = {
-        subscribed: "Ativo",
-        unsubscribed: "Inativo",
-        bounced: "Devolvido",
-      }[row.original.status];
+        subscribed: 'Ativo',
+        unsubscribed: 'Inativo',
+        bounced: 'Devolvido'
+      }[row.original.status]
 
       return h(
         UBadge,
-        { class: "capitalize", variant: "subtle", color },
-        () => statusLabel,
-      );
-    },
+        { class: 'capitalize', variant: 'subtle', color },
+        () => statusLabel
+      )
+    }
   },
   {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => {
       return h(
-        "div",
-        { class: "text-right" },
+        'div',
+        { class: 'text-right' },
         h(
           UDropdownMenu,
           {
             content: {
-              align: "end",
+              align: 'end'
             },
-            items: getRowItems(row),
+            items: getRowItems(row)
           },
           () =>
             h(UButton, {
-              icon: "i-lucide-ellipsis-vertical",
-              color: "neutral",
-              variant: "ghost",
-              class: "ml-auto",
-            }),
-        ),
-      );
-    },
-  },
-];
+              icon: 'i-lucide-ellipsis-vertical',
+              color: 'neutral',
+              variant: 'ghost',
+              class: 'ml-auto'
+            })
+        )
+      )
+    }
+  }
+]
 
 const pagination = ref({
   pageIndex: 0,
-  pageSize: 10,
-});
+  pageSize: 10
+})
 </script>
 
 <template>
@@ -293,7 +293,7 @@ const pagination = ref({
         v-model:sorting="sorting"
         v-model:pagination="pagination"
         :pagination-options="{
-          getPaginationRowModel: getPaginationRowModel(),
+          getPaginationRowModel: getPaginationRowModel()
         }"
         class="shrink-0"
         :data="data"
@@ -305,7 +305,7 @@ const pagination = ref({
           tbody: '[&>tr]:last:[&>td]:border-b-0',
           th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
           td: 'border-b border-default',
-          separator: 'h-0',
+          separator: 'h-0'
         }"
       />
 
