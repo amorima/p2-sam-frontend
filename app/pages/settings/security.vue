@@ -63,7 +63,7 @@ const validate = (state: Partial<PasswordSchema>): FormError[] => {
   <UPageCard
     title="Conta"
     description="Já não queres usar o nosso serviço? Podes eliminar a tua conta aqui. Esta ação não pode ser revertida. Todas as informações associadas a esta conta serão eliminadas permanentemente."
-    class="bg-gradient-to-tl from-error/10 from-5% to-default"
+    class="bg-linear-to-tl from-error/10 from-5% to-default"
   >
     <template #footer>
       <UButton label="Eliminar conta" color="error" />
