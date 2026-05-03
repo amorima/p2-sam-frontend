@@ -3,7 +3,7 @@ import { sub } from 'date-fns'
 const mails = [{
   id: 1,
   from: {
-    name: 'Alex Smith',
+    name: 'António Amorim',
     email: 'alex.smith@example.com',
     avatar: {
       src: 'https://i.pravatar.cc/128?u=1'
