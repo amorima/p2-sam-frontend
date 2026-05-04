@@ -8,7 +8,7 @@ jobs:
     steps:
     - name: atualizar código
       run: |
-        cd ~/p2-sam-backend
+        cd ~/p2-sam-frontend
         git pull origin main
         npm install
-        pm2 restart backend
+        pm2 restart frontend
