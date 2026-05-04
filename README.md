@@ -17,7 +17,7 @@ Get started with the Nuxt dashboard template with multiple pages, collapsible si
 
 > The dashboard template for Vue is on https://github.com/nuxt-ui-templates/dashboard-vue.
 
-## Quick Start
+## Quick Start!
 
 ```bash [Terminal]
 npm create nuxt@latest -- -t ui/dashboard
