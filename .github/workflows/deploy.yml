@@ -6,15 +6,9 @@ jobs:
   deploy:
     runs-on: [self-hosted, frontend]
     steps:
-    - name: aceder e atualizar
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd ~/p2-sam-frontend
-          git pull origin main
-          npm install
-          npm run build
-          pm2 restart frontend
+    - name: atualizar código
+      run: |
+        cd ~/p2-sam-backend
+        git pull origin main
+        npm install
+        pm2 restart backend
