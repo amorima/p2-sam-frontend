@@ -1,49 +1,108 @@
 <script setup lang="ts">
-import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
+import * as z from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui";
 
-const fileRef = ref<HTMLInputElement>()
+const fileRef = ref<HTMLInputElement>();
+const userProfile = useUserProfile();
 
 const profileSchema = z.object({
-  name: z.string().min(2, 'Demasiado curto'),
-  email: z.string().email('Email inválido'),
-  username: z.string().min(2, 'Demasiado curto'),
+  name: z.string().min(2, "Demasiado curto"),
+  email: z.string().email("Email inválido"),
+  username: z.string().min(2, "Demasiado curto"),
   avatar: z.string().optional(),
-  bio: z.string().optional()
-})
+  bio: z.string().optional(),
+});
 
-type ProfileSchema = z.output<typeof profileSchema>
+type ProfileSchema = z.output<typeof profileSchema>;
 
 const profile = reactive<Partial<ProfileSchema>>({
-  name: 'Benjamin Canac',
-  email: 'ben@nuxtlabs.com',
-  username: 'benjamincanac',
-  avatar: undefined,
-  bio: undefined
-})
-const toast = useToast()
+  name: userProfile.profile.value.name,
+  email: "ben@nuxtlabs.com",
+  username: userProfile.defaultName,
+  avatar: userProfile.profile.value.avatar,
+  bio: undefined,
+});
+
+const toast = useToast();
+
 async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
+  userProfile.profile.value.name =
+    profile.name || userProfile.profile.value.name;
+  userProfile.profile.value.avatar =
+    profile.avatar || userProfile.profile.value.avatar;
+
   toast.add({
-    title: 'Sucesso',
-    description: 'As tuas definições foram atualizadas.',
-    icon: 'i-lucide-check',
-    color: 'success'
-  })
-  console.log(event.data)
+    title: "Sucesso",
+    description: "As tuas definições foram atualizadas.",
+    icon: "i-lucide-check",
+    color: "success",
+  });
+
+  console.log(event.data);
 }
 
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement
+async function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement;
 
   if (!input.files?.length) {
-    return
+    return;
   }
 
-  profile.avatar = URL.createObjectURL(input.files[0]!)
+  const file = input.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  const previewUrl = URL.createObjectURL(file);
+  profile.avatar = previewUrl;
+  userProfile.profile.value.avatar = previewUrl;
+
+  try {
+    const filename = encodeURIComponent(file.name);
+
+    const uploadRes = await fetch(`/api/upload/avatar?nome=${filename}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": file.type || "application/octet-stream",
+      },
+      body: file,
+    });
+
+    if (!uploadRes.ok) {
+      const text = await uploadRes.text();
+      throw new Error(text || uploadRes.statusText);
+    }
+
+    const uploadData: { url?: string } = await uploadRes.json();
+
+    if (!uploadData.url) {
+      throw new Error("Nenhuma URL retornada pelo servidor");
+    }
+
+    profile.avatar = uploadData.url;
+    userProfile.profile.value.avatar = uploadData.url;
+
+    toast.add({
+      title: "Sucesso",
+      description: "Avatar carregado com sucesso.",
+      icon: "i-lucide-check",
+      color: "success",
+    });
+  } catch (err) {
+    console.error("Upload failed", err);
+
+    toast.add({
+      title: "Erro",
+      description: "Não foi possível carregar a imagem.",
+      icon: "i-lucide-x",
+      color: "error",
+    });
+  }
 }
 
 function onFileClick() {
-  fileRef.value?.click()
+  fileRef.value?.click();
 }
 </script>
 
@@ -116,7 +175,7 @@ function onFileClick() {
             class="hidden"
             accept=".jpg, .jpeg, .png, .gif"
             @change="onFileChange"
-          >
+          />
         </div>
       </UFormField>
       <USeparator />
@@ -127,12 +186,7 @@ function onFileClick() {
         class="flex max-sm:flex-col justify-between items-start gap-4"
         :ui="{ container: 'w-full' }"
       >
-        <UTextarea
-          v-model="profile.bio"
-          :rows="5"
-          autoresize
-          class="w-full"
-        />
+        <UTextarea v-model="profile.bio" :rows="5" autoresize class="w-full" />
       </UFormField>
     </UPageCard>
   </UForm>
