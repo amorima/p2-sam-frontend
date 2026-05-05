@@ -8,9 +8,9 @@ jobs:
     steps:
       - name: atualizar código
         run: |
-          cd /home/antonio/p2-sam-frontend
+          cd ~/p2-sam-frontend
           git pull origin main
-          npm install
+          pnpm install
           export NODE_OPTIONS="--max-old-space-size=4096"
-          npm run build
+          pnpm build
           pm2 restart frontend
