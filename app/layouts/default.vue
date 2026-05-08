@@ -117,13 +117,27 @@ const groups = computed(() => [
   },
   {
     id: 'code',
-    label: 'Código',
+    label: 'Repositórios',
     items: [
       {
-        id: 'source',
-        label: 'Ver o código da página',
+        id: 'frontend',
+        label: 'Ver código front-end',
         icon: 'i-simple-icons-github',
-        to: `https://github.com/nuxt-ui-templates/dashboard/blob/main/app/pages${route.path === '/' ? '/index' : route.path}.vue`,
+        to: 'https://github.com/amorima/p2-sam-frontend',
+        target: '_blank'
+      },
+      {
+        id: 'backend',
+        label: 'Ver código back-end',
+        icon: 'i-simple-icons-github',
+        to: 'https://github.com/amorima/p2-sam-backend',
+        target: '_blank'
+      },
+      {
+        id: 'data-generator',
+        label: 'Ver código de geração de dados',
+        icon: 'i-simple-icons-github',
+        to: 'https://github.com/amorima/p2-SAM-data-generator',
         target: '_blank'
       }
     ]
@@ -177,7 +191,7 @@ onMounted(async () => {
       <template #default="{ collapsed }">
         <UDashboardSearchButton
           :collapsed="collapsed"
-          placeholder="Pesquisar"
+          label="Pesquisar..."
           class="bg-transparent ring-default"
         />
 
@@ -195,7 +209,7 @@ onMounted(async () => {
       </template>
     </UDashboardSidebar>
 
-    <UDashboardSearch :groups="groups" />
+    <UDashboardSearch :groups="groups" placeholder="Escreva um comando ou pesquise" />
 
     <slot />
 
