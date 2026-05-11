@@ -311,7 +311,7 @@ onBeforeUnmount(() => {
           </template>
           <div class="panel-card-body">
             <iframe
-              src="https://www.openstreetmap.org/export/embed.html?bbox=8.65,41.25,8.85,41.40&layer=mapnik&marker=41.3304,8.7447"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-8.85,41.25,-8.65,41.40&layer=mapnik&marker=41.3304,-8.7447"
               class="panel-map-frame"
               style="border: 0"
               allowfullscreen=""
@@ -849,6 +849,10 @@ onBeforeUnmount(() => {
 /* THANKS MODAL */
 .thanks-modal {
   background: white;
+}
+
+:deep(.u-modal[open="false"]) {
+  display: none;
 }
 
 .thanks-header {
