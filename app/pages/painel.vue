@@ -389,7 +389,7 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- SUCCESS MODAL -->
-    <UModal v-model="thanksOpen" :ui="{ width: 'w-full sm:max-w-md' }">
+    <UModal v-if="thanksOpen" v-model="thanksOpen" :ui="{ width: 'w-full sm:max-w-md' }">
       <UCard class="thanks-modal">
         <template #header>
           <div class="thanks-header">
@@ -849,10 +849,6 @@ onBeforeUnmount(() => {
 /* THANKS MODAL */
 .thanks-modal {
   background: white;
-}
-
-:deep(.u-modal[open="false"]) {
-  display: none;
 }
 
 .thanks-header {
