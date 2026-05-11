@@ -41,10 +41,43 @@ let resetTimerId: NodeJS.Timeout | null = null;
 // Bens disponíveis
 const goods: Good[] = [
   { id: "food", name: "Alimentos", emoji: "🍽️" },
+  { id: "rice", name: "Arroz", emoji: "🍚" },
+  { id: "bread", name: "Pão", emoji: "🍞" },
+  { id: "milk", name: "Leite", emoji: "🥛" },
+  { id: "eggs", name: "Ovos", emoji: "🥚" },
+  { id: "pasta", name: "Massa", emoji: "🍝" },
+  { id: "beans", name: "Feijão", emoji: "🫘" },
+  { id: "oil", name: "Óleo", emoji: "🫒" },
   { id: "clothes", name: "Roupas", emoji: "👕" },
+  { id: "shirts", name: "Camisas", emoji: "👔" },
+  { id: "pants", name: "Calças", emoji: "👖" },
+  { id: "shoes", name: "Sapatos", emoji: "👟" },
+  { id: "jackets", name: "Jaquetas", emoji: "🧥" },
+  { id: "socks", name: "Meias", emoji: "🧦" },
+  { id: "underwear", name: "Roupa Interior", emoji: "🩲" },
+  { id: "hats", name: "Chapéus", emoji: "🧢" },
   { id: "hygiene", name: "Higiene", emoji: "🧼" },
+  { id: "soap", name: "Sabonete", emoji: "🧴" },
+  { id: "toothbrush", name: "Escova Dentes", emoji: "🪥" },
+  { id: "toothpaste", name: "Pasta Dentes", emoji: "😁" },
+  { id: "shampoo", name: "Champô", emoji: "💆" },
+  { id: "deodorant", name: "Desodorizante", emoji: "💨" },
+  { id: "tissues", name: "Lenços", emoji: "🧻" },
   { id: "school", name: "Escolar", emoji: "📚" },
+  { id: "notebooks", name: "Cadernos", emoji: "📓" },
+  { id: "pens", name: "Canetas", emoji: "🖊️" },
+  { id: "pencils", name: "Lápis", emoji: "✏️" },
+  { id: "backpack", name: "Mochila", emoji: "🎒" },
+  { id: "books", name: "Livros", emoji: "📖" },
+  { id: "markers", name: "Marcadores", emoji: "🖍️" },
   { id: "blankets", name: "Cobertores", emoji: "🛏️" },
+  { id: "pillows", name: "Almofadas", emoji: "🛌" },
+  { id: "sheets", name: "Lençóis", emoji: "🧺" },
+  { id: "mattress", name: "Colchão", emoji: "🛏️" },
+  { id: "towels", name: "Toalhas", emoji: "🛁" },
+  { id: "medical", name: "Medicamentos", emoji: "💊" },
+  { id: "bandages", name: "Pensos", emoji: "🩹" },
+  { id: "vitamins", name: "Vitaminas", emoji: "💉" },
 ];
 
 // Computadas
@@ -330,8 +363,6 @@ onBeforeUnmount(() => {
       </button>
 
       <div class="donate-container">
-        <img src="/logo_big.svg" alt="Vila do Conde" class="donate-logo" />
-
         <h1 class="donate-screen-title">Fazer uma Doação</h1>
         <p class="donate-screen-subtitle">
           Selecione o tipo de bem que deseja doar e preencha os seus dados.
@@ -705,13 +736,6 @@ onBeforeUnmount(() => {
   padding-top: 60px;
 }
 
-.donate-logo {
-  width: 80px;
-  height: auto;
-  margin: 0 auto 20px;
-  display: block;
-  object-fit: contain;
-}
 
 .donate-screen-title {
   font-size: 24px;
@@ -744,10 +768,10 @@ onBeforeUnmount(() => {
 .donate-goods-slider {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 280px;
+  gap: 12px;
+  max-height: 500px;
   overflow-y: auto;
-  padding: 8px;
+  padding: 12px;
   background: #f8fafc;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
@@ -755,20 +779,21 @@ onBeforeUnmount(() => {
 
 .donate-good-item {
   flex: 0 0 auto;
-  width: calc(100% - 16px);
-  min-height: 60px;
-  padding: 12px 16px;
+  width: 100%;
+  min-height: 70px;
+  padding: 16px;
   background: white;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   font-size: 16px;
   color: #0f172a;
   font-weight: 500;
   transition: all 0.2s ease;
+  text-align: left;
 }
 
 .donate-good-item:hover {
@@ -784,11 +809,12 @@ onBeforeUnmount(() => {
 }
 
 .good-emoji {
-  font-size: 24px;
+  font-size: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
+  min-width: 32px;
+  flex-shrink: 0;
 }
 
 .good-name {
