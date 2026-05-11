@@ -738,19 +738,24 @@ onBeforeUnmount(() => {
 
 
 .donate-screen-title {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 32px;
+  font-weight: 800;
   color: #0f172a;
   margin: 0 0 8px 0;
   text-align: center;
+  background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .donate-screen-subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: #64748b;
-  margin: 0 0 24px 0;
+  margin: 0 0 32px 0;
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 .donate-section {
@@ -823,30 +828,37 @@ onBeforeUnmount(() => {
 
 /* FORM STYLING */
 :deep(.u-form-field) {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   color: #0f172a;
 }
 
 :deep(.u-form-field label) {
   color: #0f172a;
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+:deep(.u-form-field label span) {
+  color: #dc2626;
 }
 
 :deep(.u-input) {
   background: #ffffff !important;
   color: #0f172a !important;
   border: 2px solid #e2e8f0 !important;
-  border-radius: 8px !important;
+  border-radius: 12px !important;
   font-size: 16px !important;
-  padding: 12px 16px !important;
+  padding: 14px 18px !important;
   transition: all 0.2s ease !important;
+  min-height: 48px !important;
 }
 
 :deep(.u-input:focus) {
   border-color: #2563eb !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+  background: #f0f9ff !important;
 }
 
 :deep(.u-input::placeholder) {
@@ -854,22 +866,35 @@ onBeforeUnmount(() => {
 }
 
 :deep(.u-button) {
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 15px;
 }
 
 :deep(.u-button:not(:disabled)) {
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
 }
 
 :deep(.u-button:not(:disabled):hover) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+}
+
+:deep(.u-button:disabled) {
+  background: #e2e8f0 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed;
 }
 
 .donate-submit-btn {
-  margin-top: 8px !important;
+  margin-top: 12px !important;
+  min-height: 52px !important;
+}
 }
 
 /* THANKS MODAL */
