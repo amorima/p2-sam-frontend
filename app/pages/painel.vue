@@ -895,7 +895,6 @@ onBeforeUnmount(() => {
   margin-top: 12px !important;
   min-height: 52px !important;
 }
-}
 
 /* THANKS MODAL */
 .thanks-modal {
