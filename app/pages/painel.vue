@@ -275,23 +275,29 @@ onBeforeUnmount(() => {
             <span>Meteorologia</span>
           </div>
           <div class="weather-body">
-            <UIcon :name="weatherIcon" class="weather-main-icon" />
-            <div class="weather-temp-block">
+            <div class="weather-hero">
+              <UIcon :name="weatherIcon" class="weather-main-icon" />
               <div class="weather-temp">
                 {{ weatherData.temp }}°
               </div>
-              <div class="weather-unit">
-                C
-              </div>
             </div>
-            <div class="weather-info">
-              <div class="weather-desc">
-                {{ weatherData.description }}
-              </div>
-              <div class="weather-details">
-                <span class="weather-pill">💧 {{ weatherData.humidity }}%</span>
-                <span class="weather-pill">💨 {{ weatherData.windSpeed }} km/h</span>
-              </div>
+            <div class="weather-desc">
+              {{ weatherData.description }}
+            </div>
+            <div class="weather-details">
+              <span class="weather-pill">
+                <span class="weather-pill-icon">💧</span>
+                <span class="weather-pill-val">{{ weatherData.humidity }}%</span>
+                <span class="weather-pill-label">Humidade</span>
+              </span>
+              <span class="weather-pill">
+                <span class="weather-pill-icon">💨</span>
+                <span class="weather-pill-val">{{ weatherData.windSpeed }}</span>
+                <span class="weather-pill-label">km/h</span>
+              </span>
+            </div>
+            <div class="weather-unit-label">
+              Temperatura em graus Celsius · Vila do Conde
             </div>
           </div>
         </div>
@@ -865,63 +871,85 @@ onBeforeUnmount(() => {
 /* ── WEATHER CARD ── */
 .weather-body {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
+  gap: 0;
+  padding: 24px 20px 20px;
+  text-align: center;
+}
+
+.weather-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .weather-main-icon {
-  font-size: 56px;
+  font-size: 80px;
   color: #fbbf24;
-  filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.4));
+  filter: drop-shadow(0 0 24px rgba(251, 191, 36, 0.55));
   flex-shrink: 0;
 }
 
-.weather-temp-block {
-  display: flex;
-  align-items: flex-start;
+.weather-temp {
+  font-size: 96px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -4px;
   line-height: 1;
 }
 
-.weather-temp {
-  font-size: 64px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -2px;
-}
-
-.weather-unit {
-  font-size: 24px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.5);
-  margin-top: 10px;
-}
-
-.weather-info {
-  flex: 1;
-}
-
 .weather-desc {
-  font-size: 16px;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 10px;
+  font-size: 17px;
+  color: rgba(255,255,255,0.75);
   font-weight: 500;
+  margin-bottom: 16px;
+  text-transform: capitalize;
 }
 
 .weather-details {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .weather-pill {
-  display: inline-block;
-  background: rgba(255,255,255,0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 20px;
-  padding: 4px 12px;
+  border-radius: 14px;
+  padding: 8px 14px;
   font-size: 13px;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.85);
+}
+
+.weather-pill-icon { font-size: 15px; }
+
+.weather-pill-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-pill-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.weather-unit-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.28);
+  text-transform: uppercase;
+  letter-spacing: 1px;
   font-weight: 500;
 }
 
@@ -1299,7 +1327,8 @@ onBeforeUnmount(() => {
   .panel-title { font-size: 26px; }
   .clock-time { font-size: 32px; }
   .hero-title { font-size: 30px; }
-  .weather-temp { font-size: 72px; }
+  .weather-temp { font-size: 108px; }
+  .weather-main-icon { font-size: 88px; }
 }
 
 @media (min-width: 640px) {
