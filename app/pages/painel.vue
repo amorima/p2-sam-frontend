@@ -150,7 +150,7 @@ const fetchWeather = async () => {
     } else {
       weatherData.value = { temp: 18, description: 'Parcialmente nublado', humidity: 65, windSpeed: 12, icon: '02d' }
     }
-  } catch (_error) {
+  } catch {
     weatherData.value = { temp: 18, description: 'Parcialmente nublado', humidity: 65, windSpeed: 12, icon: '02d' }
   }
 }
@@ -334,6 +334,161 @@ onBeforeUnmount(() => {
             <p class="news-text">
               Últimas novidades da comunidade local e iniciativas comunitárias.
             </p>
+          </div>
+        </div>
+
+        <!-- TRANSPORT CARD -->
+        <div class="glass-card transport-card">
+          <div class="glass-card-header">
+            <UIcon name="i-fa6-solid-bus" class="glass-icon" />
+            <span>Transportes</span>
+          </div>
+          <div class="transport-body">
+            <div class="transport-row">
+              <div class="transport-line">
+                <span class="transport-badge">L1</span>
+                <span class="transport-name">Porto – Vila do Conde</span>
+              </div>
+              <span class="transport-time">08:42</span>
+            </div>
+            <div class="transport-row">
+              <div class="transport-line">
+                <span class="transport-badge">L2</span>
+                <span class="transport-name">Póvoa de Varzim</span>
+              </div>
+              <span class="transport-time">09:15</span>
+            </div>
+            <div class="transport-row">
+              <div class="transport-line">
+                <span class="transport-badge transport-badge--green">M</span>
+                <span class="transport-name">Metro – Linha Vermelha</span>
+              </div>
+              <span class="transport-time">09:28</span>
+            </div>
+            <div class="transport-row">
+              <div class="transport-line">
+                <span class="transport-badge">L1</span>
+                <span class="transport-name">Porto – Vila do Conde</span>
+              </div>
+              <span class="transport-time transport-time--next">10:10</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTACTS CARD -->
+        <div class="glass-card contacts-card">
+          <div class="glass-card-header">
+            <UIcon name="i-fa6-solid-phone" class="glass-icon" />
+            <span>Contactos Úteis</span>
+          </div>
+          <div class="contacts-body">
+            <div class="contact-row">
+              <div class="contact-icon contact-icon--red">
+                <UIcon name="i-fa6-solid-triangle-exclamation" />
+              </div>
+              <div class="contact-info">
+                <div class="contact-label">
+                  Emergência
+                </div>
+                <div class="contact-number">
+                  112
+                </div>
+              </div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-icon contact-icon--blue">
+                <UIcon name="i-fa6-solid-shield-halved" />
+              </div>
+              <div class="contact-info">
+                <div class="contact-label">
+                  PSP Vila do Conde
+                </div>
+                <div class="contact-number">
+                  252 248 290
+                </div>
+              </div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-icon contact-icon--green">
+                <UIcon name="i-fa6-solid-hospital" />
+              </div>
+              <div class="contact-info">
+                <div class="contact-label">
+                  Centro de Saúde
+                </div>
+                <div class="contact-number">
+                  252 240 900
+                </div>
+              </div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-icon contact-icon--orange">
+                <UIcon name="i-fa6-solid-building-columns" />
+              </div>
+              <div class="contact-info">
+                <div class="contact-label">
+                  Câmara Municipal
+                </div>
+                <div class="contact-number">
+                  252 248 400
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EVENTS CARD -->
+        <div class="glass-card events-card">
+          <div class="glass-card-header">
+            <UIcon name="i-fa6-solid-calendar-days" class="glass-icon" />
+            <span>Agenda</span>
+          </div>
+          <div class="events-body">
+            <div class="event-row">
+              <div class="event-date-block">
+                <span class="event-day">14</span>
+                <span class="event-month">Mai</span>
+              </div>
+              <div class="event-detail">
+                <div class="event-title">
+                  Feira Semanal do Mercado
+                </div>
+                <div class="event-meta">
+                  <UIcon name="i-fa6-solid-clock" />
+                  <span>09:00 – 14:00 · Praça do Município</span>
+                </div>
+              </div>
+            </div>
+            <div class="event-row">
+              <div class="event-date-block">
+                <span class="event-day">17</span>
+                <span class="event-month">Mai</span>
+              </div>
+              <div class="event-detail">
+                <div class="event-title">
+                  Concerto no Auditório Municipal
+                </div>
+                <div class="event-meta">
+                  <UIcon name="i-fa6-solid-clock" />
+                  <span>21:30 · Auditório Municipal</span>
+                </div>
+              </div>
+            </div>
+            <div class="event-row">
+              <div class="event-date-block">
+                <span class="event-day">24</span>
+                <span class="event-month">Mai</span>
+              </div>
+              <div class="event-detail">
+                <div class="event-title">
+                  Dia do Município – Festas
+                </div>
+                <div class="event-meta">
+                  <UIcon name="i-fa6-solid-clock" />
+                  <span>Todo o dia · Centro Histórico</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1173,6 +1328,210 @@ onBeforeUnmount(() => {
   .map-frame { height: 440px; }
   .donate-goods-grid { max-height: 440px; }
   .news-image { height: 200px; }
+}
+
+/* ── TRANSPORT CARD ── */
+.transport-body {
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.transport-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.18s ease;
+}
+
+.transport-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.transport-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.transport-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 22px;
+  padding: 0 6px;
+  background: rgba(96, 165, 250, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #93c5fd;
+  letter-spacing: 0.5px;
+}
+
+.transport-badge--green {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #6ee7b7;
+}
+
+.transport-name {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 500;
+}
+
+.transport-time {
+  font-size: 15px;
+  font-weight: 700;
+  color: #60a5fa;
+  font-variant-numeric: tabular-nums;
+}
+
+.transport-time--next {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── CONTACTS CARD ── */
+.contacts-body {
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.contact-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.contact-icon--red    { background: rgba(239, 68, 68, 0.15);  color: #f87171; }
+.contact-icon--blue   { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+.contact-icon--green  { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.contact-icon--orange { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
+
+.contact-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  font-weight: 600;
+}
+
+.contact-number {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── EVENTS CARD ── */
+.events-body {
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.18s ease;
+}
+
+.event-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.event-date-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  flex-shrink: 0;
+  background: rgba(96, 165, 250, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 10px;
+  padding: 6px 4px;
+}
+
+.event-day {
+  font-size: 20px;
+  font-weight: 800;
+  color: #60a5fa;
+  line-height: 1;
+}
+
+.event-month {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(96, 165, 250, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.event-detail {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.event-meta :deep(svg) { font-size: 11px; flex-shrink: 0; }
+
+/* responsive span adjustments for new cards */
+@media (min-width: 640px) {
+  .contacts-card { grid-column: span 1; }
+}
+
+@media (min-width: 1024px) {
+  .transport-card,
+  .contacts-card,
+  .events-card { grid-column: span 1; }
 }
 
 /* ── UCard overrides ── */
