@@ -5,7 +5,6 @@ definePageMeta({
   layout: false
 })
 
-// Tipos
 interface WeatherData {
   temp: number
   description: string
@@ -20,7 +19,6 @@ interface Good {
   emoji: string
 }
 
-// Estado
 const screen = ref<'panel' | 'donate'>('panel')
 const selectedGoodId = ref('')
 const donorName = ref('')
@@ -34,11 +32,13 @@ const weatherData = ref<WeatherData>({
   icon: '02d'
 })
 const thanksOpen = ref(false)
+const currentTime = ref('')
+const currentDate = ref('')
 
-let modalTimerId: NodeJS.Timeout | null = null
-let resetTimerId: NodeJS.Timeout | null = null
+let modalTimerId: ReturnType<typeof setTimeout> | null = null
+let resetTimerId: ReturnType<typeof setTimeout> | null = null
+let clockInterval: ReturnType<typeof setInterval> | null = null
 
-// Bens disponíveis
 const goods: Good[] = [
   { id: 'food', name: 'Alimentos', emoji: '🍽️' },
   { id: 'rice', name: 'Arroz', emoji: '🍚' },
@@ -80,7 +80,6 @@ const goods: Good[] = [
   { id: 'vitamins', name: 'Vitaminas', emoji: '💉' }
 ]
 
-// Computadas
 const emailIsValid = computed(() =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorEmail.value.trim())
 )
@@ -117,7 +116,20 @@ const weatherIcon = computed(() => {
   return iconMap[weatherData.value.icon] || 'i-fa6-solid-cloud-sun'
 })
 
-// Métodos
+const updateClock = () => {
+  const now = new Date()
+  currentTime.value = now.toLocaleTimeString('pt-PT', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
+  currentDate.value = now.toLocaleDateString('pt-PT', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  })
+}
+
 const fetchWeather = async () => {
   try {
     const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY
@@ -136,57 +148,35 @@ const fetchWeather = async () => {
         }
       }
     } else {
-      // Fallback quando API retorna erro (401, 429, etc)
-      weatherData.value = {
-        temp: 18,
-        description: 'Parcialmente nublado',
-        humidity: 65,
-        windSpeed: 12,
-        icon: '02d'
-      }
+      weatherData.value = { temp: 18, description: 'Parcialmente nublado', humidity: 65, windSpeed: 12, icon: '02d' }
     }
   } catch (_error) {
-    // Fallback em qualquer erro de rede
-    weatherData.value = {
-      temp: 18,
-      description: 'Parcialmente nublado',
-      humidity: 65,
-      windSpeed: 12,
-      icon: '02d'
-    }
+    weatherData.value = { temp: 18, description: 'Parcialmente nublado', humidity: 65, windSpeed: 12, icon: '02d' }
   }
 }
 
-const generatePin = (): string => {
-  return Math.floor(100000 + Math.random() * 900000).toString()
-}
+const generatePin = (): string => Math.floor(100000 + Math.random() * 900000).toString()
 
 const goToDonate = () => {
   screen.value = 'donate'
 }
-
 const goBack = () => {
   screen.value = 'panel'
   resetDonation()
 }
-
 const toggleGood = (goodId: string) => {
   selectedGoodId.value = selectedGoodId.value === goodId ? '' : goodId
 }
 
 const submitDonation = () => {
   if (!isDonateEnabled.value) return
-
   pin.value = generatePin()
   thanksOpen.value = true
-
   if (modalTimerId) clearTimeout(modalTimerId)
   if (resetTimerId) clearTimeout(resetTimerId)
-
   modalTimerId = setTimeout(() => {
     thanksOpen.value = false
   }, 5000)
-
   resetTimerId = setTimeout(() => {
     resetDonation()
     screen.value = 'panel'
@@ -203,11 +193,13 @@ const resetDonation = () => {
 const clearTimers = () => {
   if (modalTimerId) clearTimeout(modalTimerId)
   if (resetTimerId) clearTimeout(resetTimerId)
+  if (clockInterval) clearInterval(clockInterval)
 }
 
-// Ciclo de vida
 onMounted(() => {
   fetchWeather()
+  updateClock()
+  clockInterval = setInterval(updateClock, 1000)
 })
 
 onBeforeUnmount(() => {
@@ -220,17 +212,11 @@ onBeforeUnmount(() => {
     <!-- HEADER -->
     <header class="panel-header">
       <div class="panel-header-content">
-        <img
-          src="/VCD1.png"
-          alt="Brasão Vila do Conde"
-          class="panel-header-logo"
-        >
-        <img
-          src="/logo_big.svg"
-          alt="Vila do Conde"
-          class="panel-header-brand"
-        >
-        <div class="panel-header-text">
+        <div class="panel-header-brand-group">
+          <img src="/VCD1.png" alt="Brasão Vila do Conde" class="panel-header-logo">
+          <img src="/logo_big.svg" alt="Vila do Conde" class="panel-header-brand">
+        </div>
+        <div class="panel-header-center">
           <div class="panel-kicker">
             Município de Vila do Conde
           </div>
@@ -238,132 +224,134 @@ onBeforeUnmount(() => {
             Painel do Cidadão
           </div>
         </div>
+        <div class="panel-header-clock">
+          <div class="clock-time">
+            {{ currentTime }}
+          </div>
+          <div class="clock-date">
+            {{ currentDate }}
+          </div>
+        </div>
       </div>
     </header>
 
     <!-- MAIN PANEL -->
-    <div v-if="screen === 'panel'" class="panel-wrap">
-      <!-- DOACOES SECTION (ACIMA DO MAPA) -->
-      <div class="panel-donate-card">
-        <div class="donate-card-inner">
-          <div class="donate-card-icon">
+    <div
+      v-if="screen === 'panel'"
+      class="panel-wrap"
+    >
+      <!-- HERO DONATION CARD -->
+      <div class="hero-donate" @click="goToDonate">
+        <div class="hero-donate-glow" />
+        <div class="hero-donate-inner">
+          <div class="hero-icon">
             <UIcon name="i-fa6-solid-hand-holding-heart" />
           </div>
-          <div class="donate-card-content">
-            <h2 class="donate-card-title">
+          <div class="hero-content">
+            <h2 class="hero-title">
               Fazer uma Doação
             </h2>
-            <p class="donate-card-subtitle">
-              Ajude a comunidade local. Doe bens essenciais e receba um código
-              de referência para rastreamento.
+            <p class="hero-subtitle">
+              Ajude a comunidade local. Doe bens essenciais e receba um código de referência para rastreamento.
             </p>
-            <div class="donate-card-cta">
-              <UButton
-                label="Iniciar Doação"
-                color="primary"
-                size="xl"
-                block
-                class="donate-button"
-                @click="goToDonate"
-              />
+          </div>
+          <div class="hero-cta">
+            <div class="hero-btn">
+              <UIcon name="i-fa6-solid-arrow-right" />
             </div>
           </div>
-          <div class="donate-card-decoration">
-            <div class="donate-card-bg-accent" />
-          </div>
+        </div>
+        <div class="hero-label">
+          Toque para começar
         </div>
       </div>
 
       <!-- INFO CARDS GRID -->
       <div class="panel-grid">
-        <!-- INFO -->
-        <UCard class="panel-card">
-          <template #header>
-            <div class="panel-card-header">
-              <UIcon name="i-fa6-solid-circle-info" class="panel-icon" />
-              <span>Informações</span>
-            </div>
-          </template>
-          <div class="panel-card-body">
-            <p>
-              Bem-vindo ao Painel do Cidadão. Aqui encontra informações
-              relevantes sobre a comunidade de Vila do Conde.
-            </p>
-            <p class="mt-3 text-sm text-gray-600">
-              📍 Localização: Vila do Conde, Portugal
-            </p>
-            <p class="mt-2 text-sm text-gray-600">
-              🌍 Latitude: 41.3304°N | Longitude: 8.7447°W
-            </p>
+        <!-- WEATHER CARD -->
+        <div class="glass-card weather-card">
+          <div class="glass-card-header">
+            <UIcon name="i-fa6-solid-cloud-sun" class="glass-icon" />
+            <span>Meteorologia</span>
           </div>
-        </UCard>
-
-        <!-- NEWS -->
-        <UCard class="panel-card">
-          <template #header>
-            <div class="panel-card-header">
-              <UIcon name="i-fa6-solid-newspaper" class="panel-icon" />
-              <span>Notícias</span>
+          <div class="weather-body">
+            <UIcon :name="weatherIcon" class="weather-main-icon" />
+            <div class="weather-temp-block">
+              <div class="weather-temp">
+                {{ weatherData.temp }}°
+              </div>
+              <div class="weather-unit">
+                C
+              </div>
             </div>
-          </template>
-          <div class="panel-card-body">
-            <img
-              src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=400&q=80"
-              alt="Notícia"
-              class="panel-card-image"
-            >
-            <p class="mt-3">
-              Últimas novidades da comunidade local e iniciativas comunitárias.
-            </p>
-          </div>
-        </UCard>
-
-        <!-- WEATHER -->
-        <UCard class="panel-card">
-          <template #header>
-            <div class="panel-card-header">
-              <UIcon name="i-fa6-solid-cloud-sun" class="panel-icon" />
-              <span>Meteorologia</span>
-            </div>
-          </template>
-          <div class="panel-card-body">
-            <div class="weather-content">
-              <UIcon :name="weatherIcon" class="weather-icon" />
-              <div class="weather-data">
-                <div class="weather-temp">
-                  {{ weatherData.temp }}°C
-                </div>
-                <div class="weather-desc">
-                  {{ weatherData.description }}
-                </div>
-                <div class="weather-details">
-                  <span>💧 {{ weatherData.humidity }}%</span>
-                  <span>💨 {{ weatherData.windSpeed }} km/h</span>
-                </div>
+            <div class="weather-info">
+              <div class="weather-desc">
+                {{ weatherData.description }}
+              </div>
+              <div class="weather-details">
+                <span class="weather-pill">💧 {{ weatherData.humidity }}%</span>
+                <span class="weather-pill">💨 {{ weatherData.windSpeed }} km/h</span>
               </div>
             </div>
           </div>
-        </UCard>
+        </div>
 
-        <!-- MAP -->
-        <UCard class="panel-card panel-card-full">
-          <template #header>
-            <div class="panel-card-header">
-              <UIcon name="i-fa6-solid-map-location-dot" class="panel-icon" />
-              <span>Localização</span>
-            </div>
-          </template>
-          <div class="panel-card-body">
-            <iframe
-              src="https://www.openstreetmap.org/export/embed.html?bbox=-8.85,41.25,-8.65,41.40&layer=mapnik&marker=41.3304,-8.7447"
-              class="panel-map-frame"
-              style="border: 0"
-              allowfullscreen=""
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-            />
+        <!-- INFO CARD -->
+        <div class="glass-card info-card">
+          <div class="glass-card-header">
+            <UIcon name="i-fa6-solid-circle-info" class="glass-icon" />
+            <span>Informações</span>
           </div>
-        </UCard>
+          <div class="info-body">
+            <p class="info-text">
+              Bem-vindo ao Painel do Cidadão de Vila do Conde.
+            </p>
+            <div class="info-badges">
+              <div class="info-badge">
+                <UIcon name="i-fa6-solid-location-dot" />
+                <span>Vila do Conde, Portugal</span>
+              </div>
+              <div class="info-badge">
+                <UIcon name="i-fa6-solid-globe" />
+                <span>41.3304°N · 8.7447°W</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEWS CARD -->
+        <div class="glass-card news-card">
+          <div class="glass-card-header">
+            <UIcon name="i-fa6-solid-newspaper" class="glass-icon" />
+            <span>Notícias</span>
+          </div>
+          <div class="news-body">
+            <img
+              src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&q=80"
+              alt="Notícia"
+              class="news-image"
+            >
+            <p class="news-text">
+              Últimas novidades da comunidade local e iniciativas comunitárias.
+            </p>
+          </div>
+        </div>
+
+        <!-- MAP CARD -->
+        <div class="glass-card map-card">
+          <div class="glass-card-header">
+            <UIcon name="i-fa6-solid-map-location-dot" class="glass-icon" />
+            <span>Localização</span>
+          </div>
+          <iframe
+            src="https://www.openstreetmap.org/export/embed.html?bbox=-8.85,41.25,-8.65,41.40&layer=mapnik&marker=41.3304,-8.7447"
+            class="map-frame"
+            style="border: 0"
+            :allowfullscreen="true"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          />
+        </div>
       </div>
     </div>
 
@@ -371,37 +359,48 @@ onBeforeUnmount(() => {
     <div v-else class="donate-screen">
       <button class="donate-back-btn" @click="goBack">
         <UIcon name="i-fa6-solid-arrow-left" />
+        <span>Voltar</span>
       </button>
 
       <div class="donate-container">
-        <h1 class="donate-screen-title">
-          Fazer uma Doação
-        </h1>
-        <p class="donate-screen-subtitle">
-          Selecione o tipo de bem que deseja doar e preencha os seus dados.
-        </p>
-
-        <!-- GOODS SELECTOR -->
-        <div class="donate-section">
-          <div class="donate-section-title">
-            Selecione um bem para doar
+        <div class="donate-header">
+          <div class="donate-header-icon">
+            <UIcon name="i-fa6-solid-hand-holding-heart" />
           </div>
-          <div class="donate-goods-slider">
+          <h1 class="donate-screen-title">
+            Fazer uma Doação
+          </h1>
+          <p class="donate-screen-subtitle">
+            Selecione o tipo de bem e preencha os seus dados.
+          </p>
+        </div>
+
+        <!-- GOODS GRID -->
+        <div class="donate-section">
+          <div class="donate-section-label">
+            <UIcon name="i-fa6-solid-box-open" />
+            Selecione o bem a doar
+          </div>
+          <div class="donate-goods-grid">
             <button
               v-for="good in goods"
               :key="good.id"
-              class="donate-good-item"
+              class="good-chip"
               :class="{ active: selectedGoodId === good.id }"
               @click="toggleGood(good.id)"
             >
-              <span class="good-emoji">{{ good.emoji }}</span>
               <span class="good-name">{{ good.name }}</span>
             </button>
           </div>
         </div>
 
         <!-- DONOR FORM -->
-        <div class="donate-section donate-section-form">
+        <div class="donate-section donate-form-section">
+          <div class="donate-section-label">
+            <UIcon name="i-fa6-solid-user" />
+            Os seus dados
+          </div>
+
           <UFormField label="Nome completo" required>
             <UInput
               v-model="donorName"
@@ -419,826 +418,769 @@ onBeforeUnmount(() => {
             />
           </UFormField>
 
-          <UButton
-            label="Confirmar Doação"
-            color="primary"
-            size="xl"
-            block
-            :disabled="!isDonateEnabled"
+          <button
             class="donate-submit-btn"
+            :disabled="!isDonateEnabled"
             @click="submitDonation"
-          />
+          >
+            Confirmar Doação
+          </button>
         </div>
       </div>
     </div>
 
     <!-- SUCCESS MODAL -->
-    <UModal
-      v-if="thanksOpen"
-      v-model="thanksOpen"
-      :ui="{ width: 'w-full sm:max-w-md' }"
-    >
-      <UCard class="thanks-modal">
-        <template #header>
-          <div class="thanks-header">
-            <UIcon name="i-fa6-solid-circle-check" />
-            Doação Confirmada
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div
+          v-if="thanksOpen"
+          class="modal-overlay"
+          @click="thanksOpen = false"
+        >
+          <div class="thanks-modal" @click.stop>
+            <div class="thanks-check">
+              <UIcon name="i-fa6-solid-circle-check" />
+            </div>
+            <h2 class="thanks-title">
+              Doação Confirmada!
+            </h2>
+            <p class="thanks-label">
+              O seu código de referência
+            </p>
+            <div class="thanks-pin">
+              {{ pin }}
+            </div>
+            <p class="thanks-info">
+              Código enviado para {{ donorEmail }}
+            </p>
+            <p class="thanks-note">
+              Obrigado por ajudar a comunidade de Vila do Conde!
+            </p>
           </div>
-        </template>
-
-        <div class="thanks-content">
-          <p class="thanks-label">
-            O seu código de doação
-          </p>
-          <div class="thanks-pin">
-            {{ pin }}
-          </div>
-
-          <p class="thanks-info">
-            Código enviado para {{ donorEmail }}
-          </p>
-
-          <p class="thanks-note">
-            Obrigado por ajudar a comunidade de Vila do Conde!
-          </p>
         </div>
-      </UCard>
-    </UModal>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <style scoped>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
+/* ── BASE ── */
 .panel-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  background: linear-gradient(160deg, #06091a 0%, #0b1535 40%, #0f2050 70%, #0d1a40 100%);
   display: flex;
   flex-direction: column;
+  color: #fff;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* HEADER */
+/* ── HEADER ── */
 .panel-header {
-  background: linear-gradient(
-    135deg,
-    #0f172a 0%,
-    #1e40af 40%,
-    #3b82f6 70%,
-    #60a5fa 100%
-  );
-  color: white;
-  padding: 16px;
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .panel-header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  max-width: 960px;
+  gap: 16px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
-.panel-header-text {
-  flex: 1;
-  order: -1;
+.panel-header-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .panel-header-logo {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
-  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.4));
 }
 
 .panel-header-brand {
-  width: 64px;
+  width: 56px;
   height: auto;
   object-fit: contain;
-  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.panel-header-center {
+  flex: 1;
+  text-align: center;
 }
 
 .panel-kicker {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
 }
 
 .panel-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin-top: 2px;
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #93c5fd, #ffffff, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.3px;
 }
 
-/* MAIN PANEL */
+.panel-header-clock {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.clock-time {
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #60a5fa;
+  line-height: 1;
+}
+
+.clock-date {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: capitalize;
+  margin-top: 3px;
+}
+
+/* ── MAIN PANEL ── */
 .panel-wrap {
   flex: 1;
-  padding: 16px;
-  max-width: 960px;
+  padding: 20px 16px 32px;
+  max-width: 1100px;
   margin: 0 auto;
   width: 100%;
 }
 
-/* DONATE CARD (MELHORADO SIGNIFICATIVAMENTE) */
-.panel-donate-card {
+/* ── HERO DONATION ── */
+.hero-donate {
+  position: relative;
   margin-bottom: 24px;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
+  box-shadow: 0 20px 60px rgba(37, 99, 235, 0.5), 0 0 0 1px rgba(96, 165, 250, 0.3);
 }
 
-.donate-card-inner {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 50%, #93c5fd 100%);
-  border-radius: 16px;
-  padding: 24px;
+.hero-donate:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 28px 70px rgba(37, 99, 235, 0.6), 0 0 0 1px rgba(96, 165, 250, 0.4);
+}
+
+.hero-donate:active {
+  transform: translateY(0);
+}
+
+.hero-donate-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(255,255,255,0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-donate-inner {
   display: flex;
   align-items: center;
   gap: 20px;
+  padding: 28px 24px 20px;
   position: relative;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
-  border: 2px solid #60a5fa;
 }
 
-.donate-card-decoration {
-  position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 200px;
-  height: 200px;
-  opacity: 0.1;
-}
-
-.donate-card-bg-accent {
-  width: 100%;
-  height: 100%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100 20 L120 80 L180 80 L130 120 L150 180 L100 140 L50 180 L70 120 L20 80 L80 80 Z' fill='%233b82f6'/%3E%3C/svg%3E")
-    no-repeat center;
-  background-size: 100%;
-}
-
-.donate-card-icon {
-  font-size: 56px;
-  color: #2563eb;
+.hero-icon {
+  font-size: 52px;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+  animation: pulse-icon 2.5s ease-in-out infinite;
 }
 
-.donate-card-content {
+@keyframes pulse-icon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
+.hero-content {
   flex: 1;
-  position: relative;
-  z-index: 2;
 }
 
-.donate-card-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1e40af;
-  margin: 0 0 8px 0;
+.hero-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-.donate-card-subtitle {
+.hero-subtitle {
   font-size: 14px;
-  color: #1e3a8a;
-  margin: 0 0 16px 0;
+  color: rgba(255,255,255,0.85);
+  margin: 0;
   line-height: 1.5;
 }
 
-.donate-card-cta {
+.hero-cta {
+  flex-shrink: 0;
+}
+
+.hero-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.4);
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: white;
+  transition: background 0.2s ease;
 }
 
-.donate-button {
-  background: #2563eb !important;
-  color: white !important;
-  font-weight: 600;
-  border: none !important;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-  transition: all 0.3s ease;
+.hero-donate:hover .hero-btn {
+  background: rgba(255,255,255,0.3);
 }
 
-.donate-button:hover {
-  background: #1d4ed8 !important;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+.hero-label {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  padding: 0 24px 16px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 500;
 }
 
-/* GRID */
+/* ── GLASS CARDS ── */
 .panel-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
 }
 
-.panel-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
   overflow: hidden;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.panel-card-full {
-  grid-column: span 1;
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 
-.panel-card-header {
+.glass-card-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #0f172a;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.panel-icon {
-  font-size: 20px;
-  color: #2563eb;
-}
-
-.panel-card-body {
-  padding: 16px;
-  color: #0f172a;
+  gap: 10px;
+  padding: 16px 20px 12px;
   font-size: 14px;
-  line-height: 1.6;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-.panel-card-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 12px;
+.glass-icon {
+  font-size: 18px;
+  color: #60a5fa;
 }
 
-/* WEATHER */
-.weather-content {
+/* ── WEATHER CARD ── */
+.weather-body {
   display: flex;
   align-items: center;
   gap: 16px;
+  padding: 20px;
 }
 
-.weather-icon {
-  font-size: 48px;
-  color: #2563eb;
-  min-width: 48px;
+.weather-main-icon {
+  font-size: 56px;
+  color: #fbbf24;
+  filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.4));
+  flex-shrink: 0;
 }
 
-.weather-data {
-  flex: 1;
-}
-
-.weather-temp {
-  font-size: 32px;
-  font-weight: 700;
-  color: #0f172a;
+.weather-temp-block {
+  display: flex;
+  align-items: flex-start;
   line-height: 1;
 }
 
+.weather-temp {
+  font-size: 64px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -2px;
+}
+
+.weather-unit {
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  margin-top: 10px;
+}
+
+.weather-info {
+  flex: 1;
+}
+
 .weather-desc {
-  font-size: 14px;
-  color: #64748b;
-  margin-top: 4px;
+  font-size: 16px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 10px;
+  font-weight: 500;
 }
 
 .weather-details {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.weather-pill {
+  display: inline-block;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 4px 12px;
   font-size: 13px;
-  color: #64748b;
-  margin-top: 8px;
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
 }
 
-/* MAP */
-.panel-map-frame {
+/* ── INFO CARD ── */
+.info-body {
+  padding: 20px;
+}
+
+.info-text {
+  font-size: 15px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.info-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #93c5fd;
+  font-weight: 500;
+}
+
+.info-badge :deep(svg) { font-size: 16px; flex-shrink: 0; }
+
+/* ── NEWS CARD ── */
+.news-body {
+  padding: 16px 20px 20px;
+}
+
+.news-image {
   width: 100%;
-  height: 360px;
-  border-radius: 8px;
-  border: 2px solid #e2e8f0;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 14px;
 }
 
-/* DONATION SCREEN */
+.news-text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── MAP CARD ── */
+.map-frame {
+  width: 100%;
+  height: 320px;
+  display: block;
+  border: none;
+}
+
+/* ── DONATION SCREEN ── */
 .donate-screen {
   flex: 1;
-  padding: 20px 16px;
+  padding: 16px;
   position: relative;
 }
 
 .donate-back-btn {
-  position: absolute;
-  top: 20px;
-  left: 16px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: white;
-  border: 2px solid #e2e8f0;
-  color: #2563eb;
-  font-size: 20px;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #93c5fd;
+  border-radius: 50px;
+  padding: 10px 20px 10px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 10;
+  margin-bottom: 24px;
 }
 
 .donate-back-btn:hover {
-  background: #2563eb;
-  color: white;
-  border-color: #2563eb;
+  background: rgba(255,255,255,0.14);
+  color: #fff;
 }
 
 .donate-container {
-  max-width: 480px;
+  max-width: 600px;
   margin: 0 auto;
-  padding-top: 60px;
+}
+
+.donate-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.donate-header-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: inline-block;
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
+  border-radius: 20px;
+  padding: 16px;
+  color: white;
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
 }
 
 .donate-screen-title {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 8px 0;
-  text-align: center;
-  background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+  background: linear-gradient(90deg, #93c5fd, #ffffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  margin: 0 0 8px;
 }
 
 .donate-screen-subtitle {
   font-size: 15px;
-  color: #64748b;
-  margin: 0 0 32px 0;
-  text-align: center;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
   line-height: 1.6;
-  font-weight: 500;
 }
 
 .donate-section {
-  margin-bottom: 24px;
-}
-
-.donate-section:nth-of-type(2) {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
-  border: 2px solid #d4e4f7;
-  border-radius: 16px;
-  padding: 28px 24px;
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
-}
-
-.donate-section-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: #0f172a;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 24px;
   margin-bottom: 20px;
-  letter-spacing: 0.3px;
+}
+
+.donate-section-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #60a5fa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
 }
 
-.donate-section:nth-of-type(2) .donate-section-title::before {
-  content: "";
-  display: inline-block;
-  width: 4px;
-  height: 24px;
-  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
-  border-radius: 2px;
-}
+.donate-section-label :deep(svg) { font-size: 16px; }
 
-/* GOODS SLIDER */
-.donate-goods-slider {
+/* ── GOODS GRID ── */
+.donate-goods-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 500px;
+  gap: 8px;
+  max-height: 380px;
   overflow-y: auto;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  padding-right: 4px;
 }
 
-.donate-good-item {
-  flex: 0 0 auto;
+.good-chip {
   width: 100%;
-  min-height: 70px;
-  padding: 16px;
-  background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 16px;
-  color: #0f172a;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 15px;
   font-weight: 500;
-  transition: all 0.2s ease;
   text-align: left;
+  transition: all 0.18s ease;
+  min-height: 52px;
 }
 
-.donate-good-item:hover {
-  border-color: #bfdbfe;
-  background: #eff6ff;
+.good-chip:hover {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.3);
+  color: #fff;
 }
 
-.donate-good-item.active {
-  background: #2563eb;
-  color: white;
-  border-color: #2563eb;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-}
-
-.good-emoji {
-  font-size: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  flex-shrink: 0;
+.good-chip.active {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  border-color: #60a5fa;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
 }
 
 .good-name {
-  flex: 1;
-}
-
-/* FORM STYLING */
-:deep(.u-form-field) {
-  margin-bottom: 20px;
-  color: #0f172a;
-}
-
-:deep(.u-form-field:last-of-type) {
-  margin-bottom: 32px;
-}
-
-:deep(.u-form-field label) {
-  color: #374151;
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 8px;
   display: block;
-  letter-spacing: 0.3px;
+  line-height: 1.2;
 }
 
-:deep(.u-form-field label span) {
-  color: #dc2626;
-  margin-left: 3px;
-  font-weight: 700;
+/* ── DONATE FORM ── */
+.donate-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-:deep(.u-input) {
-  background: #f9fafb !important;
-  color: #111827 !important;
-  border: 2px solid #e5e7eb !important;
+:deep(.u-form-field) {
+  margin-bottom: 28px;
+}
+
+:deep(label) {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: block;
+}
+
+:deep(input) {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: 12px !important;
   font-size: 16px !important;
-  padding: 12px 16px !important;
+  padding: 14px 18px !important;
+  min-height: 54px !important;
   transition: all 0.2s ease !important;
-  min-height: 50px !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  outline: none;
 }
 
-:deep(.u-input:hover) {
-  border-color: #d1d5db !important;
-  background: #ffffff !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+:deep(input::placeholder) {
+  color: rgba(255, 255, 255, 0.3) !important;
 }
 
-:deep(.u-input:focus) {
-  border-color: #2563eb !important;
-  background: #ffffff !important;
-  box-shadow:
-    0 0 0 3px rgba(37, 99, 235, 0.1),
-    0 2px 4px rgba(0, 0, 0, 0.05) !important;
-  outline: none !important;
-}
-
-:deep(.u-input::placeholder) {
-  color: #9ca3af !important;
-  opacity: 1 !important;
-}
-
-:deep(.u-input:disabled) {
-  background: #f3f4f6 !important;
-  color: #d1d5db !important;
-  cursor: not-allowed !important;
-}
-
-:deep(.u-button) {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  font-size: 14px;
-  border-radius: 12px !important;
-  position: relative;
-  overflow: hidden;
-}
-
-:deep(.u-button::before) {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transition: left 0.6s ease;
-}
-
-:deep(.u-button:not(:disabled)) {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
-  color: white !important;
-  box-shadow:
-    0 6px 20px rgba(37, 99, 235, 0.4),
-    0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  border: none !important;
-}
-
-:deep(.u-button:not(:disabled):hover::before) {
-  left: 100%;
-}
-
-:deep(.u-button:not(:disabled):hover) {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow:
-    0 10px 28px rgba(37, 99, 235, 0.5),
-    0 4px 8px rgba(0, 0, 0, 0.12) !important;
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%) !important;
-}
-
-:deep(.u-button:not(:disabled):focus) {
-  outline: 3px solid rgba(37, 99, 235, 0.5) !important;
-  outline-offset: 2px !important;
-}
-
-:deep(.u-button:not(:disabled):active) {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
-}
-
-:deep(.u-button:disabled) {
-  background: #f3f4f6 !important;
-  color: #d1d5db !important;
-  cursor: not-allowed;
-  box-shadow: none !important;
-  opacity: 0.7;
+:deep(input:focus) {
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
 }
 
 .donate-submit-btn {
-  margin-top: 0 !important;
-  min-height: 50px !important;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 12px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  transition: all 0.25s ease;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
 }
 
-/* THANKS MODAL */
-.thanks-modal {
-  background: white;
+.donate-submit-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.65);
 }
 
-.thanks-header {
+.donate-submit-btn:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.donate-submit-btn:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.25);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: #059669;
-  font-weight: 600;
-  font-size: 18px;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
 }
 
-.thanks-header :deep(.i-fa6-solid-circle-check) {
-  font-size: 24px;
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.25s ease;
 }
 
-.thanks-content {
+.modal-fade-enter-active .thanks-modal,
+.modal-fade-leave-active .thanks-modal {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-from .thanks-modal {
+  transform: scale(0.92) translateY(16px);
+}
+
+.modal-fade-leave-to .thanks-modal {
+  transform: scale(0.95);
+  opacity: 0;
+}
+
+/* ── THANKS MODAL ── */
+.thanks-modal {
+  background: linear-gradient(160deg, #0d1535 0%, #0f2050 100%);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 24px;
+  padding: 40px 32px;
   text-align: center;
-  padding: 20px 0;
-  max-width: 400px;
+  color: white;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(96, 165, 250, 0.15);
+}
+
+.thanks-check {
+  font-size: 56px;
+  color: #34d399;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.4));
+}
+
+.thanks-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 24px;
 }
 
 .thanks-label {
-  font-size: 14px;
-  color: #64748b;
-  margin: 0 0 12px 0;
-  font-weight: 500;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 12px;
 }
 
 .thanks-pin {
-  font-size: 48px;
-  font-weight: 700;
-  color: #2563eb;
-  margin: 16px 0;
-  letter-spacing: 8px;
-  font-family: "Courier New", monospace;
+  font-size: 52px;
+  font-weight: 800;
+  color: #60a5fa;
+  letter-spacing: 10px;
+  font-variant-numeric: tabular-nums;
+  margin: 0 0 24px;
+  text-shadow: 0 0 30px rgba(96, 165, 250, 0.5);
 }
 
 .thanks-info {
   font-size: 14px;
-  color: #0f172a;
-  margin: 16px 0 0 0;
+  color: rgba(255,255,255,0.6);
+  margin: 0 0 8px;
 }
 
 .thanks-note {
   font-size: 13px;
-  color: #64748b;
-  margin: 12px 0 0 0;
+  color: rgba(255,255,255,0.4);
   font-style: italic;
+  margin: 0;
 }
 
-/* RESPONSIVE */
+/* ── SCROLLBAR ── */
+.donate-goods-grid::-webkit-scrollbar { width: 5px; }
+.donate-goods-grid::-webkit-scrollbar-track { background: transparent; }
+.donate-goods-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+/* ── RESPONSIVE ── */
 @media (min-width: 480px) {
-  .panel-header-logo {
-    width: 64px;
-    height: 64px;
-  }
-
-  .panel-header-brand {
-    width: 72px;
-  }
-
-  .panel-title {
-    font-size: 28px;
-  }
-
-  .panel-wrap {
-    padding: 20px 16px;
-  }
-
-  .donate-goods-slider {
-    max-height: 320px;
-  }
-
-  .panel-map-frame {
-    height: 380px;
-  }
+  .panel-title { font-size: 26px; }
+  .clock-time { font-size: 32px; }
+  .hero-title { font-size: 30px; }
+  .weather-temp { font-size: 72px; }
 }
 
 @media (min-width: 640px) {
-  .panel-wrap {
-    padding: 24px 16px;
-  }
-
-  .panel-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .panel-card-full {
-    grid-column: span 2;
-  }
-
-  .donate-goods-slider {
-    max-height: 340px;
-  }
-
-  .panel-map-frame {
-    height: 400px;
-  }
-
-  .donate-card-inner {
-    padding: 32px;
-    gap: 24px;
-  }
-
-  .donate-card-icon {
-    font-size: 64px;
-  }
-
-  .donate-card-title {
-    font-size: 26px;
-  }
+  .panel-wrap { padding: 24px 20px 40px; }
+  .panel-grid { grid-template-columns: repeat(2, 1fr); }
+  .map-card { grid-column: span 2; }
+  .donate-goods-grid { max-height: 400px; }
+  .map-frame { height: 380px; }
+  .hero-donate-inner { padding: 36px 32px 24px; }
+  .hero-icon { font-size: 64px; }
 }
 
 @media (min-width: 768px) {
-  .panel-header {
-    padding: 20px;
-  }
-
-  .panel-header-logo {
-    width: 72px;
-    height: 72px;
-  }
-
-  .panel-header-brand {
-    width: 88px;
-  }
-
-  .panel-title {
-    font-size: 32px;
-  }
-
-  .panel-wrap {
-    padding: 28px 24px;
-  }
-
-  .donate-goods-slider {
-    max-height: 360px;
-  }
-
-  .panel-map-frame {
-    height: 420px;
-  }
-
-  .donate-container {
-    max-width: 520px;
-  }
+  .panel-header { padding: 16px 32px; }
+  .panel-header-logo { width: 60px; height: 60px; }
+  .panel-header-brand { width: 68px; }
+  .panel-title { font-size: 30px; }
+  .panel-wrap { padding: 28px 24px 48px; }
+  .map-frame { height: 420px; }
+  .donate-goods-grid { max-height: 420px; }
 }
 
 @media (min-width: 1024px) {
-  .panel-wrap {
-    padding: 32px 24px;
-  }
-
-  .panel-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .panel-card-full {
-    grid-column: span 3;
-  }
-
-  .donate-goods-slider {
-    max-height: 400px;
-  }
-
-  .panel-map-frame {
-    height: 440px;
-  }
-
-  .panel-card-image {
-    height: 240px;
-  }
-
-  .donate-container {
-    max-width: 560px;
-  }
+  .panel-grid { grid-template-columns: repeat(3, 1fr); }
+  .map-card { grid-column: span 3; }
+  .map-frame { height: 440px; }
+  .donate-goods-grid { max-height: 440px; }
+  .news-image { height: 200px; }
 }
 
-/* Scrollbar styling */
-.donate-goods-slider::-webkit-scrollbar {
-  width: 6px;
-}
-
-.donate-goods-slider::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-.donate-goods-slider::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.donate-goods-slider::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Light mode override */
+/* ── UCard overrides ── */
 :deep(.u-card) {
-  background: #ffffff;
-  color: #0f172a;
+  background: transparent !important;
+  color: inherit !important;
   border: none !important;
 }
 
-:deep(.u-card-header) {
-  background: #ffffff;
-  color: #0f172a;
-}
-
-:deep(.u-badge) {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-html,
-body {
-  color-scheme: light;
-}
-
-/* Utility */
-.mt-3 {
-  margin-top: 12px;
-}
-
-.mt-2 {
-  margin-top: 8px;
-}
-
-.text-sm {
-  font-size: 13px;
-}
-
-.text-gray-600 {
-  color: #64748b;
-}
+html, body { color-scheme: dark; }
 </style>
