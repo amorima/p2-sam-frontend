@@ -9,7 +9,10 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
-    backendBase: 'https://apisam.netdw.tech'
+    backendBase: 'https://apisam.netdw.tech',
+    public: {
+      openWeatherApiKey: ''
+    }
   },
 
   routeRules: {

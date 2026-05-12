@@ -14,11 +14,11 @@ onMounted(async () => {
 
   if (!mapEl.value) return
 
-  map = L.map(mapEl.value, {
+  map = L.map(mapEl.value as unknown as HTMLElement, {
     attributionControl: false,
     zoomControl: true,
     scrollWheelZoom: false,
-    dragging: true,
+    dragging: true
   })
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map)
@@ -27,7 +27,7 @@ onMounted(async () => {
     className: '',
     html: '<div class="painel-map-dot"></div>',
     iconSize: [20, 20],
-    iconAnchor: [10, 10],
+    iconAnchor: [10, 10]
   })
 
   const setView = (lat: number, lng: number, zoom = 15) => {
@@ -40,7 +40,7 @@ onMounted(async () => {
     navigator.geolocation.getCurrentPosition(
       pos => setView(pos.coords.latitude, pos.coords.longitude),
       () => setView(...VILA_DO_CONDE, 14),
-      { timeout: 6000 },
+      { timeout: 6000 }
     )
   } else {
     setView(...VILA_DO_CONDE, 14)

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
+const config = useRuntimeConfig()
+
 definePageMeta({
   layout: false
 })
@@ -132,7 +134,7 @@ const updateClock = () => {
 
 const fetchWeather = async () => {
   try {
-    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY
+    const apiKey = config.public.openWeatherApiKey
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=Vila%20do%20Conde,PT&units=metric&lang=pt&appid=${apiKey}`
     )
@@ -236,354 +238,356 @@ onBeforeUnmount(() => {
     </header>
 
     <!-- MAIN PANEL -->
-    <div
-      v-if="screen === 'panel'"
-      class="panel-wrap"
-    >
-      <!-- HERO DONATION CARD -->
-      <div class="hero-donate" @click="goToDonate">
-        <div class="hero-donate-glow" />
-        <div class="hero-donate-inner">
-          <div class="hero-icon">
-            <UIcon name="i-fa6-solid-hand-holding-heart" />
+    <main>
+      <div
+        v-if="screen === 'panel'"
+        class="panel-wrap"
+      >
+        <!-- HERO DONATION CARD -->
+        <button class="hero-donate" aria-label="Fazer uma doação" @click="goToDonate">
+          <div class="hero-donate-glow" aria-hidden="true" />
+          <div class="hero-donate-inner">
+            <div class="hero-icon" aria-hidden="true">
+              <UIcon name="i-fa6-solid-hand-holding-heart" />
+            </div>
+            <div class="hero-content">
+              <h2 class="hero-title">
+                Fazer uma Doação
+              </h2>
+              <p class="hero-subtitle">
+                Ajude a comunidade local. Doe bens essenciais e receba um código de referência para rastreamento.
+              </p>
+            </div>
+            <div class="hero-cta" aria-hidden="true">
+              <div class="hero-btn">
+                <UIcon name="i-fa6-solid-arrow-right" />
+              </div>
+            </div>
           </div>
-          <div class="hero-content">
-            <h2 class="hero-title">
+          <div class="hero-label" aria-hidden="true">
+            Toque para começar
+          </div>
+        </button>
+
+        <!-- INFO CARDS GRID -->
+        <div class="panel-grid">
+          <!-- WEATHER CARD -->
+          <div class="glass-card weather-card">
+            <div class="glass-card-header">
+              <UIcon name="i-fa6-solid-cloud-sun" class="glass-icon" aria-hidden="true" />
+              <span>Meteorologia</span>
+            </div>
+            <div class="weather-body">
+              <div class="weather-hero">
+                <UIcon :name="weatherIcon" class="weather-main-icon" aria-hidden="true" />
+                <div class="weather-temp">
+                  {{ weatherData.temp }}°
+                </div>
+              </div>
+              <div class="weather-desc">
+                {{ weatherData.description }}
+              </div>
+              <div class="weather-details">
+                <span class="weather-pill">
+                  <span class="weather-pill-icon" aria-hidden="true">💧</span>
+                  <span class="weather-pill-val">{{ weatherData.humidity }}%</span>
+                  <span class="weather-pill-label">Humidade</span>
+                </span>
+                <span class="weather-pill">
+                  <span class="weather-pill-icon" aria-hidden="true">💨</span>
+                  <span class="weather-pill-val">{{ weatherData.windSpeed }}</span>
+                  <span class="weather-pill-label">km/h</span>
+                </span>
+              </div>
+              <div class="weather-unit-label">
+                Temperatura em graus Celsius · Vila do Conde
+              </div>
+            </div>
+          </div>
+
+          <!-- INFO CARD -->
+          <div class="glass-card info-card">
+            <div class="glass-card-header">
+              <UIcon name="i-fa6-solid-circle-info" class="glass-icon" aria-hidden="true" />
+              <span>Informações</span>
+            </div>
+            <div class="info-body">
+              <p class="info-text">
+                Bem-vindo ao Painel do Cidadão de Vila do Conde.
+              </p>
+              <div class="info-badges">
+                <div class="info-badge">
+                  <UIcon name="i-fa6-solid-location-dot" aria-hidden="true" />
+                  <span>Vila do Conde, Portugal</span>
+                </div>
+                <div class="info-badge">
+                  <UIcon name="i-fa6-solid-globe" aria-hidden="true" />
+                  <span>41.3304°N · 8.7447°W</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NEWS CARD -->
+          <div class="glass-card news-card">
+            <div class="glass-card-header">
+              <UIcon name="i-fa6-solid-newspaper" class="glass-icon" aria-hidden="true" />
+              <span>Notícias</span>
+            </div>
+            <div class="news-body">
+              <img
+                src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&q=80"
+                alt="Notícia"
+                class="news-image"
+              >
+              <p class="news-text">
+                Últimas novidades da comunidade local e iniciativas comunitárias.
+              </p>
+            </div>
+          </div>
+
+          <!-- TRANSPORT CARD -->
+          <div class="glass-card transport-card">
+            <div class="glass-card-header">
+              <UIcon name="i-fa6-solid-bus" class="glass-icon" aria-hidden="true" />
+              <span>Transportes</span>
+            </div>
+            <div class="transport-body">
+              <div class="transport-row">
+                <div class="transport-line">
+                  <span class="transport-badge">L1</span>
+                  <span class="transport-name">Porto – Vila do Conde</span>
+                </div>
+                <span class="transport-time">08:42</span>
+              </div>
+              <div class="transport-row">
+                <div class="transport-line">
+                  <span class="transport-badge">L2</span>
+                  <span class="transport-name">Póvoa de Varzim</span>
+                </div>
+                <span class="transport-time">09:15</span>
+              </div>
+              <div class="transport-row">
+                <div class="transport-line">
+                  <span class="transport-badge transport-badge--green">M</span>
+                  <span class="transport-name">Metro – Linha Vermelha</span>
+                </div>
+                <span class="transport-time">09:28</span>
+              </div>
+              <div class="transport-row">
+                <div class="transport-line">
+                  <span class="transport-badge">L1</span>
+                  <span class="transport-name">Porto – Vila do Conde</span>
+                </div>
+                <span class="transport-time transport-time--next">10:10</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTACTS CARD -->
+          <div class="glass-card contacts-card">
+            <div class="glass-card-header">
+              <UIcon name="i-fa6-solid-phone" class="glass-icon" aria-hidden="true" />
+              <span>Contactos Úteis</span>
+            </div>
+            <div class="contacts-body">
+              <div class="contact-row">
+                <div class="contact-icon contact-icon--red" aria-hidden="true">
+                  <UIcon name="i-fa6-solid-triangle-exclamation" />
+                </div>
+                <div class="contact-info">
+                  <div class="contact-label">
+                    Emergência
+                  </div>
+                  <div class="contact-number">
+                    112
+                  </div>
+                </div>
+              </div>
+              <div class="contact-row">
+                <div class="contact-icon contact-icon--blue" aria-hidden="true">
+                  <UIcon name="i-fa6-solid-shield-halved" />
+                </div>
+                <div class="contact-info">
+                  <div class="contact-label">
+                    PSP Vila do Conde
+                  </div>
+                  <div class="contact-number">
+                    252 248 290
+                  </div>
+                </div>
+              </div>
+              <div class="contact-row">
+                <div class="contact-icon contact-icon--green" aria-hidden="true">
+                  <UIcon name="i-fa6-solid-hospital" />
+                </div>
+                <div class="contact-info">
+                  <div class="contact-label">
+                    Centro de Saúde
+                  </div>
+                  <div class="contact-number">
+                    252 240 900
+                  </div>
+                </div>
+              </div>
+              <div class="contact-row">
+                <div class="contact-icon contact-icon--orange" aria-hidden="true">
+                  <UIcon name="i-fa6-solid-building-columns" />
+                </div>
+                <div class="contact-info">
+                  <div class="contact-label">
+                    Câmara Municipal
+                  </div>
+                  <div class="contact-number">
+                    252 248 400
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EVENTS CARD -->
+          <div class="glass-card events-card">
+            <div class="glass-card-header">
+              <UIcon name="i-fa6-solid-calendar-days" class="glass-icon" aria-hidden="true" />
+              <span>Agenda</span>
+            </div>
+            <div class="events-body">
+              <div class="event-row">
+                <div class="event-date-block" aria-hidden="true">
+                  <span class="event-day">14</span>
+                  <span class="event-month">Mai</span>
+                </div>
+                <div class="event-detail">
+                  <div class="event-title">
+                    Feira Semanal do Mercado
+                  </div>
+                  <div class="event-meta">
+                    <UIcon name="i-fa6-solid-clock" aria-hidden="true" />
+                    <span>09:00 – 14:00 · Praça do Município</span>
+                  </div>
+                </div>
+              </div>
+              <div class="event-row">
+                <div class="event-date-block" aria-hidden="true">
+                  <span class="event-day">17</span>
+                  <span class="event-month">Mai</span>
+                </div>
+                <div class="event-detail">
+                  <div class="event-title">
+                    Concerto no Auditório Municipal
+                  </div>
+                  <div class="event-meta">
+                    <UIcon name="i-fa6-solid-clock" aria-hidden="true" />
+                    <span>21:30 · Auditório Municipal</span>
+                  </div>
+                </div>
+              </div>
+              <div class="event-row">
+                <div class="event-date-block" aria-hidden="true">
+                  <span class="event-day">24</span>
+                  <span class="event-month">Mai</span>
+                </div>
+                <div class="event-detail">
+                  <div class="event-title">
+                    Dia do Município – Festas
+                  </div>
+                  <div class="event-meta">
+                    <UIcon name="i-fa6-solid-clock" aria-hidden="true" />
+                    <span>Todo o dia · Centro Histórico</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MAP CARD -->
+          <div class="glass-card map-card">
+            <div class="glass-card-header">
+              <UIcon name="i-fa6-solid-map-location-dot" class="glass-icon" aria-hidden="true" />
+              <span>Localização</span>
+            </div>
+            <div class="map-wrapper">
+              <PainelMap />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DONATION SCREEN -->
+      <div v-else class="donate-screen">
+        <button class="donate-back-btn" @click="goBack">
+          <UIcon name="i-fa6-solid-arrow-left" aria-hidden="true" />
+          <span>Voltar</span>
+        </button>
+
+        <div class="donate-container">
+          <div class="donate-header">
+            <div class="donate-header-icon" aria-hidden="true">
+              <UIcon name="i-fa6-solid-hand-holding-heart" />
+            </div>
+            <h1 class="donate-screen-title">
               Fazer uma Doação
-            </h2>
-            <p class="hero-subtitle">
-              Ajude a comunidade local. Doe bens essenciais e receba um código de referência para rastreamento.
+            </h1>
+            <p class="donate-screen-subtitle">
+              Selecione o tipo de bem e preencha os seus dados.
             </p>
           </div>
-          <div class="hero-cta">
-            <div class="hero-btn">
-              <UIcon name="i-fa6-solid-arrow-right" />
-            </div>
-          </div>
-        </div>
-        <div class="hero-label">
-          Toque para começar
-        </div>
-      </div>
 
-      <!-- INFO CARDS GRID -->
-      <div class="panel-grid">
-        <!-- WEATHER CARD -->
-        <div class="glass-card weather-card">
-          <div class="glass-card-header">
-            <UIcon name="i-fa6-solid-cloud-sun" class="glass-icon" />
-            <span>Meteorologia</span>
-          </div>
-          <div class="weather-body">
-            <div class="weather-hero">
-              <UIcon :name="weatherIcon" class="weather-main-icon" />
-              <div class="weather-temp">
-                {{ weatherData.temp }}°
-              </div>
+          <!-- GOODS GRID -->
+          <div class="donate-section">
+            <div class="donate-section-label">
+              <UIcon name="i-fa6-solid-box-open" aria-hidden="true" />
+              Selecione o bem a doar
             </div>
-            <div class="weather-desc">
-              {{ weatherData.description }}
-            </div>
-            <div class="weather-details">
-              <span class="weather-pill">
-                <span class="weather-pill-icon">💧</span>
-                <span class="weather-pill-val">{{ weatherData.humidity }}%</span>
-                <span class="weather-pill-label">Humidade</span>
-              </span>
-              <span class="weather-pill">
-                <span class="weather-pill-icon">💨</span>
-                <span class="weather-pill-val">{{ weatherData.windSpeed }}</span>
-                <span class="weather-pill-label">km/h</span>
-              </span>
-            </div>
-            <div class="weather-unit-label">
-              Temperatura em graus Celsius · Vila do Conde
+            <div class="donate-goods-grid">
+              <button
+                v-for="good in goods"
+                :key="good.id"
+                class="good-chip"
+                :class="{ active: selectedGoodId === good.id }"
+                @click="toggleGood(good.id)"
+              >
+                <span class="good-name">{{ good.name }}</span>
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- INFO CARD -->
-        <div class="glass-card info-card">
-          <div class="glass-card-header">
-            <UIcon name="i-fa6-solid-circle-info" class="glass-icon" />
-            <span>Informações</span>
-          </div>
-          <div class="info-body">
-            <p class="info-text">
-              Bem-vindo ao Painel do Cidadão de Vila do Conde.
-            </p>
-            <div class="info-badges">
-              <div class="info-badge">
-                <UIcon name="i-fa6-solid-location-dot" />
-                <span>Vila do Conde, Portugal</span>
-              </div>
-              <div class="info-badge">
-                <UIcon name="i-fa6-solid-globe" />
-                <span>41.3304°N · 8.7447°W</span>
-              </div>
+          <!-- DONOR FORM -->
+          <div class="donate-section donate-form-section">
+            <div class="donate-section-label">
+              <UIcon name="i-fa6-solid-user" aria-hidden="true" />
+              Os seus dados
             </div>
-          </div>
-        </div>
 
-        <!-- NEWS CARD -->
-        <div class="glass-card news-card">
-          <div class="glass-card-header">
-            <UIcon name="i-fa6-solid-newspaper" class="glass-icon" />
-            <span>Notícias</span>
-          </div>
-          <div class="news-body">
-            <img
-              src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&q=80"
-              alt="Notícia"
-              class="news-image"
-            >
-            <p class="news-text">
-              Últimas novidades da comunidade local e iniciativas comunitárias.
-            </p>
-          </div>
-        </div>
+            <UFormField label="Nome completo" required>
+              <UInput
+                v-model="donorName"
+                placeholder="Insira o seu nome"
+                size="xl"
+              />
+            </UFormField>
 
-        <!-- TRANSPORT CARD -->
-        <div class="glass-card transport-card">
-          <div class="glass-card-header">
-            <UIcon name="i-fa6-solid-bus" class="glass-icon" />
-            <span>Transportes</span>
-          </div>
-          <div class="transport-body">
-            <div class="transport-row">
-              <div class="transport-line">
-                <span class="transport-badge">L1</span>
-                <span class="transport-name">Porto – Vila do Conde</span>
-              </div>
-              <span class="transport-time">08:42</span>
-            </div>
-            <div class="transport-row">
-              <div class="transport-line">
-                <span class="transport-badge">L2</span>
-                <span class="transport-name">Póvoa de Varzim</span>
-              </div>
-              <span class="transport-time">09:15</span>
-            </div>
-            <div class="transport-row">
-              <div class="transport-line">
-                <span class="transport-badge transport-badge--green">M</span>
-                <span class="transport-name">Metro – Linha Vermelha</span>
-              </div>
-              <span class="transport-time">09:28</span>
-            </div>
-            <div class="transport-row">
-              <div class="transport-line">
-                <span class="transport-badge">L1</span>
-                <span class="transport-name">Porto – Vila do Conde</span>
-              </div>
-              <span class="transport-time transport-time--next">10:10</span>
-            </div>
-          </div>
-        </div>
+            <UFormField label="Email" required>
+              <UInput
+                v-model="donorEmail"
+                placeholder="seu@email.pt"
+                type="email"
+                size="xl"
+              />
+            </UFormField>
 
-        <!-- CONTACTS CARD -->
-        <div class="glass-card contacts-card">
-          <div class="glass-card-header">
-            <UIcon name="i-fa6-solid-phone" class="glass-icon" />
-            <span>Contactos Úteis</span>
-          </div>
-          <div class="contacts-body">
-            <div class="contact-row">
-              <div class="contact-icon contact-icon--red">
-                <UIcon name="i-fa6-solid-triangle-exclamation" />
-              </div>
-              <div class="contact-info">
-                <div class="contact-label">
-                  Emergência
-                </div>
-                <div class="contact-number">
-                  112
-                </div>
-              </div>
-            </div>
-            <div class="contact-row">
-              <div class="contact-icon contact-icon--blue">
-                <UIcon name="i-fa6-solid-shield-halved" />
-              </div>
-              <div class="contact-info">
-                <div class="contact-label">
-                  PSP Vila do Conde
-                </div>
-                <div class="contact-number">
-                  252 248 290
-                </div>
-              </div>
-            </div>
-            <div class="contact-row">
-              <div class="contact-icon contact-icon--green">
-                <UIcon name="i-fa6-solid-hospital" />
-              </div>
-              <div class="contact-info">
-                <div class="contact-label">
-                  Centro de Saúde
-                </div>
-                <div class="contact-number">
-                  252 240 900
-                </div>
-              </div>
-            </div>
-            <div class="contact-row">
-              <div class="contact-icon contact-icon--orange">
-                <UIcon name="i-fa6-solid-building-columns" />
-              </div>
-              <div class="contact-info">
-                <div class="contact-label">
-                  Câmara Municipal
-                </div>
-                <div class="contact-number">
-                  252 248 400
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- EVENTS CARD -->
-        <div class="glass-card events-card">
-          <div class="glass-card-header">
-            <UIcon name="i-fa6-solid-calendar-days" class="glass-icon" />
-            <span>Agenda</span>
-          </div>
-          <div class="events-body">
-            <div class="event-row">
-              <div class="event-date-block">
-                <span class="event-day">14</span>
-                <span class="event-month">Mai</span>
-              </div>
-              <div class="event-detail">
-                <div class="event-title">
-                  Feira Semanal do Mercado
-                </div>
-                <div class="event-meta">
-                  <UIcon name="i-fa6-solid-clock" />
-                  <span>09:00 – 14:00 · Praça do Município</span>
-                </div>
-              </div>
-            </div>
-            <div class="event-row">
-              <div class="event-date-block">
-                <span class="event-day">17</span>
-                <span class="event-month">Mai</span>
-              </div>
-              <div class="event-detail">
-                <div class="event-title">
-                  Concerto no Auditório Municipal
-                </div>
-                <div class="event-meta">
-                  <UIcon name="i-fa6-solid-clock" />
-                  <span>21:30 · Auditório Municipal</span>
-                </div>
-              </div>
-            </div>
-            <div class="event-row">
-              <div class="event-date-block">
-                <span class="event-day">24</span>
-                <span class="event-month">Mai</span>
-              </div>
-              <div class="event-detail">
-                <div class="event-title">
-                  Dia do Município – Festas
-                </div>
-                <div class="event-meta">
-                  <UIcon name="i-fa6-solid-clock" />
-                  <span>Todo o dia · Centro Histórico</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MAP CARD -->
-        <div class="glass-card map-card">
-          <div class="glass-card-header">
-            <UIcon name="i-fa6-solid-map-location-dot" class="glass-icon" />
-            <span>Localização</span>
-          </div>
-          <div class="map-wrapper">
-            <PainelMap />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- DONATION SCREEN -->
-    <div v-else class="donate-screen">
-      <button class="donate-back-btn" @click="goBack">
-        <UIcon name="i-fa6-solid-arrow-left" />
-        <span>Voltar</span>
-      </button>
-
-      <div class="donate-container">
-        <div class="donate-header">
-          <div class="donate-header-icon">
-            <UIcon name="i-fa6-solid-hand-holding-heart" />
-          </div>
-          <h1 class="donate-screen-title">
-            Fazer uma Doação
-          </h1>
-          <p class="donate-screen-subtitle">
-            Selecione o tipo de bem e preencha os seus dados.
-          </p>
-        </div>
-
-        <!-- GOODS GRID -->
-        <div class="donate-section">
-          <div class="donate-section-label">
-            <UIcon name="i-fa6-solid-box-open" />
-            Selecione o bem a doar
-          </div>
-          <div class="donate-goods-grid">
             <button
-              v-for="good in goods"
-              :key="good.id"
-              class="good-chip"
-              :class="{ active: selectedGoodId === good.id }"
-              @click="toggleGood(good.id)"
+              class="donate-submit-btn"
+              :disabled="!isDonateEnabled"
+              @click="submitDonation"
             >
-              <span class="good-name">{{ good.name }}</span>
+              Confirmar Doação
             </button>
           </div>
         </div>
-
-        <!-- DONOR FORM -->
-        <div class="donate-section donate-form-section">
-          <div class="donate-section-label">
-            <UIcon name="i-fa6-solid-user" />
-            Os seus dados
-          </div>
-
-          <UFormField label="Nome completo" required>
-            <UInput
-              v-model="donorName"
-              placeholder="Insira o seu nome"
-              size="xl"
-            />
-          </UFormField>
-
-          <UFormField label="Email" required>
-            <UInput
-              v-model="donorEmail"
-              placeholder="seu@email.pt"
-              type="email"
-              size="xl"
-            />
-          </UFormField>
-
-          <button
-            class="donate-submit-btn"
-            :disabled="!isDonateEnabled"
-            @click="submitDonation"
-          >
-            Confirmar Doação
-          </button>
-        </div>
       </div>
-    </div>
+    </main>
 
     <!-- SUCCESS MODAL -->
     <Teleport to="body">
@@ -593,11 +597,17 @@ onBeforeUnmount(() => {
           class="modal-overlay"
           @click="thanksOpen = false"
         >
-          <div class="thanks-modal" @click.stop>
-            <div class="thanks-check">
+          <div
+            class="thanks-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="thanks-title"
+            @click.stop
+          >
+            <div class="thanks-check" aria-hidden="true">
               <UIcon name="i-fa6-solid-circle-check" />
             </div>
-            <h2 class="thanks-title">
+            <h2 id="thanks-title" class="thanks-title">
               Doação Confirmada!
             </h2>
             <p class="thanks-label">
@@ -734,6 +744,11 @@ onBeforeUnmount(() => {
   cursor: pointer;
   background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
   box-shadow: 0 20px 60px rgba(37, 99, 235, 0.5), 0 0 0 1px rgba(96, 165, 250, 0.3);
+  appearance: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  display: block;
 }
 
 .hero-donate-glow {
