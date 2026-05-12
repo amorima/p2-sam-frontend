@@ -9,7 +9,8 @@ jobs:
       - name: atualizar código
         run: |
           cd ~/p2-sam-frontend
-          git pull origin main
+          git fetch origin main
+          git reset --hard origin/main
           pnpm install
           export NODE_OPTIONS="--max-old-space-size=4096"
           pnpm build
