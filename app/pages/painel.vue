@@ -1,217 +1,218 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 definePageMeta({
-  layout: false,
-});
+  layout: false
+})
 
 // Tipos
 interface WeatherData {
-  temp: number;
-  description: string;
-  humidity: number;
-  windSpeed: number;
-  icon: string;
+  temp: number
+  description: string
+  humidity: number
+  windSpeed: number
+  icon: string
 }
 
 interface Good {
-  id: string;
-  name: string;
-  emoji: string;
+  id: string
+  name: string
+  emoji: string
 }
 
 // Estado
-const screen = ref<"panel" | "donate">("panel");
-const selectedGoodId = ref("");
-const donorName = ref("");
-const donorEmail = ref("");
-const pin = ref("");
+const screen = ref<'panel' | 'donate'>('panel')
+const selectedGoodId = ref('')
+const donorName = ref('')
+const donorEmail = ref('')
+const pin = ref('')
 const weatherData = ref<WeatherData>({
   temp: 18,
-  description: "Parcialmente nublado",
+  description: 'Parcialmente nublado',
   humidity: 65,
   windSpeed: 12,
-  icon: "02d",
-});
-const thanksOpen = ref(false);
+  icon: '02d'
+})
+const thanksOpen = ref(false)
 
-let modalTimerId: NodeJS.Timeout | null = null;
-let resetTimerId: NodeJS.Timeout | null = null;
+let modalTimerId: NodeJS.Timeout | null = null
+let resetTimerId: NodeJS.Timeout | null = null
 
 // Bens disponíveis
 const goods: Good[] = [
-  { id: "food", name: "Alimentos", emoji: "🍽️" },
-  { id: "rice", name: "Arroz", emoji: "🍚" },
-  { id: "bread", name: "Pão", emoji: "🍞" },
-  { id: "milk", name: "Leite", emoji: "🥛" },
-  { id: "eggs", name: "Ovos", emoji: "🥚" },
-  { id: "pasta", name: "Massa", emoji: "🍝" },
-  { id: "beans", name: "Feijão", emoji: "🫘" },
-  { id: "oil", name: "Óleo", emoji: "🫒" },
-  { id: "clothes", name: "Roupas", emoji: "👕" },
-  { id: "shirts", name: "Camisas", emoji: "👔" },
-  { id: "pants", name: "Calças", emoji: "👖" },
-  { id: "shoes", name: "Sapatos", emoji: "👟" },
-  { id: "jackets", name: "Jaquetas", emoji: "🧥" },
-  { id: "socks", name: "Meias", emoji: "🧦" },
-  { id: "underwear", name: "Roupa Interior", emoji: "🩲" },
-  { id: "hats", name: "Chapéus", emoji: "🧢" },
-  { id: "hygiene", name: "Higiene", emoji: "🧼" },
-  { id: "soap", name: "Sabonete", emoji: "🧴" },
-  { id: "toothbrush", name: "Escova Dentes", emoji: "🪥" },
-  { id: "toothpaste", name: "Pasta Dentes", emoji: "😁" },
-  { id: "shampoo", name: "Champô", emoji: "💆" },
-  { id: "deodorant", name: "Desodorizante", emoji: "💨" },
-  { id: "tissues", name: "Lenços", emoji: "🧻" },
-  { id: "school", name: "Escolar", emoji: "📚" },
-  { id: "notebooks", name: "Cadernos", emoji: "📓" },
-  { id: "pens", name: "Canetas", emoji: "🖊️" },
-  { id: "pencils", name: "Lápis", emoji: "✏️" },
-  { id: "backpack", name: "Mochila", emoji: "🎒" },
-  { id: "books", name: "Livros", emoji: "📖" },
-  { id: "markers", name: "Marcadores", emoji: "🖍️" },
-  { id: "blankets", name: "Cobertores", emoji: "🛏️" },
-  { id: "pillows", name: "Almofadas", emoji: "🛌" },
-  { id: "sheets", name: "Lençóis", emoji: "🧺" },
-  { id: "mattress", name: "Colchão", emoji: "🛏️" },
-  { id: "towels", name: "Toalhas", emoji: "🛁" },
-  { id: "medical", name: "Medicamentos", emoji: "💊" },
-  { id: "bandages", name: "Pensos", emoji: "🩹" },
-  { id: "vitamins", name: "Vitaminas", emoji: "💉" },
-];
+  { id: 'food', name: 'Alimentos', emoji: '🍽️' },
+  { id: 'rice', name: 'Arroz', emoji: '🍚' },
+  { id: 'bread', name: 'Pão', emoji: '🍞' },
+  { id: 'milk', name: 'Leite', emoji: '🥛' },
+  { id: 'eggs', name: 'Ovos', emoji: '🥚' },
+  { id: 'pasta', name: 'Massa', emoji: '🍝' },
+  { id: 'beans', name: 'Feijão', emoji: '🫘' },
+  { id: 'oil', name: 'Óleo', emoji: '🫒' },
+  { id: 'clothes', name: 'Roupas', emoji: '👕' },
+  { id: 'shirts', name: 'Camisas', emoji: '👔' },
+  { id: 'pants', name: 'Calças', emoji: '👖' },
+  { id: 'shoes', name: 'Sapatos', emoji: '👟' },
+  { id: 'jackets', name: 'Jaquetas', emoji: '🧥' },
+  { id: 'socks', name: 'Meias', emoji: '🧦' },
+  { id: 'underwear', name: 'Roupa Interior', emoji: '🩲' },
+  { id: 'hats', name: 'Chapéus', emoji: '🧢' },
+  { id: 'hygiene', name: 'Higiene', emoji: '🧼' },
+  { id: 'soap', name: 'Sabonete', emoji: '🧴' },
+  { id: 'toothbrush', name: 'Escova Dentes', emoji: '🪥' },
+  { id: 'toothpaste', name: 'Pasta Dentes', emoji: '😁' },
+  { id: 'shampoo', name: 'Champô', emoji: '💆' },
+  { id: 'deodorant', name: 'Desodorizante', emoji: '💨' },
+  { id: 'tissues', name: 'Lenços', emoji: '🧻' },
+  { id: 'school', name: 'Escolar', emoji: '📚' },
+  { id: 'notebooks', name: 'Cadernos', emoji: '📓' },
+  { id: 'pens', name: 'Canetas', emoji: '🖊️' },
+  { id: 'pencils', name: 'Lápis', emoji: '✏️' },
+  { id: 'backpack', name: 'Mochila', emoji: '🎒' },
+  { id: 'books', name: 'Livros', emoji: '📖' },
+  { id: 'markers', name: 'Marcadores', emoji: '🖍️' },
+  { id: 'blankets', name: 'Cobertores', emoji: '🛏️' },
+  { id: 'pillows', name: 'Almofadas', emoji: '🛌' },
+  { id: 'sheets', name: 'Lençóis', emoji: '🧺' },
+  { id: 'mattress', name: 'Colchão', emoji: '🛏️' },
+  { id: 'towels', name: 'Toalhas', emoji: '🛁' },
+  { id: 'medical', name: 'Medicamentos', emoji: '💊' },
+  { id: 'bandages', name: 'Pensos', emoji: '🩹' },
+  { id: 'vitamins', name: 'Vitaminas', emoji: '💉' }
+]
 
 // Computadas
 const emailIsValid = computed(() =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorEmail.value.trim()),
-);
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorEmail.value.trim())
+)
 
 const isDonateEnabled = computed(() => {
   return (
-    selectedGoodId.value.length > 0 &&
-    donorName.value.trim().length > 0 &&
-    emailIsValid.value
-  );
-});
+    selectedGoodId.value.length > 0
+    && donorName.value.trim().length > 0
+    && emailIsValid.value
+  )
+})
 
 const weatherIcon = computed(() => {
   const iconMap: Record<string, string> = {
-    "01d": "i-fa6-solid-sun",
-    "01n": "i-fa6-solid-moon",
-    "02d": "i-fa6-solid-cloud-sun",
-    "02n": "i-fa6-solid-cloud-moon",
-    "03d": "i-fa6-solid-cloud",
-    "03n": "i-fa6-solid-cloud",
-    "04d": "i-fa6-solid-cloud",
-    "04n": "i-fa6-solid-cloud",
-    "09d": "i-fa6-solid-cloud-rain",
-    "09n": "i-fa6-solid-cloud-rain",
-    "10d": "i-fa6-solid-cloud-rain",
-    "10n": "i-fa6-solid-cloud-rain",
-    "11d": "i-fa6-solid-cloud-bolt",
-    "11n": "i-fa6-solid-cloud-bolt",
-    "13d": "i-fa6-solid-snowflake",
-    "13n": "i-fa6-solid-snowflake",
-    "50d": "i-fa6-solid-smog",
-    "50n": "i-fa6-solid-smog",
-  };
-  return iconMap[weatherData.value.icon] || "i-fa6-solid-cloud-sun";
-});
+    '01d': 'i-fa6-solid-sun',
+    '01n': 'i-fa6-solid-moon',
+    '02d': 'i-fa6-solid-cloud-sun',
+    '02n': 'i-fa6-solid-cloud-moon',
+    '03d': 'i-fa6-solid-cloud',
+    '03n': 'i-fa6-solid-cloud',
+    '04d': 'i-fa6-solid-cloud',
+    '04n': 'i-fa6-solid-cloud',
+    '09d': 'i-fa6-solid-cloud-rain',
+    '09n': 'i-fa6-solid-cloud-rain',
+    '10d': 'i-fa6-solid-cloud-rain',
+    '10n': 'i-fa6-solid-cloud-rain',
+    '11d': 'i-fa6-solid-cloud-bolt',
+    '11n': 'i-fa6-solid-cloud-bolt',
+    '13d': 'i-fa6-solid-snowflake',
+    '13n': 'i-fa6-solid-snowflake',
+    '50d': 'i-fa6-solid-smog',
+    '50n': 'i-fa6-solid-smog'
+  }
+  return iconMap[weatherData.value.icon] || 'i-fa6-solid-cloud-sun'
+})
 
 // Métodos
 const fetchWeather = async () => {
   try {
+    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY
     const response = await fetch(
-      "https://api.openweathermap.org/data/2.5/weather?q=Vila%20do%20Conde,PT&units=metric&lang=pt&appid=9059ef4edcdc2306c4f5c51a6f292aa3",
-    );
+      `https://api.openweathermap.org/data/2.5/weather?q=Vila%20do%20Conde,PT&units=metric&lang=pt&appid=${apiKey}`
+    )
     if (response.ok) {
-      const data = await response.json();
+      const data = await response.json()
       if (data.main) {
         weatherData.value = {
           temp: Math.round(data.main.temp),
-          description: data.weather?.[0]?.main || "Parcialmente nublado",
+          description: data.weather?.[0]?.main || 'Parcialmente nublado',
           humidity: data.main.humidity || 65,
           windSpeed: Math.round(data.wind?.speed || 12),
-          icon: data.weather?.[0]?.icon || "02d",
-        };
+          icon: data.weather?.[0]?.icon || '02d'
+        }
       }
     } else {
       // Fallback quando API retorna erro (401, 429, etc)
       weatherData.value = {
         temp: 18,
-        description: "Parcialmente nublado",
+        description: 'Parcialmente nublado',
         humidity: 65,
         windSpeed: 12,
-        icon: "02d",
-      };
+        icon: '02d'
+      }
     }
   } catch (_error) {
     // Fallback em qualquer erro de rede
     weatherData.value = {
       temp: 18,
-      description: "Parcialmente nublado",
+      description: 'Parcialmente nublado',
       humidity: 65,
       windSpeed: 12,
-      icon: "02d",
-    };
+      icon: '02d'
+    }
   }
-};
+}
 
 const generatePin = (): string => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
 
 const goToDonate = () => {
-  screen.value = "donate";
-};
+  screen.value = 'donate'
+}
 
 const goBack = () => {
-  screen.value = "panel";
-  resetDonation();
-};
+  screen.value = 'panel'
+  resetDonation()
+}
 
 const toggleGood = (goodId: string) => {
-  selectedGoodId.value = selectedGoodId.value === goodId ? "" : goodId;
-};
+  selectedGoodId.value = selectedGoodId.value === goodId ? '' : goodId
+}
 
 const submitDonation = () => {
-  if (!isDonateEnabled.value) return;
+  if (!isDonateEnabled.value) return
 
-  pin.value = generatePin();
-  thanksOpen.value = true;
+  pin.value = generatePin()
+  thanksOpen.value = true
 
-  if (modalTimerId) clearTimeout(modalTimerId);
-  if (resetTimerId) clearTimeout(resetTimerId);
+  if (modalTimerId) clearTimeout(modalTimerId)
+  if (resetTimerId) clearTimeout(resetTimerId)
 
   modalTimerId = setTimeout(() => {
-    thanksOpen.value = false;
-  }, 5000);
+    thanksOpen.value = false
+  }, 5000)
 
   resetTimerId = setTimeout(() => {
-    resetDonation();
-    screen.value = "panel";
-  }, 30000);
-};
+    resetDonation()
+    screen.value = 'panel'
+  }, 30000)
+}
 
 const resetDonation = () => {
-  selectedGoodId.value = "";
-  donorName.value = "";
-  donorEmail.value = "";
-  pin.value = "";
-};
+  selectedGoodId.value = ''
+  donorName.value = ''
+  donorEmail.value = ''
+  pin.value = ''
+}
 
 const clearTimers = () => {
-  if (modalTimerId) clearTimeout(modalTimerId);
-  if (resetTimerId) clearTimeout(resetTimerId);
-};
+  if (modalTimerId) clearTimeout(modalTimerId)
+  if (resetTimerId) clearTimeout(resetTimerId)
+}
 
 // Ciclo de vida
 onMounted(() => {
-  fetchWeather();
-});
+  fetchWeather()
+})
 
 onBeforeUnmount(() => {
-  clearTimers();
-});
+  clearTimers()
+})
 </script>
 
 <template>
@@ -223,15 +224,19 @@ onBeforeUnmount(() => {
           src="/VCD1.png"
           alt="Brasão Vila do Conde"
           class="panel-header-logo"
-        />
+        >
         <img
           src="/logo_big.svg"
           alt="Vila do Conde"
           class="panel-header-brand"
-        />
+        >
         <div class="panel-header-text">
-          <div class="panel-kicker">Município de Vila do Conde</div>
-          <div class="panel-title">Painel do Cidadão</div>
+          <div class="panel-kicker">
+            Município de Vila do Conde
+          </div>
+          <div class="panel-title">
+            Painel do Cidadão
+          </div>
         </div>
       </div>
     </header>
@@ -245,7 +250,9 @@ onBeforeUnmount(() => {
             <UIcon name="i-fa6-solid-hand-holding-heart" />
           </div>
           <div class="donate-card-content">
-            <h2 class="donate-card-title">Fazer uma Doação</h2>
+            <h2 class="donate-card-title">
+              Fazer uma Doação
+            </h2>
             <p class="donate-card-subtitle">
               Ajude a comunidade local. Doe bens essenciais e receba um código
               de referência para rastreamento.
@@ -256,8 +263,8 @@ onBeforeUnmount(() => {
                 color="primary"
                 size="xl"
                 block
-                @click="goToDonate"
                 class="donate-button"
+                @click="goToDonate"
               />
             </div>
           </div>
@@ -304,7 +311,7 @@ onBeforeUnmount(() => {
               src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=400&q=80"
               alt="Notícia"
               class="panel-card-image"
-            />
+            >
             <p class="mt-3">
               Últimas novidades da comunidade local e iniciativas comunitárias.
             </p>
@@ -323,8 +330,12 @@ onBeforeUnmount(() => {
             <div class="weather-content">
               <UIcon :name="weatherIcon" class="weather-icon" />
               <div class="weather-data">
-                <div class="weather-temp">{{ weatherData.temp }}°C</div>
-                <div class="weather-desc">{{ weatherData.description }}</div>
+                <div class="weather-temp">
+                  {{ weatherData.temp }}°C
+                </div>
+                <div class="weather-desc">
+                  {{ weatherData.description }}
+                </div>
                 <div class="weather-details">
                   <span>💧 {{ weatherData.humidity }}%</span>
                   <span>💨 {{ weatherData.windSpeed }} km/h</span>
@@ -363,14 +374,18 @@ onBeforeUnmount(() => {
       </button>
 
       <div class="donate-container">
-        <h1 class="donate-screen-title">Fazer uma Doação</h1>
+        <h1 class="donate-screen-title">
+          Fazer uma Doação
+        </h1>
         <p class="donate-screen-subtitle">
           Selecione o tipo de bem que deseja doar e preencha os seus dados.
         </p>
 
         <!-- GOODS SELECTOR -->
         <div class="donate-section">
-          <div class="donate-section-title">Selecione um bem para doar</div>
+          <div class="donate-section-title">
+            Selecione um bem para doar
+          </div>
           <div class="donate-goods-slider">
             <button
               v-for="good in goods"
@@ -386,9 +401,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- DONOR FORM -->
-        <div class="donate-section">
-          <div class="donate-section-title">Dados do doador</div>
-
+        <div class="donate-section donate-section-form">
           <UFormField label="Nome completo" required>
             <UInput
               v-model="donorName"
@@ -412,15 +425,19 @@ onBeforeUnmount(() => {
             size="xl"
             block
             :disabled="!isDonateEnabled"
-            @click="submitDonation"
             class="donate-submit-btn"
+            @click="submitDonation"
           />
         </div>
       </div>
     </div>
 
     <!-- SUCCESS MODAL -->
-    <UModal v-if="thanksOpen" v-model="thanksOpen" :ui="{ width: 'w-full sm:max-w-md' }">
+    <UModal
+      v-if="thanksOpen"
+      v-model="thanksOpen"
+      :ui="{ width: 'w-full sm:max-w-md' }"
+    >
       <UCard class="thanks-modal">
         <template #header>
           <div class="thanks-header">
@@ -430,10 +447,16 @@ onBeforeUnmount(() => {
         </template>
 
         <div class="thanks-content">
-          <p class="thanks-label">O seu código de doação</p>
-          <div class="thanks-pin">{{ pin }}</div>
+          <p class="thanks-label">
+            O seu código de doação
+          </p>
+          <div class="thanks-pin">
+            {{ pin }}
+          </div>
 
-          <p class="thanks-info">Código enviado para {{ donorEmail }}</p>
+          <p class="thanks-info">
+            Código enviado para {{ donorEmail }}
+          </p>
 
           <p class="thanks-note">
             Obrigado por ajudar a comunidade de Vila do Conde!
@@ -736,7 +759,6 @@ onBeforeUnmount(() => {
   padding-top: 60px;
 }
 
-
 .donate-screen-title {
   font-size: 32px;
   font-weight: 800;
@@ -762,11 +784,32 @@ onBeforeUnmount(() => {
   margin-bottom: 24px;
 }
 
+.donate-section:nth-of-type(2) {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  border: 2px solid #d4e4f7;
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+}
+
 .donate-section-title {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 800;
   color: #0f172a;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.donate-section:nth-of-type(2) .donate-section-title::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  border-radius: 2px;
 }
 
 /* GOODS SLIDER */
@@ -832,68 +875,132 @@ onBeforeUnmount(() => {
   color: #0f172a;
 }
 
+:deep(.u-form-field:last-of-type) {
+  margin-bottom: 32px;
+}
+
 :deep(.u-form-field label) {
-  color: #0f172a;
-  font-weight: 700;
-  font-size: 16px;
-  margin-bottom: 12px;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
   display: block;
+  letter-spacing: 0.3px;
 }
 
 :deep(.u-form-field label span) {
   color: #dc2626;
+  margin-left: 3px;
+  font-weight: 700;
 }
 
 :deep(.u-input) {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border: 2px solid #e2e8f0 !important;
+  background: #f9fafb !important;
+  color: #111827 !important;
+  border: 2px solid #e5e7eb !important;
   border-radius: 12px !important;
   font-size: 16px !important;
-  padding: 14px 18px !important;
+  padding: 12px 16px !important;
   transition: all 0.2s ease !important;
-  min-height: 48px !important;
+  min-height: 50px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+:deep(.u-input:hover) {
+  border-color: #d1d5db !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
 }
 
 :deep(.u-input:focus) {
   border-color: #2563eb !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
-  background: #f0f9ff !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  outline: none !important;
 }
 
 :deep(.u-input::placeholder) {
-  color: #94a3b8 !important;
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+:deep(.u-input:disabled) {
+  background: #f3f4f6 !important;
+  color: #d1d5db !important;
+  cursor: not-allowed !important;
 }
 
 :deep(.u-button) {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  font-size: 15px;
+  font-size: 14px;
+  border-radius: 12px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+:deep(.u-button::before) {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.6s ease;
 }
 
 :deep(.u-button:not(:disabled)) {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
   color: white !important;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+  box-shadow:
+    0 6px 20px rgba(37, 99, 235, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
+}
+
+:deep(.u-button:not(:disabled):hover::before) {
+  left: 100%;
 }
 
 :deep(.u-button:not(:disabled):hover) {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 10px 28px rgba(37, 99, 235, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.12) !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%) !important;
+}
+
+:deep(.u-button:not(:disabled):focus) {
+  outline: 3px solid rgba(37, 99, 235, 0.5) !important;
+  outline-offset: 2px !important;
+}
+
+:deep(.u-button:not(:disabled):active) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
 }
 
 :deep(.u-button:disabled) {
-  background: #e2e8f0 !important;
-  color: #94a3b8 !important;
+  background: #f3f4f6 !important;
+  color: #d1d5db !important;
   cursor: not-allowed;
+  box-shadow: none !important;
+  opacity: 0.7;
 }
 
 .donate-submit-btn {
-  margin-top: 12px !important;
-  min-height: 52px !important;
+  margin-top: 0 !important;
+  min-height: 50px !important;
 }
 
 /* THANKS MODAL */
