@@ -504,14 +504,9 @@ onBeforeUnmount(() => {
             <UIcon name="i-fa6-solid-map-location-dot" class="glass-icon" />
             <span>Localização</span>
           </div>
-          <iframe
-            src="https://www.openstreetmap.org/export/embed.html?bbox=-8.85,41.25,-8.65,41.40&layer=mapnik&marker=41.3304,-8.7447"
-            class="map-frame"
-            style="border: 0"
-            :allowfullscreen="true"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-          />
+          <div class="map-wrapper">
+            <PainelMap />
+          </div>
         </div>
       </div>
     </div>
@@ -737,18 +732,8 @@ onBeforeUnmount(() => {
   border-radius: 24px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
   box-shadow: 0 20px 60px rgba(37, 99, 235, 0.5), 0 0 0 1px rgba(96, 165, 250, 0.3);
-}
-
-.hero-donate:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 28px 70px rgba(37, 99, 235, 0.6), 0 0 0 1px rgba(96, 165, 250, 0.4);
-}
-
-.hero-donate:active {
-  transform: translateY(0);
 }
 
 .hero-donate-glow {
@@ -812,11 +797,6 @@ onBeforeUnmount(() => {
   justify-content: center;
   font-size: 22px;
   color: white;
-  transition: background 0.2s ease;
-}
-
-.hero-donate:hover .hero-btn {
-  background: rgba(255,255,255,0.3);
 }
 
 .hero-label {
@@ -842,12 +822,6 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   overflow: hidden;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-}
-
-.glass-card:hover {
-  background: rgba(255, 255, 255, 0.09);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 
 .glass-card-header {
@@ -1007,11 +981,9 @@ onBeforeUnmount(() => {
 }
 
 /* ── MAP CARD ── */
-.map-frame {
-  width: 100%;
+.map-wrapper {
   height: 320px;
-  display: block;
-  border: none;
+  overflow: hidden;
 }
 
 /* ── DONATION SCREEN ── */
@@ -1033,13 +1005,7 @@ onBeforeUnmount(() => {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
   margin-bottom: 24px;
-}
-
-.donate-back-btn:hover {
-  background: rgba(255,255,255,0.14);
-  color: #fff;
 }
 
 .donate-container {
@@ -1123,14 +1089,7 @@ onBeforeUnmount(() => {
   font-size: 15px;
   font-weight: 500;
   text-align: left;
-  transition: all 0.18s ease;
   min-height: 52px;
-}
-
-.good-chip:hover {
-  background: rgba(96, 165, 250, 0.15);
-  border-color: rgba(96, 165, 250, 0.3);
-  color: #fff;
 }
 
 .good-chip.active {
@@ -1205,13 +1164,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
 }
 
-.donate-submit-btn:not(:disabled):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.65);
-}
-
 .donate-submit-btn:not(:disabled):active {
-  transform: translateY(0);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
@@ -1336,7 +1289,7 @@ onBeforeUnmount(() => {
   .panel-grid { grid-template-columns: repeat(2, 1fr); }
   .map-card { grid-column: span 2; }
   .donate-goods-grid { max-height: 400px; }
-  .map-frame { height: 380px; }
+  .map-wrapper { height: 380px; }
   .hero-donate-inner { padding: 36px 32px 24px; }
   .hero-icon { font-size: 64px; }
 }
@@ -1347,14 +1300,14 @@ onBeforeUnmount(() => {
   .panel-header-brand { width: 68px; }
   .panel-title { font-size: 30px; }
   .panel-wrap { padding: 28px 24px 48px; }
-  .map-frame { height: 420px; }
+  .map-wrapper { height: 420px; }
   .donate-goods-grid { max-height: 420px; }
 }
 
 @media (min-width: 1024px) {
   .panel-grid { grid-template-columns: repeat(3, 1fr); }
   .map-card { grid-column: span 3; }
-  .map-frame { height: 440px; }
+  .map-wrapper { height: 440px; }
   .donate-goods-grid { max-height: 440px; }
   .news-image { height: 200px; }
 }
@@ -1375,11 +1328,6 @@ onBeforeUnmount(() => {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: background 0.18s ease;
-}
-
-.transport-row:hover {
-  background: rgba(255, 255, 255, 0.08);
 }
 
 .transport-line {
@@ -1492,11 +1440,6 @@ onBeforeUnmount(() => {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: background 0.18s ease;
-}
-
-.event-row:hover {
-  background: rgba(255, 255, 255, 0.08);
 }
 
 .event-date-block {
