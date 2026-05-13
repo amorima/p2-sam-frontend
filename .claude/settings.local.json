@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\SAM\\\\p2-sam-frontend\" -Directory)",
+      "Bash(xargs grep -l \"patron\\\\|mecena\")"
+    ]
+  }
+}

@@ -1,118 +1,134 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
+import type { NavigationMenuItem, CommandPaletteItem } from '@nuxt/ui'
 
 const toast = useToast()
+const { isAdmin } = useAuth()
 
 const open = ref(false)
 
-const links = [
-  [
+const links = computed<NavigationMenuItem[][]>(() => {
+  const notificacoesItem: NavigationMenuItem = {
+    label: 'Notificações',
+    icon: 'i-lucide-bell',
+    to: '/inbox',
+    onSelect: () => { open.value = false }
+  }
+
+  const mecenasItem: NavigationMenuItem = {
+    label: 'Mecenas',
+    icon: 'i-lucide-hand-coins',
+    to: '/mecenas',
+    type: 'trigger' as const,
+    defaultOpen: false,
+    children: isAdmin.value
+      ? [
+          {
+            label: 'Todas as Doações',
+            to: '/mecenas',
+            exact: true,
+            onSelect: () => { open.value = false }
+          },
+          {
+            label: 'Doação Manual',
+            to: '/mecenas/doacao_manual',
+            onSelect: () => { open.value = false }
+          }
+        ]
+      : [
+          {
+            label: 'As Minhas Doações',
+            to: '/mecenas',
+            exact: true,
+            onSelect: () => { open.value = false }
+          },
+          {
+            label: 'Nova Doação',
+            to: '/mecenas/doacao',
+            onSelect: () => { open.value = false }
+          }
+        ]
+  }
+
+  const definicoesItem: NavigationMenuItem = {
+    label: 'Definições',
+    to: '/settings',
+    icon: 'i-lucide-settings',
+    defaultOpen: true,
+    type: 'trigger' as const,
+    children: [
+      {
+        label: 'Geral',
+        to: '/settings',
+        exact: true,
+        onSelect: () => { open.value = false }
+      },
+      {
+        label: 'Membros',
+        to: '/settings/members',
+        onSelect: () => { open.value = false }
+      },
+      {
+        label: 'Notificações',
+        to: '/settings/notifications',
+        onSelect: () => { open.value = false }
+      },
+      {
+        label: 'Segurança',
+        to: '/settings/security',
+        onSelect: () => { open.value = false }
+      }
+    ]
+  }
+
+  if (!isAdmin.value) {
+    return [[notificacoesItem, mecenasItem, definicoesItem]]
+  }
+
+  return [[
     {
       label: 'Início',
       icon: 'i-lucide-house',
       to: '/',
       exact: true,
-      onSelect: () => {
-        open.value = false
-      }
+      onSelect: () => { open.value = false }
     },
-    {
-      label: 'Notificações',
-      icon: 'i-lucide-bell',
-      to: '/inbox',
-      onSelect: () => {
-        open.value = false
-      }
-    },
-    {
-      label: 'Registo de doações',
-      icon: 'i-lucide-hand-coins',
-      onSelect: () => {
-        open.value = false
-      }
-    },
+    notificacoesItem,
+    mecenasItem,
     {
       label: 'Registo de pedidos',
       icon: 'i-lucide-clipboard-list',
-      onSelect: () => {
-        open.value = false
-      }
+      onSelect: () => { open.value = false }
     },
     {
       label: 'Doações de cidadãos',
       icon: 'i-lucide-heart-handshake',
-      onSelect: () => {
-        open.value = false
-      }
+      onSelect: () => { open.value = false }
     },
     {
       label: 'Registo de negócios',
       icon: 'i-lucide-briefcase',
-      onSelect: () => {
-        open.value = false
-      }
+      onSelect: () => { open.value = false }
     },
     {
       label: 'Estado de equipamentos',
       icon: 'i-lucide-monitor-cog',
-      onSelect: () => {
-        open.value = false
-      }
+      onSelect: () => { open.value = false }
     },
     {
       label: 'Utilizadores',
       icon: 'i-lucide-users',
       to: '/customers',
-      onSelect: () => {
-        open.value = false
-      }
+      onSelect: () => { open.value = false }
     },
-    {
-      label: 'Definições',
-      to: '/settings',
-      icon: 'i-lucide-settings',
-      defaultOpen: true,
-      type: 'trigger',
-      children: [
-        {
-          label: 'Geral',
-          to: '/settings',
-          exact: true,
-          onSelect: () => {
-            open.value = false
-          }
-        },
-        {
-          label: 'Membros',
-          to: '/settings/members',
-          onSelect: () => {
-            open.value = false
-          }
-        },
-        {
-          label: 'Notificações',
-          to: '/settings/notifications',
-          onSelect: () => {
-            open.value = false
-          }
-        },
-        {
-          label: 'Segurança',
-          to: '/settings/security',
-          onSelect: () => {
-            open.value = false
-          }
-        }
-      ]
-    }
-  ]
-] satisfies NavigationMenuItem[][]
+    definicoesItem
+  ]]
+})
 
 const groups = computed(() => [
   {
     id: 'links',
     label: 'Ir para',
-    items: links.flat()
+    items: links.value.flat() as unknown as CommandPaletteItem[]
   },
   {
     id: 'code',
