@@ -20,7 +20,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  updated: []
+  'updated': []
 }>()
 
 const toast = useToast()
@@ -120,17 +120,25 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           class="flex flex-wrap gap-4 rounded-lg bg-elevated/50 border border-default p-4 text-sm"
         >
           <div>
-            <p class="text-xs text-muted uppercase tracking-wide font-medium">Valor</p>
+            <p class="text-xs text-muted uppercase tracking-wide font-medium">
+              Valor
+            </p>
             <p class="font-semibold">
               {{ new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(donation.valor_transacao) }}
             </p>
           </div>
           <div>
-            <p class="text-xs text-muted uppercase tracking-wide font-medium">Data</p>
-            <p class="font-semibold">{{ new Date(donation.data).toLocaleDateString('pt-PT') }}</p>
+            <p class="text-xs text-muted uppercase tracking-wide font-medium">
+              Data
+            </p>
+            <p class="font-semibold">
+              {{ new Date(donation.data).toLocaleDateString('pt-PT') }}
+            </p>
           </div>
           <div>
-            <p class="text-xs text-muted uppercase tracking-wide font-medium">Estado atual</p>
+            <p class="text-xs text-muted uppercase tracking-wide font-medium">
+              Estado atual
+            </p>
             <UBadge :color="estadoBadgeColor" variant="subtle" size="sm">
               {{ donation.estado }}
             </UBadge>

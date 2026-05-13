@@ -247,7 +247,7 @@ export function printDonationReceipt(donation: ReceiptDonation) {
     <div class="header">
       <div class="logo-block">
         <div class="logo-text">SAM</div>
-        <div class="logo-sub">Serviço de Apoio Municipal</div>
+        <div class="logo-sub">Sistema de Apoio Municipal</div>
       </div>
       <div class="doc-block">
         <div class="doc-title">Comprovativo de Doação</div>
@@ -272,7 +272,7 @@ export function printDonationReceipt(donation: ReceiptDonation) {
         <div class="party-label">Beneficiário</div>
         <div class="party-name">SAM</div>
         <div class="party-detail">
-          Serviço de Apoio Municipal<br>
+          Sistema de Apoio Municipal<br>
           Rua Central, 1<br>
           4490-000 Porto, Portugal
         </div>
@@ -313,7 +313,7 @@ export function printDonationReceipt(donation: ReceiptDonation) {
       <div class="footer-left">
         Documento emitido a ${printDate}<br>
         Este comprovativo tem validade legal como recibo de donativo.<br>
-        SAM — Serviço de Apoio Municipal · Porto, Portugal
+        SAM — Sistema de Apoio Municipal · Porto, Portugal
       </div>
       <div class="footer-right">
         <div class="signature-line"></div>
@@ -324,7 +324,7 @@ export function printDonationReceipt(donation: ReceiptDonation) {
 
   <script>
     window.onload = function() { window.print(); };
-  <\/script>
+  </script>
 </body>
 </html>`
 

@@ -2,6 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { Row } from '@tanstack/table-core'
 import { printDonationReceipt, type ReceiptDonation } from '~/utils/donationPDF'
+import { mockApprovedDonation } from '~/utils/mockData'
 
 interface Donation {
   id_doacao: number
@@ -19,14 +20,15 @@ const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 
-const { isAdmin, isPatron, patronNif, patronName, setRole } = useAuth()
-const toast = useToast()
+const { isAdmin, patronNif, setRole } = useAuth()
 
 const statusModalOpen = ref(false)
 const selectedDonation = ref<Donation | null>(null)
 
 const fetchUrl = computed(() =>
-  isAdmin.value ? '/api/donations' : `/api/patrons/${patronNif.value}/donations`
+  isAdmin.value
+    ? '/api/donations'
+    : `/api/patrons/${patronNif.value}/donations`
 )
 
 const { data: rawData, status, refresh } = await useFetch<{ donations: Donation[] }>(
@@ -34,7 +36,12 @@ const { data: rawData, status, refresh } = await useFetch<{ donations: Donation[
   { lazy: true, server: false }
 )
 
-const donations = computed(() => rawData.value?.donations ?? [])
+const donations = computed<Donation[]>(() => {
+  const real = rawData.value?.donations ?? []
+  // Inject mock approved donation for demo (removed when real data is available)
+  const alreadyHasMock = real.some(d => d.id_doacao === mockApprovedDonation.id_doacao)
+  return alreadyHasMock ? real : [mockApprovedDonation as Donation, ...real]
+})
 
 function badgeColor(estado: string): 'warning' | 'success' | 'error' {
   if (estado === 'ACEITE') return 'success'
@@ -56,6 +63,8 @@ function openStatusModal(donation: Donation) {
 }
 
 function downloadPDF(donation: Donation) {
+  // TODO: When Minio integration is ready, fetch the file from bucket "files"
+  // using the donation ID. For now, generate the PDF locally.
   const receipt: ReceiptDonation = {
     id_doacao: donation.id_doacao,
     mecena_nif_nipc: donation.mecena_nif_nipc,
@@ -69,7 +78,7 @@ function downloadPDF(donation: Donation) {
 }
 
 function getRowItems(row: Row<Donation>) {
-  const items = []
+  const items: object[] = []
 
   if (isAdmin.value) {
     items.push({
@@ -80,6 +89,7 @@ function getRowItems(row: Row<Donation>) {
   }
 
   if (row.original.estado === 'ACEITE') {
+    if (items.length > 0) items.push({ type: 'separator' })
     items.push({
       label: 'Descarregar comprovativo',
       icon: 'i-lucide-download',
@@ -106,7 +116,7 @@ const adminColumns: TableColumn<Donation>[] = [
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium text-highlighted' }, row.original.nome_entidade ?? row.original.mecena_nif_nipc),
-        h('p', { class: 'text-xs text-muted' }, row.original.mecena_nif_nipc)
+        h('p', { class: 'text-xs text-muted font-mono' }, row.original.mecena_nif_nipc)
       ])
   },
   {
@@ -117,7 +127,7 @@ const adminColumns: TableColumn<Donation>[] = [
   {
     accessorKey: 'valor_transacao',
     header: 'Valor',
-    cell: ({ row }) => h('span', { class: 'font-semibold' }, formatEUR(row.original.valor_transacao))
+    cell: ({ row }) => h('span', { class: 'font-semibold tabular-nums' }, formatEUR(row.original.valor_transacao))
   },
   {
     accessorKey: 'tipo_donativo',
@@ -160,7 +170,7 @@ const patronColumns: TableColumn<Donation>[] = [
   {
     accessorKey: 'valor_transacao',
     header: 'Valor',
-    cell: ({ row }) => h('span', { class: 'font-semibold' }, formatEUR(row.original.valor_transacao))
+    cell: ({ row }) => h('span', { class: 'font-semibold tabular-nums' }, formatEUR(row.original.valor_transacao))
   },
   {
     accessorKey: 'tipo_donativo',
@@ -181,34 +191,36 @@ const patronColumns: TableColumn<Donation>[] = [
   {
     id: 'actions',
     cell: ({ row }) =>
-      h('div', { class: 'text-right' },
+      h('div', { class: 'flex justify-end' },
         row.original.estado === 'ACEITE'
           ? h(UButton, {
               icon: 'i-lucide-download',
               label: 'Comprovativo',
-              color: 'neutral',
-              variant: 'ghost',
+              color: 'primary',
+              variant: 'subtle',
               size: 'sm',
               onClick: () => downloadPDF(row.original)
             })
-          : h('span', { class: 'text-xs text-muted' }, '—')
+          : h('span', { class: 'text-xs text-muted italic' },
+              row.original.estado === 'PENDENTE' ? 'Aguarda aprovação' : 'Recusada'
+            )
       )
   }
 ]
 
 const columns = computed(() => isAdmin.value ? adminColumns : patronColumns)
-
 const pageTitle = computed(() => isAdmin.value ? 'Gestão de Doações' : 'As Minhas Doações')
-const newDonationPath = computed(() => isAdmin.value ? '/donations/new' : '/mecenas/nova')
+const newDonationPath = computed(() => isAdmin.value ? '/mecenas/doacao_manual' : '/mecenas/doacao')
 
 const stats = computed(() => {
   const list = donations.value
-  const total = list.reduce((sum, d) => sum + Number(d.valor_transacao), 0)
+  const total = list.filter(d => d.estado === 'ACEITE').reduce((s, d) => s + Number(d.valor_transacao), 0)
   return {
     total: formatEUR(total),
     count: list.length,
     aceites: list.filter(d => d.estado === 'ACEITE').length,
-    pendentes: list.filter(d => d.estado === 'PENDENTE').length
+    pendentes: list.filter(d => d.estado === 'PENDENTE').length,
+    rejeitadas: list.filter(d => d.estado === 'REJEITADO').length
   }
 })
 
@@ -222,7 +234,6 @@ const globalFilter = ref('')
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
-
         <template #right>
           <UButton
             label="Nova Doação"
@@ -241,7 +252,7 @@ const globalFilter = ref('')
         color="info"
         variant="subtle"
         title="Modo de demonstração"
-        :description="`A ver como: ${isAdmin ? 'Administrador' : `Mecenas (${patronName || patronNif})`}`"
+        :description="`Vista atual: ${isAdmin ? 'Administrador' : 'Mecenas'}`"
         class="mb-6"
       >
         <template #actions>
@@ -252,7 +263,7 @@ const globalFilter = ref('')
             color="info"
             variant="subtle"
             icon="i-lucide-user"
-            @click="setRole('patron', '123456789', 'Patron Organization')"
+            @click="setRole('patron', '123456789', 'Patron Organization, Lda.')"
           />
           <UButton
             v-else
@@ -266,27 +277,43 @@ const globalFilter = ref('')
         </template>
       </UAlert>
 
-      <!-- Stats row -->
+      <!-- Stats -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">Total Doado</p>
-          <p class="text-xl font-bold text-highlighted">{{ stats.total }}</p>
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Total Aceite
+          </p>
+          <p class="text-xl font-bold text-highlighted">
+            {{ stats.total }}
+          </p>
         </UPageCard>
         <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">Doações</p>
-          <p class="text-xl font-bold text-highlighted">{{ stats.count }}</p>
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Doações
+          </p>
+          <p class="text-xl font-bold text-highlighted">
+            {{ stats.count }}
+          </p>
         </UPageCard>
         <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">Aceites</p>
-          <p class="text-xl font-bold text-success">{{ stats.aceites }}</p>
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Aceites
+          </p>
+          <p class="text-xl font-bold text-success">
+            {{ stats.aceites }}
+          </p>
         </UPageCard>
         <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">Pendentes</p>
-          <p class="text-xl font-bold text-warning">{{ stats.pendentes }}</p>
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Pendentes
+          </p>
+          <p class="text-xl font-bold text-warning">
+            {{ stats.pendentes }}
+          </p>
         </UPageCard>
       </div>
 
-      <!-- Search + Table -->
+      <!-- Table -->
       <div class="space-y-4">
         <UInput
           v-model="globalFilter"
@@ -314,7 +341,9 @@ const globalFilter = ref('')
           class="flex flex-col items-center justify-center py-16 text-center"
         >
           <UIcon name="i-lucide-hand-coins" class="size-12 text-muted mb-3" />
-          <p class="font-medium text-highlighted">Nenhuma doação encontrada</p>
+          <p class="font-medium text-highlighted">
+            Nenhuma doação encontrada
+          </p>
           <p class="text-sm text-muted mt-1">
             {{ isAdmin ? 'Ainda não existem doações registadas.' : 'Ainda não fez nenhuma doação.' }}
           </p>

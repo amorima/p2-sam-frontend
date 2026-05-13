@@ -40,8 +40,8 @@ const links = computed<NavigationMenuItem[][]>(() => [
               onSelect: () => { open.value = false }
             },
             {
-              label: 'Nova Doação',
-              to: '/donations/new',
+              label: 'Doação Manual',
+              to: '/mecenas/doacao_manual',
               onSelect: () => { open.value = false }
             }
           ]
@@ -54,7 +54,7 @@ const links = computed<NavigationMenuItem[][]>(() => [
             },
             {
               label: 'Nova Doação',
-              to: '/mecenas/nova',
+              to: '/mecenas/doacao',
               onSelect: () => { open.value = false }
             }
           ]
