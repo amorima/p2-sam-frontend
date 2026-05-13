@@ -66,6 +66,7 @@ const { data: stats } = await useAsyncData<Stat[]>(
     })
   },
   {
+    server: false,
     watch: [() => props.period, () => props.range],
     default: () => []
   }

@@ -42,6 +42,7 @@ const { data } = await useAsyncData(
     )
   },
   {
+    server: false,
     watch: [() => props.period, () => props.range],
     default: () => []
   }
