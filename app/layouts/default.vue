@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
+import type { NavigationMenuItem, CommandPaletteItem } from '@nuxt/ui'
 
 const toast = useToast()
 const { isAdmin } = useAuth()
@@ -128,7 +128,7 @@ const groups = computed(() => [
   {
     id: 'links',
     label: 'Ir para',
-    items: links.value.flat()
+    items: links.value.flat() as unknown as CommandPaletteItem[]
   },
   {
     id: 'code',

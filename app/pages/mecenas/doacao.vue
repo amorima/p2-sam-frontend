@@ -3,7 +3,8 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { mockPatron } from '~/utils/mockData'
 
-type PaymentMethod = 'Numerário' | 'Transferência Bancária' | 'Referência Multibanco' | 'Cheque'
+const paymentMethods = ['Numerário', 'Transferência Bancária', 'Referência Multibanco', 'Cheque'] as const
+type PaymentMethod = typeof paymentMethods[number]
 
 const toast = useToast()
 const router = useRouter()
@@ -14,7 +15,7 @@ if (isAdmin.value) {
 }
 
 // TODO: Replace mockPatron with data fetched from auth session + API
-const patronData = reactive({ ...mockPatron.entity, ...mockPatron.locations[0] })
+const patronData = reactive({ ...mockPatron.entity, ...mockPatron.locations[0]! })
 
 function metodoToTipo(metodo: string): string {
   const map: Record<string, string> = {
@@ -37,17 +38,10 @@ const docNumber = useState('docNumber.doacao', () => {
   return `DOA-${year}-${rand}`
 })
 
-const paymentMethods: PaymentMethod[] = [
-  'Numerário',
-  'Transferência Bancária',
-  'Referência Multibanco',
-  'Cheque'
-]
-
 const schema = z.object({
   data: z.string().min(1, 'Data obrigatória'),
   valor_transacao: z.number({ message: 'Valor obrigatório' }).positive('O valor deve ser positivo'),
-  metodo_pagamento: z.string().min(1, 'Método de doação obrigatório'),
+  metodo_pagamento: z.enum(paymentMethods),
   anonimo: z.boolean()
 })
 

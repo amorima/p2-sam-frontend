@@ -9,7 +9,8 @@ interface Patron {
   contacts: Array<{ contacto: string, nome_contacto: string, descricao: string }>
 }
 
-type PaymentMethod = 'Numerário' | 'Transferência Bancária' | 'Referência Multibanco' | 'Cheque'
+const paymentMethods = ['Numerário', 'Transferência Bancária', 'Referência Multibanco', 'Cheque'] as const
+type PaymentMethod = typeof paymentMethods[number]
 type EstadoDonativo = 'PENDENTE' | 'ACEITE' | 'REJEITADO'
 
 const toast = useToast()
@@ -57,7 +58,6 @@ const docNumber = useState('docNumber.manual', () => {
   return `DOA-${year}-${rand}`
 })
 
-const paymentMethods: PaymentMethod[] = ['Numerário', 'Transferência Bancária', 'Referência Multibanco', 'Cheque']
 const estadoOptions = [
   { label: 'Pendente', value: 'PENDENTE' },
   { label: 'Aceite', value: 'ACEITE' },
@@ -67,7 +67,7 @@ const estadoOptions = [
 const schema = z.object({
   data: z.string().min(1, 'Data obrigatória'),
   valor_transacao: z.number({ message: 'Valor obrigatório' }).positive('O valor deve ser positivo'),
-  metodo_pagamento: z.string().min(1, 'Método obrigatório'),
+  metodo_pagamento: z.enum(paymentMethods),
   estado: z.enum(['PENDENTE', 'ACEITE', 'REJEITADO']),
   anonimo: z.boolean()
 })
