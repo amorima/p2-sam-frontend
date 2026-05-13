@@ -2,10 +2,11 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const toast = useToast()
+const { isAdmin } = useAuth()
 
 const open = ref(false)
 
-const links = [
+const links = computed<NavigationMenuItem[][]>(() => [
   [
     {
       label: 'Início',
@@ -25,11 +26,38 @@ const links = [
       }
     },
     {
-      label: 'Registo de doações',
+      label: 'Mecenas',
       icon: 'i-lucide-hand-coins',
-      onSelect: () => {
-        open.value = false
-      }
+      to: '/mecenas',
+      type: 'trigger' as const,
+      defaultOpen: false,
+      children: isAdmin.value
+        ? [
+            {
+              label: 'Todas as Doações',
+              to: '/mecenas',
+              exact: true,
+              onSelect: () => { open.value = false }
+            },
+            {
+              label: 'Nova Doação',
+              to: '/donations/new',
+              onSelect: () => { open.value = false }
+            }
+          ]
+        : [
+            {
+              label: 'As Minhas Doações',
+              to: '/mecenas',
+              exact: true,
+              onSelect: () => { open.value = false }
+            },
+            {
+              label: 'Nova Doação',
+              to: '/mecenas/nova',
+              onSelect: () => { open.value = false }
+            }
+          ]
     },
     {
       label: 'Registo de pedidos',
@@ -72,7 +100,7 @@ const links = [
       to: '/settings',
       icon: 'i-lucide-settings',
       defaultOpen: true,
-      type: 'trigger',
+      type: 'trigger' as const,
       children: [
         {
           label: 'Geral',
@@ -106,13 +134,13 @@ const links = [
       ]
     }
   ]
-] satisfies NavigationMenuItem[][]
+])
 
 const groups = computed(() => [
   {
     id: 'links',
     label: 'Ir para',
-    items: links.flat()
+    items: links.value.flat()
   },
   {
     id: 'code',
