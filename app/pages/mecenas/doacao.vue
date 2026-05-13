@@ -311,7 +311,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                 />
               </UFormField>
               <UFormField name="metodo_pagamento" label="Método de Pagamento" required>
-                <USelect v-model="state.metodo_pagamento" :items="paymentMethods" class="w-full" />
+                <USelect v-model="state.metodo_pagamento" :items="[...paymentMethods]" class="w-full" />
               </UFormField>
             </div>
 
