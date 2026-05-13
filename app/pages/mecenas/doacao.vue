@@ -16,8 +16,19 @@ if (isAdmin.value) {
 // TODO: Replace mockPatron with data fetched from auth session + API
 const patronData = reactive({ ...mockPatron.entity, ...mockPatron.locations[0] })
 
+function metodoToTipo(metodo: string): string {
+  const map: Record<string, string> = {
+    'Numerário': 'NUMERARIO',
+    'Transferência Bancária': 'TRANSFERENCIA',
+    'Referência Multibanco': 'REFERENCIA',
+    'Cheque': 'CHEQUE'
+  }
+  return map[metodo] ?? 'NUMERARIO'
+}
+
 const showEditModal = ref(false)
 const showMBModal = ref(false)
+const showIBANModal = ref(false)
 const isSubmitting = ref(false)
 
 const docNumber = useState('docNumber.doacao', () => {
@@ -55,6 +66,9 @@ watch(() => state.metodo_pagamento, (method) => {
   if (method === 'Referência Multibanco' && (state.valor_transacao ?? 0) > 0) {
     showMBModal.value = true
   }
+  if (method === 'Transferência Bancária') {
+    showIBANModal.value = true
+  }
 })
 
 function openMBModal() {
@@ -79,7 +93,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       body: {
         data: event.data.data,
         valor_transacao: event.data.valor_transacao,
-        tipo_donativo: 'NUMERARIO',
+        tipo_donativo: metodoToTipo(event.data.metodo_pagamento),
         anonimo: event.data.anonimo,
         url_comprovativo: '',
         estado: 'PENDENTE'
@@ -254,10 +268,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     Organização
                   </p>
                   <p class="font-semibold text-highlighted">
-                    SAM
-                  </p>
-                  <p class="text-muted">
-                    Sistema de Apoio Municipal
+                    Serviço de Apoio Municipal de Vila do Conde
                   </p>
                 </div>
                 <USeparator />
@@ -265,8 +276,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                   <p class="text-xs text-muted uppercase tracking-wide font-medium mb-0.5">
                     Morada
                   </p>
-                  <p>Rua Central, 1</p>
-                  <p>4490-000 Porto, Portugal</p>
+                  <p>Praça Vasco da Gama</p>
+                  <p>4480-454 Vila do Conde</p>
                 </div>
                 <USeparator />
                 <div>
@@ -311,6 +322,21 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               </UFormField>
             </div>
 
+            <div v-if="state.metodo_pagamento === 'Transferência Bancária'" class="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
+              <UIcon name="i-lucide-info" class="size-4 text-primary shrink-0" />
+              <p class="text-sm flex-1">
+                Transfira para o IBAN do SAM e indique o nº de documento como referência.
+              </p>
+              <UButton
+                label="Ver IBAN"
+                icon="i-lucide-credit-card"
+                color="primary"
+                variant="subtle"
+                size="sm"
+                @click="showIBANModal = true"
+              />
+            </div>
+
             <div v-if="state.metodo_pagamento === 'Referência Multibanco'" class="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3">
               <UIcon name="i-lucide-info" class="size-4 text-primary shrink-0" />
               <p class="text-sm flex-1">
@@ -329,7 +355,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <USeparator />
 
             <UFormField name="anonimo" label="Doação Anónima">
-              <div class="flex items-center gap-3 h-[34px]">
+              <div class="flex items-center gap-3 h-8.5">
                 <USwitch v-model="state.anonimo" />
                 <span class="text-sm text-muted">{{ state.anonimo ? 'O seu nome não será divulgado publicamente' : 'Doação pública' }}</span>
               </div>
@@ -376,6 +402,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         :patron="patronData"
         @saved="(updated) => Object.assign(patronData, updated)"
       />
+
+      <DonationsIBANModal v-model:open="showIBANModal" />
 
       <DonationsMBReferenceModal
         v-model:open="showMBModal"

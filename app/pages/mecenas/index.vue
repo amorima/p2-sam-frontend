@@ -10,7 +10,7 @@ interface Donation {
   nome_entidade?: string
   data: string
   valor_transacao: number
-  tipo_donativo: 'ESPECIE' | 'NUMERARIO'
+  tipo_donativo: 'NUMERARIO' | 'TRANSFERENCIA' | 'REFERENCIA' | 'CHEQUE'
   anonimo: boolean
   url_comprovativo: string
   estado: 'ACEITE' | 'REJEITADO' | 'PENDENTE'
@@ -55,6 +55,17 @@ function formatDate(d: string) {
 
 function formatEUR(v: number) {
   return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(v)
+}
+
+const modoLabel: Record<string, string> = {
+  NUMERARIO: 'Numerário',
+  TRANSFERENCIA: 'Transferência',
+  REFERENCIA: 'Ref. Multibanco',
+  CHEQUE: 'Cheque'
+}
+
+function formatModo(tipo: string) {
+  return modoLabel[tipo] ?? tipo
 }
 
 function openStatusModal(donation: Donation) {
@@ -131,10 +142,10 @@ const adminColumns: TableColumn<Donation>[] = [
   },
   {
     accessorKey: 'tipo_donativo',
-    header: 'Tipo',
+    header: 'Modo',
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' },
-        () => row.original.tipo_donativo === 'NUMERARIO' ? 'Monetário' : 'Espécie'
+        () => formatModo(row.original.tipo_donativo)
       )
   },
   {
@@ -174,10 +185,10 @@ const patronColumns: TableColumn<Donation>[] = [
   },
   {
     accessorKey: 'tipo_donativo',
-    header: 'Tipo',
+    header: 'Modo',
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' },
-        () => row.original.tipo_donativo === 'NUMERARIO' ? 'Monetário' : 'Espécie'
+        () => formatModo(row.original.tipo_donativo)
       )
   },
   {

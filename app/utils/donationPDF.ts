@@ -247,7 +247,7 @@ export function printDonationReceipt(donation: ReceiptDonation) {
     <div class="header">
       <div class="logo-block">
         <div class="logo-text">SAM</div>
-        <div class="logo-sub">Sistema de Apoio Municipal</div>
+        <div class="logo-sub">Serviço de Apoio Municipal de Vila do Conde</div>
       </div>
       <div class="doc-block">
         <div class="doc-title">Comprovativo de Doação</div>
@@ -272,9 +272,9 @@ export function printDonationReceipt(donation: ReceiptDonation) {
         <div class="party-label">Beneficiário</div>
         <div class="party-name">SAM</div>
         <div class="party-detail">
-          Sistema de Apoio Municipal<br>
-          Rua Central, 1<br>
-          4490-000 Porto, Portugal
+          Serviço de Apoio Municipal de Vila do Conde<br>
+          Praça Vasco da Gama<br>
+          4480-454 Vila do Conde
         </div>
       </div>
     </div>
@@ -313,7 +313,7 @@ export function printDonationReceipt(donation: ReceiptDonation) {
       <div class="footer-left">
         Documento emitido a ${printDate}<br>
         Este comprovativo tem validade legal como recibo de donativo.<br>
-        SAM — Sistema de Apoio Municipal · Porto, Portugal
+        Serviço de Apoio Municipal de Vila do Conde · Praça Vasco da Gama, 4480-454 Vila do Conde
       </div>
       <div class="footer-right">
         <div class="signature-line"></div>
