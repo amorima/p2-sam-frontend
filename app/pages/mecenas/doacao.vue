@@ -4,7 +4,6 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 import { mockPatron } from '~/utils/mockData'
 
 const paymentMethods = ['Numerário', 'Transferência Bancária', 'Referência Multibanco', 'Cheque'] as const
-type PaymentMethod = typeof paymentMethods[number]
 
 const toast = useToast()
 const router = useRouter()

@@ -10,7 +10,6 @@ interface Patron {
 }
 
 const paymentMethods = ['Numerário', 'Transferência Bancária', 'Referência Multibanco', 'Cheque'] as const
-type PaymentMethod = typeof paymentMethods[number]
 type EstadoDonativo = 'PENDENTE' | 'ACEITE' | 'REJEITADO'
 
 const toast = useToast()
