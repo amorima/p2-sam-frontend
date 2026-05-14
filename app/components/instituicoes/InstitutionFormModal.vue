@@ -216,7 +216,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         <USeparator label="Localização" />
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <UFormField name="rua" label="Rua" required class="sm:col-span-2">
+          <UFormField
+            name="rua"
+            label="Rua"
+            required
+            class="sm:col-span-2"
+          >
             <UInput v-model="state.rua" class="w-full" />
           </UFormField>
           <UFormField name="n_porta" label="Nº Porta">
