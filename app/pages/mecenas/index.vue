@@ -91,7 +91,14 @@ function downloadPDF(donation: Donation) {
 function getRowItems(row: Row<Donation>) {
   const items: object[] = []
 
+  items.push({
+    label: 'Ver detalhes',
+    icon: 'i-lucide-eye',
+    to: `/mecenas/${row.original.id_doacao}`
+  })
+
   if (isAdmin.value) {
+    items.push({ type: 'separator' })
     items.push({
       label: 'Mudar estado',
       icon: 'i-lucide-refresh-cw',
@@ -100,16 +107,12 @@ function getRowItems(row: Row<Donation>) {
   }
 
   if (row.original.estado === 'ACEITE') {
-    if (items.length > 0) items.push({ type: 'separator' })
+    items.push({ type: 'separator' })
     items.push({
       label: 'Descarregar comprovativo',
       icon: 'i-lucide-download',
       onSelect() { downloadPDF(row.original) }
     })
-  }
-
-  if (items.length === 0) {
-    items.push({ type: 'label', label: 'Sem ações disponíveis' })
   }
 
   return items
@@ -202,19 +205,10 @@ const patronColumns: TableColumn<Donation>[] = [
   {
     id: 'actions',
     cell: ({ row }) =>
-      h('div', { class: 'flex justify-end' },
-        row.original.estado === 'ACEITE'
-          ? h(UButton, {
-              icon: 'i-lucide-download',
-              label: 'Comprovativo',
-              color: 'primary',
-              variant: 'subtle',
-              size: 'sm',
-              onClick: () => downloadPDF(row.original)
-            })
-          : h('span', { class: 'text-xs text-muted italic' },
-              row.original.estado === 'PENDENTE' ? 'Aguarda aprovação' : 'Recusada'
-            )
+      h('div', { class: 'text-right' },
+        h(UDropdownMenu, { content: { align: 'end' }, items: getRowItems(row) },
+          () => h(UButton, { icon: 'i-lucide-ellipsis-vertical', color: 'neutral', variant: 'ghost', class: 'ml-auto' })
+        )
       )
   }
 ]

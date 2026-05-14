@@ -230,3 +230,253 @@ export const mockApprovedDonation = {
   url_comprovativo: '',
   estado: 'ACEITE' as const
 }
+
+export const mockInstitution = {
+  resource: {
+    nif_nipc: '500999888',
+    geo_latitude: 41.3526,
+    geo_longitude: -8.7396,
+    url_comprovativo_estatuto: ''
+  },
+  entity: {
+    nif_nipc: '500999888',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    email_login: 'instituicao@bsamaritano.pt',
+    iban: 'PT50000201230000000999888'
+  },
+  locations: [
+    {
+      rua: 'Rua da Solidariedade',
+      n_porta: '23',
+      codigo_postal: '4480-200',
+      concelho: 'Vila do Conde',
+      distrito: 'Porto',
+      freguesia: 'Vila do Conde',
+      pais: 'Portugal'
+    }
+  ],
+  contacts: [
+    {
+      contacto: '252631500',
+      nome_contacto: 'Padre João Mendes',
+      descricao: 'Diretor'
+    }
+  ]
+}
+
+export const mockInstitutions = [
+  mockInstitution,
+  {
+    resource: { nif_nipc: '500111222', geo_latitude: 41.3490, geo_longitude: -8.7430, url_comprovativo_estatuto: '' },
+    entity: { nif_nipc: '500111222', nome_entidade: 'Associação Mãos Solidárias', email_login: 'geral@maossolidarias.pt', iban: 'PT50000201230000000111222' },
+    locations: [{ rua: 'Travessa da Paz', n_porta: '5', codigo_postal: '4480-450', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Azurara', pais: 'Portugal' }],
+    contacts: [{ contacto: '252620111', nome_contacto: 'Marta Costa', descricao: 'Presidente' }]
+  },
+  {
+    resource: { nif_nipc: '500333444', geo_latitude: 41.3460, geo_longitude: -8.7350, url_comprovativo_estatuto: '' },
+    entity: { nif_nipc: '500333444', nome_entidade: 'Lar de São Vicente', email_login: 'direcao@larsvicente.pt', iban: 'PT50000201230000000333444' },
+    locations: [{ rua: 'Avenida do Mar', n_porta: '88', codigo_postal: '4480-100', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Vila do Conde', pais: 'Portugal' }],
+    contacts: [{ contacto: '252600333', nome_contacto: 'Helena Rocha', descricao: 'Diretora Técnica' }]
+  }
+]
+
+export type TipoBem = 'BEM' | 'SERVICO'
+export interface GoodsService {
+  tipo_bem_servico: string
+  tipo_bem: TipoBem
+}
+
+export const mockGoodsServices: GoodsService[] = [
+  { tipo_bem_servico: 'Cabazes alimentares', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Roupa de bebé', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Material escolar', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Produtos de higiene', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Cobertores e roupa de cama', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Medicamentos', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Apoio psicológico', tipo_bem: 'SERVICO' },
+  { tipo_bem_servico: 'Consulta médica', tipo_bem: 'SERVICO' },
+  { tipo_bem_servico: 'Transporte adaptado', tipo_bem: 'SERVICO' },
+  { tipo_bem_servico: 'Aulas de explicação', tipo_bem: 'SERVICO' },
+  { tipo_bem_servico: 'Apoio jurídico', tipo_bem: 'SERVICO' }
+]
+
+export type EstadoPedido = 'PENDENTE' | 'ACEITE' | 'REJEITADO'
+export type MatchTipo = 'VOUCHER' | 'NEGOCIO' | 'PAINEL'
+export type ItemStatus = 'available' | 'pending' | 'completed'
+
+export interface NeedItem {
+  id_item: number
+  id_pedido: number
+  tipo_bem_servico: string
+  tipo_bem: TipoBem
+  status: ItemStatus
+  match_tipo: MatchTipo | null
+  match_ref: string | null
+}
+
+export interface Need {
+  id_pedido: number
+  nif_nipc: string
+  nome_entidade?: string
+  data: string
+  estado: EstadoPedido
+  urgente: boolean
+  motivo_recusa?: string
+  items: NeedItem[]
+}
+
+export interface Panel {
+  id_dispositivo: number
+  nome: string
+  geo_latitude: number
+  geo_longitude: number
+  raio_alcance: number
+  localizacao: string
+}
+
+export const mockPanels: Panel[] = [
+  { id_dispositivo: 1, nome: 'Painel #1 - Praça Vasco da Gama', geo_latitude: 41.3526, geo_longitude: -8.7396, raio_alcance: 500, localizacao: 'Praça Vasco da Gama' },
+  { id_dispositivo: 2, nome: 'Painel #2 - Mercado Municipal', geo_latitude: 41.3552, geo_longitude: -8.7444, raio_alcance: 500, localizacao: 'Mercado Municipal' },
+  { id_dispositivo: 3, nome: 'Painel #3 - Estação CP', geo_latitude: 41.3493, geo_longitude: -8.7375, raio_alcance: 500, localizacao: 'Estação Ferroviária' },
+  { id_dispositivo: 4, nome: 'Painel #4 - Centro de Saúde', geo_latitude: 41.3478, geo_longitude: -8.7402, raio_alcance: 500, localizacao: 'Centro de Saúde de Vila do Conde' },
+  { id_dispositivo: 5, nome: 'Painel #5 - Azurara', geo_latitude: 41.3416, geo_longitude: -8.7479, raio_alcance: 500, localizacao: 'Azurara' },
+  { id_dispositivo: 6, nome: 'Painel #6 - Touguinhó', geo_latitude: 41.3713, geo_longitude: -8.6987, raio_alcance: 500, localizacao: 'Touguinhó' },
+  { id_dispositivo: 7, nome: 'Painel #7 - Póvoa de Varzim', geo_latitude: 41.3811, geo_longitude: -8.7589, raio_alcance: 500, localizacao: 'Póvoa de Varzim' },
+  { id_dispositivo: 8, nome: 'Painel #8 - Mindelo', geo_latitude: 41.3043, geo_longitude: -8.7299, raio_alcance: 500, localizacao: 'Mindelo' },
+  { id_dispositivo: 9, nome: 'Painel #9 - Vairão', geo_latitude: 41.3247, geo_longitude: -8.6716, raio_alcance: 500, localizacao: 'Vairão' },
+  { id_dispositivo: 10, nome: 'Painel #10 - Modivas', geo_latitude: 41.2891, geo_longitude: -8.7211, raio_alcance: 500, localizacao: 'Modivas' },
+  { id_dispositivo: 11, nome: 'Painel #11 - Esposende', geo_latitude: 41.5340, geo_longitude: -8.7822, raio_alcance: 500, localizacao: 'Esposende (fora do raio)' }
+]
+
+export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (d: number) => d * Math.PI / 180
+  const R = 6371
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(a))
+}
+
+export interface BusinessOffer {
+  id_oferta: number
+  negocio_nif_nipc: string
+  tipo_bem_servico: string
+  descricao: string
+  valor_total: number
+  desconto: number
+}
+
+export interface Business {
+  resource: {
+    nif_nipc: string
+    geo_latitude: number
+    geo_longitude: number
+  }
+  entity: {
+    nif_nipc: string
+    nome_entidade: string
+    email_login: string
+    iban: string
+  }
+  offers: BusinessOffer[]
+}
+
+export const mockBusinesses: Business[] = [
+  {
+    resource: { nif_nipc: '510100200', geo_latitude: 41.3540, geo_longitude: -8.7400 },
+    entity: { nif_nipc: '510100200', nome_entidade: 'Advogados Costa & Associados', email_login: 'contacto@costaassociados.pt', iban: 'PT50000201230000010100200' },
+    offers: [
+      { id_oferta: 901, negocio_nif_nipc: '510100200', tipo_bem_servico: 'Apoio jurídico', descricao: 'Consultas jurídicas em direito civil e família', valor_total: 80, desconto: 100 },
+      { id_oferta: 902, negocio_nif_nipc: '510100200', tipo_bem_servico: 'Aulas de explicação', descricao: 'Explicações de Português e História', valor_total: 25, desconto: 50 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100300', geo_latitude: 41.3500, geo_longitude: -8.7480 },
+    entity: { nif_nipc: '510100300', nome_entidade: 'Sociedade de Advogados Conde', email_login: 'geral@sacondeadvogados.pt', iban: 'PT50000201230000010100300' },
+    offers: [
+      { id_oferta: 903, negocio_nif_nipc: '510100300', tipo_bem_servico: 'Apoio jurídico', descricao: 'Apoio jurídico em direito laboral', valor_total: 90, desconto: 75 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100400', geo_latitude: 41.3480, geo_longitude: -8.7390 },
+    entity: { nif_nipc: '510100400', nome_entidade: 'Clínica Norte+ Saúde', email_login: 'clinica@norteplus.pt', iban: 'PT50000201230000010100400' },
+    offers: [
+      { id_oferta: 904, negocio_nif_nipc: '510100400', tipo_bem_servico: 'Consulta médica', descricao: 'Consultas de medicina geral e familiar', valor_total: 40, desconto: 100 },
+      { id_oferta: 905, negocio_nif_nipc: '510100400', tipo_bem_servico: 'Apoio psicológico', descricao: 'Acompanhamento psicológico semanal', valor_total: 50, desconto: 80 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100500', geo_latitude: 41.3560, geo_longitude: -8.7420 },
+    entity: { nif_nipc: '510100500', nome_entidade: 'Psicologia Vila do Conde', email_login: 'consultorio@psivc.pt', iban: 'PT50000201230000010100500' },
+    offers: [
+      { id_oferta: 906, negocio_nif_nipc: '510100500', tipo_bem_servico: 'Apoio psicológico', descricao: 'Terapia individual e familiar', valor_total: 55, desconto: 100 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100600', geo_latitude: 41.3470, geo_longitude: -8.7330 },
+    entity: { nif_nipc: '510100600', nome_entidade: 'Táxis Solidários do Conde', email_login: 'frota@taxisconde.pt', iban: 'PT50000201230000010100600' },
+    offers: [
+      { id_oferta: 907, negocio_nif_nipc: '510100600', tipo_bem_servico: 'Transporte adaptado', descricao: 'Viaturas adaptadas a mobilidade reduzida', valor_total: 15, desconto: 100 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100700', geo_latitude: 41.3520, geo_longitude: -8.7380 },
+    entity: { nif_nipc: '510100700', nome_entidade: 'Centro Escolar Aprender+', email_login: 'geral@aprendermais.pt', iban: 'PT50000201230000010100700' },
+    offers: [
+      { id_oferta: 908, negocio_nif_nipc: '510100700', tipo_bem_servico: 'Aulas de explicação', descricao: 'Explicações de Matemática e Ciências (1º-9º ano)', valor_total: 20, desconto: 100 }
+    ]
+  }
+]
+
+export const mockNeeds: Need[] = [
+  {
+    id_pedido: 2001,
+    nif_nipc: '500999888',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    data: '2026-04-12T10:30:00.000Z',
+    estado: 'ACEITE',
+    urgente: true,
+    items: [
+      { id_item: 1, id_pedido: 2001, tipo_bem_servico: 'Cabazes alimentares', tipo_bem: 'BEM', status: 'completed', match_tipo: 'VOUCHER', match_ref: 'VCH-2026-0042' },
+      { id_item: 2, id_pedido: 2001, tipo_bem_servico: 'Produtos de higiene', tipo_bem: 'BEM', status: 'pending', match_tipo: 'PAINEL', match_ref: 'Painel #3 - Praça Vasco da Gama' }
+    ]
+  },
+  {
+    id_pedido: 2002,
+    nif_nipc: '500111222',
+    nome_entidade: 'Associação Mãos Solidárias',
+    data: '2026-05-02T14:15:00.000Z',
+    estado: 'PENDENTE',
+    urgente: false,
+    items: [
+      { id_item: 3, id_pedido: 2002, tipo_bem_servico: 'Material escolar', tipo_bem: 'BEM', status: 'available', match_tipo: null, match_ref: null },
+      { id_item: 4, id_pedido: 2002, tipo_bem_servico: 'Aulas de explicação', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null }
+    ]
+  },
+  {
+    id_pedido: 2003,
+    nif_nipc: '500333444',
+    nome_entidade: 'Lar de São Vicente',
+    data: '2026-05-08T09:00:00.000Z',
+    estado: 'PENDENTE',
+    urgente: true,
+    items: [
+      { id_item: 5, id_pedido: 2003, tipo_bem_servico: 'Medicamentos', tipo_bem: 'BEM', status: 'available', match_tipo: null, match_ref: null },
+      { id_item: 6, id_pedido: 2003, tipo_bem_servico: 'Consulta médica', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null },
+      { id_item: 7, id_pedido: 2003, tipo_bem_servico: 'Transporte adaptado', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null }
+    ]
+  },
+  {
+    id_pedido: 2004,
+    nif_nipc: '500999888',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    data: '2026-03-25T11:00:00.000Z',
+    estado: 'REJEITADO',
+    urgente: false,
+    motivo_recusa: 'Pedido fora do âmbito do SAM.',
+    items: [
+      { id_item: 8, id_pedido: 2004, tipo_bem_servico: 'Apoio jurídico', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null }
+    ]
+  }
+]
