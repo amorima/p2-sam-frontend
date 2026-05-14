@@ -325,6 +325,110 @@ export interface Need {
   items: NeedItem[]
 }
 
+export interface Panel {
+  id_dispositivo: number
+  nome: string
+  geo_latitude: number
+  geo_longitude: number
+  raio_alcance: number
+  localizacao: string
+}
+
+export const mockPanels: Panel[] = [
+  { id_dispositivo: 1, nome: 'Painel #1 - Praça Vasco da Gama', geo_latitude: 41.3526, geo_longitude: -8.7396, raio_alcance: 500, localizacao: 'Praça Vasco da Gama' },
+  { id_dispositivo: 2, nome: 'Painel #2 - Mercado Municipal', geo_latitude: 41.3552, geo_longitude: -8.7444, raio_alcance: 500, localizacao: 'Mercado Municipal' },
+  { id_dispositivo: 3, nome: 'Painel #3 - Estação CP', geo_latitude: 41.3493, geo_longitude: -8.7375, raio_alcance: 500, localizacao: 'Estação Ferroviária' },
+  { id_dispositivo: 4, nome: 'Painel #4 - Centro de Saúde', geo_latitude: 41.3478, geo_longitude: -8.7402, raio_alcance: 500, localizacao: 'Centro de Saúde de Vila do Conde' },
+  { id_dispositivo: 5, nome: 'Painel #5 - Azurara', geo_latitude: 41.3416, geo_longitude: -8.7479, raio_alcance: 500, localizacao: 'Azurara' },
+  { id_dispositivo: 6, nome: 'Painel #6 - Touguinhó', geo_latitude: 41.3713, geo_longitude: -8.6987, raio_alcance: 500, localizacao: 'Touguinhó' },
+  { id_dispositivo: 7, nome: 'Painel #7 - Póvoa de Varzim', geo_latitude: 41.3811, geo_longitude: -8.7589, raio_alcance: 500, localizacao: 'Póvoa de Varzim' },
+  { id_dispositivo: 8, nome: 'Painel #8 - Mindelo', geo_latitude: 41.3043, geo_longitude: -8.7299, raio_alcance: 500, localizacao: 'Mindelo' },
+  { id_dispositivo: 9, nome: 'Painel #9 - Vairão', geo_latitude: 41.3247, geo_longitude: -8.6716, raio_alcance: 500, localizacao: 'Vairão' },
+  { id_dispositivo: 10, nome: 'Painel #10 - Modivas', geo_latitude: 41.2891, geo_longitude: -8.7211, raio_alcance: 500, localizacao: 'Modivas' },
+  { id_dispositivo: 11, nome: 'Painel #11 - Esposende', geo_latitude: 41.5340, geo_longitude: -8.7822, raio_alcance: 500, localizacao: 'Esposende (fora do raio)' }
+]
+
+export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (d: number) => d * Math.PI / 180
+  const R = 6371
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(a))
+}
+
+export interface BusinessOffer {
+  id_oferta: number
+  negocio_nif_nipc: string
+  tipo_bem_servico: string
+  descricao: string
+  valor_total: number
+  desconto: number
+}
+
+export interface Business {
+  resource: {
+    nif_nipc: string
+    geo_latitude: number
+    geo_longitude: number
+  }
+  entity: {
+    nif_nipc: string
+    nome_entidade: string
+    email_login: string
+    iban: string
+  }
+  offers: BusinessOffer[]
+}
+
+export const mockBusinesses: Business[] = [
+  {
+    resource: { nif_nipc: '510100200', geo_latitude: 41.3540, geo_longitude: -8.7400 },
+    entity: { nif_nipc: '510100200', nome_entidade: 'Advogados Costa & Associados', email_login: 'contacto@costaassociados.pt', iban: 'PT50000201230000010100200' },
+    offers: [
+      { id_oferta: 901, negocio_nif_nipc: '510100200', tipo_bem_servico: 'Apoio jurídico', descricao: 'Consultas jurídicas em direito civil e família', valor_total: 80, desconto: 100 },
+      { id_oferta: 902, negocio_nif_nipc: '510100200', tipo_bem_servico: 'Aulas de explicação', descricao: 'Explicações de Português e História', valor_total: 25, desconto: 50 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100300', geo_latitude: 41.3500, geo_longitude: -8.7480 },
+    entity: { nif_nipc: '510100300', nome_entidade: 'Sociedade de Advogados Conde', email_login: 'geral@sacondeadvogados.pt', iban: 'PT50000201230000010100300' },
+    offers: [
+      { id_oferta: 903, negocio_nif_nipc: '510100300', tipo_bem_servico: 'Apoio jurídico', descricao: 'Apoio jurídico em direito laboral', valor_total: 90, desconto: 75 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100400', geo_latitude: 41.3480, geo_longitude: -8.7390 },
+    entity: { nif_nipc: '510100400', nome_entidade: 'Clínica Norte+ Saúde', email_login: 'clinica@norteplus.pt', iban: 'PT50000201230000010100400' },
+    offers: [
+      { id_oferta: 904, negocio_nif_nipc: '510100400', tipo_bem_servico: 'Consulta médica', descricao: 'Consultas de medicina geral e familiar', valor_total: 40, desconto: 100 },
+      { id_oferta: 905, negocio_nif_nipc: '510100400', tipo_bem_servico: 'Apoio psicológico', descricao: 'Acompanhamento psicológico semanal', valor_total: 50, desconto: 80 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100500', geo_latitude: 41.3560, geo_longitude: -8.7420 },
+    entity: { nif_nipc: '510100500', nome_entidade: 'Psicologia Vila do Conde', email_login: 'consultorio@psivc.pt', iban: 'PT50000201230000010100500' },
+    offers: [
+      { id_oferta: 906, negocio_nif_nipc: '510100500', tipo_bem_servico: 'Apoio psicológico', descricao: 'Terapia individual e familiar', valor_total: 55, desconto: 100 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100600', geo_latitude: 41.3470, geo_longitude: -8.7330 },
+    entity: { nif_nipc: '510100600', nome_entidade: 'Táxis Solidários do Conde', email_login: 'frota@taxisconde.pt', iban: 'PT50000201230000010100600' },
+    offers: [
+      { id_oferta: 907, negocio_nif_nipc: '510100600', tipo_bem_servico: 'Transporte adaptado', descricao: 'Viaturas adaptadas a mobilidade reduzida', valor_total: 15, desconto: 100 }
+    ]
+  },
+  {
+    resource: { nif_nipc: '510100700', geo_latitude: 41.3520, geo_longitude: -8.7380 },
+    entity: { nif_nipc: '510100700', nome_entidade: 'Centro Escolar Aprender+', email_login: 'geral@aprendermais.pt', iban: 'PT50000201230000010100700' },
+    offers: [
+      { id_oferta: 908, negocio_nif_nipc: '510100700', tipo_bem_servico: 'Aulas de explicação', descricao: 'Explicações de Matemática e Ciências (1º-9º ano)', valor_total: 20, desconto: 100 }
+    ]
+  }
+]
+
 export const mockNeeds: Need[] = [
   {
     id_pedido: 2001,

@@ -56,7 +56,14 @@ function getRowItems(row: Row<Need>) {
   const items: object[] = []
   const need = row.original
 
+  items.push({
+    label: 'Ver detalhes',
+    icon: 'i-lucide-eye',
+    to: `/instituicoes/${need.id_pedido}`
+  })
+
   if (isAdmin.value) {
+    items.push({ type: 'separator' })
     items.push({
       label: 'Mudar estado',
       icon: 'i-lucide-refresh-cw',
@@ -73,7 +80,7 @@ function getRowItems(row: Row<Need>) {
 
   const vouchers = need.items.filter(i => i.match_tipo === 'VOUCHER' && i.match_ref)
   if (vouchers.length) {
-    if (items.length) items.push({ type: 'separator' })
+    items.push({ type: 'separator' })
     vouchers.forEach((it) => {
       items.push({
         label: `Voucher: ${it.tipo_bem_servico}`,
@@ -83,9 +90,6 @@ function getRowItems(row: Row<Need>) {
     })
   }
 
-  if (items.length === 0) {
-    items.push({ type: 'label', label: 'Sem ações disponíveis' })
-  }
   return items
 }
 
@@ -177,21 +181,27 @@ const institutionColumns: TableColumn<Need>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const vouchers = row.original.items.filter(i => i.match_tipo === 'VOUCHER' && i.match_ref)
-      if (vouchers.length === 0) {
-        return h('div', { class: 'text-right text-xs text-muted italic' },
-          row.original.estado === 'PENDENTE' ? 'Aguarda aprovação' : (row.original.estado === 'REJEITADO' ? 'Recusado' : 'Em alocação')
-        )
-      }
-      return h('div', { class: 'flex justify-end' },
-        h(UDropdownMenu, {
-          content: { align: 'end' },
-          items: vouchers.map(it => ({
-            label: it.tipo_bem_servico,
+      const need = row.original
+      const vouchers = need.items.filter(i => i.match_tipo === 'VOUCHER' && i.match_ref)
+      const items: object[] = [{
+        label: 'Ver detalhes',
+        icon: 'i-lucide-eye',
+        to: `/instituicoes/${need.id_pedido}`
+      }]
+      if (vouchers.length) {
+        items.push({ type: 'separator' })
+        vouchers.forEach((it) => {
+          items.push({
+            label: `Voucher: ${it.tipo_bem_servico}`,
             icon: 'i-lucide-download',
-            onSelect: () => downloadVoucher(row.original, it)
-          }))
-        }, () => h(UButton, { icon: 'i-lucide-download', label: 'Vouchers', color: 'primary', variant: 'subtle', size: 'sm' }))
+            onSelect: () => downloadVoucher(need, it)
+          })
+        })
+      }
+      return h('div', { class: 'text-right' },
+        h(UDropdownMenu, { content: { align: 'end' }, items },
+          () => h(UButton, { icon: 'i-lucide-ellipsis-vertical', color: 'neutral', variant: 'ghost', class: 'ml-auto' })
+        )
       )
     }
   }

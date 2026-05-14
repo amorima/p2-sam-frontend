@@ -5,7 +5,7 @@ import { printVoucher } from '~/utils/voucherPDF'
 
 const toast = useToast()
 const { isAdmin } = useAuth()
-const { needs, setItemMatch, approveNeed, rejectNeed } = useNeeds()
+const { needs, businesses, panels, institutions, setItemMatch, approveNeed, rejectNeed } = useNeeds()
 
 if (!isAdmin.value) {
   await navigateTo('/instituicoes')
@@ -59,10 +59,33 @@ function confirmReject() {
 }
 
 function updateMatch(need: Need, id_item: number, tipo: MatchTipo | null, ref?: string) {
-  const reference = tipo === 'VOUCHER'
-    ? `VCH-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`
-    : (ref ?? null)
+  let reference: string | null
+  if (tipo === 'VOUCHER') {
+    reference = `VCH-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`
+  } else if (tipo === 'NEGOCIO') {
+    reference = ref ?? null
+  } else if (tipo === 'PAINEL') {
+    reference = ref ?? 'A alocar a painel'
+  } else {
+    reference = null
+  }
   setItemMatch(need.id_pedido, id_item, tipo, reference)
+}
+
+function setBusinessRef(need: Need, id_item: number, label: string | null) {
+  setItemMatch(need.id_pedido, id_item, 'NEGOCIO', label)
+}
+
+function setPanelRef(need: Need, id_item: number, label: string | null) {
+  setItemMatch(need.id_pedido, id_item, 'PAINEL', label)
+}
+
+function institutionCoords(nif: string): { lat: number, lng: number } {
+  const inst = institutions.value.find(i => i.resource.nif_nipc === nif)
+  return {
+    lat: inst?.resource.geo_latitude ?? 41.3526,
+    lng: inst?.resource.geo_longitude ?? -8.7396
+  }
 }
 
 function approve(need: Need) {
@@ -210,53 +233,80 @@ function formatDate(d: string) {
             <div
               v-for="item in need.items"
               :key="item.id_item"
-              class="grid grid-cols-1 md:grid-cols-[1fr_auto_220px] gap-3 items-center rounded-lg border border-default bg-elevated/30 px-4 py-3"
+              class="rounded-lg border border-default bg-elevated/30 px-4 py-3 space-y-3"
             >
-              <div class="flex items-center gap-3 min-w-0">
-                <UIcon
-                  :name="item.tipo_bem === 'BEM' ? 'i-lucide-package' : 'i-lucide-handshake'"
-                  :class="['size-5 shrink-0', item.tipo_bem === 'BEM' ? 'text-primary' : 'text-info']"
-                />
-                <div class="min-w-0">
-                  <p class="font-medium truncate">
-                    {{ item.tipo_bem_servico }}
-                  </p>
-                  <p class="text-xs text-muted">
-                    {{ item.tipo_bem === 'BEM' ? 'Bem' : 'Serviço' }}
-                  </p>
+              <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_220px] gap-3 items-center">
+                <div class="flex items-center gap-3 min-w-0">
+                  <UIcon
+                    :name="item.tipo_bem === 'BEM' ? 'i-lucide-package' : 'i-lucide-handshake'"
+                    :class="['size-5 shrink-0', item.tipo_bem === 'BEM' ? 'text-primary' : 'text-info']"
+                  />
+                  <div class="min-w-0">
+                    <p class="font-medium truncate">
+                      {{ item.tipo_bem_servico }}
+                    </p>
+                    <p class="text-xs text-muted">
+                      {{ item.tipo_bem === 'BEM' ? 'Bem' : 'Serviço' }}
+                    </p>
+                  </div>
                 </div>
+
+                <div class="md:justify-self-center">
+                  <UBadge
+                    v-if="item.match_tipo"
+                    :icon="matchTipoIcon[item.match_tipo]"
+                    color="success"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    {{ matchTipoLabel[item.match_tipo] }}
+                  </UBadge>
+                  <UBadge
+                    v-else
+                    color="neutral"
+                    variant="subtle"
+                    size="sm"
+                    icon="i-lucide-circle-dashed"
+                  >
+                    Sem match
+                  </UBadge>
+                </div>
+
+                <USelect
+                  :model-value="item.match_tipo ?? undefined"
+                  :items="matchOptions(item.tipo_bem)"
+                  value-key="value"
+                  label-key="label"
+                  placeholder="Escolher match..."
+                  class="w-full"
+                  @update:model-value="(v: MatchTipo) => updateMatch(need, item.id_item, v)"
+                />
               </div>
 
-              <div class="md:justify-self-center">
-                <UBadge
-                  v-if="item.match_tipo"
-                  :icon="matchTipoIcon[item.match_tipo]"
-                  color="success"
-                  variant="subtle"
-                  size="sm"
-                >
-                  {{ matchTipoLabel[item.match_tipo] }}
-                </UBadge>
-                <UBadge
-                  v-else
-                  color="neutral"
-                  variant="subtle"
-                  size="sm"
-                  icon="i-lucide-circle-dashed"
-                >
-                  Sem match
-                </UBadge>
+              <div v-if="item.match_tipo === 'NEGOCIO'" class="pl-8 border-l-2 border-info/40">
+                <p class="text-xs text-muted uppercase tracking-wide font-medium mb-2">
+                  Escolha o negócio parceiro
+                </p>
+                <InstituicoesBusinessPicker
+                  :model-value="item.match_ref"
+                  :businesses="businesses"
+                  :category="item.tipo_bem_servico"
+                  @select="(v) => setBusinessRef(need, item.id_item, v.label)"
+                />
               </div>
 
-              <USelect
-                :model-value="item.match_tipo ?? undefined"
-                :items="matchOptions(item.tipo_bem)"
-                value-key="value"
-                label-key="label"
-                placeholder="Escolher match..."
-                class="w-full"
-                @update:model-value="(v: MatchTipo) => updateMatch(need, item.id_item, v)"
-              />
+              <div v-if="item.match_tipo === 'PAINEL'" class="pl-8 border-l-2 border-success/40">
+                <p class="text-xs text-muted uppercase tracking-wide font-medium mb-2">
+                  Alocação a painéis
+                </p>
+                <InstituicoesPanelPicker
+                  :model-value="item.match_ref"
+                  :panels="panels"
+                  :institution-lat="institutionCoords(need.nif_nipc).lat"
+                  :institution-lng="institutionCoords(need.nif_nipc).lng"
+                  @update:model-value="(label) => setPanelRef(need, item.id_item, label)"
+                />
+              </div>
             </div>
           </div>
 

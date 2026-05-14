@@ -3,11 +3,15 @@ import {
   mockNeeds,
   mockInstitutions,
   mockGoodsServices,
+  mockBusinesses,
+  mockPanels,
   type Need,
   type NeedItem,
   type EstadoPedido,
   type MatchTipo,
-  type GoodsService
+  type GoodsService,
+  type Business,
+  type Panel
 } from '~/utils/mockData'
 
 interface NewItemInput {
@@ -28,6 +32,8 @@ const _useNeeds = () => {
   const needs = useState<Need[]>('needs.list', () => [...mockNeeds])
   const institutions = useState('needs.institutions', () => [...mockInstitutions])
   const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [...mockGoodsServices])
+  const businesses = useState<Business[]>('needs.businesses', () => [...mockBusinesses])
+  const panels = useState<Panel[]>('needs.panels', () => [...mockPanels])
 
   const nextNeedId = () => Math.max(2000, ...needs.value.map(n => n.id_pedido)) + 1
   const nextItemId = () => {
@@ -133,6 +139,8 @@ const _useNeeds = () => {
     needs,
     institutions,
     goodsServices,
+    businesses,
+    panels,
     createNeed,
     updateNeedStatus,
     setItemMatch,
