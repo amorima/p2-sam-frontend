@@ -93,10 +93,6 @@ const items = computed<DropdownMenuItem[][]>(() => [
       icon: 'i-lucide-user'
     },
     {
-      label: 'Faturação',
-      icon: 'i-lucide-credit-card'
-    },
-    {
       label: 'Definições',
       icon: 'i-lucide-settings',
       to: '/settings'
