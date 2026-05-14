@@ -26,6 +26,39 @@ export const mockPatron = {
   ]
 }
 
+export const mockPatrons = [
+  {
+    resource: { nif_nipc: '500123456' },
+    entity: { nif_nipc: '500123456', nome_entidade: 'Fundação Cultural de Vila do Conde', email_login: 'geral@fcvc.pt', iban: 'PT50000201230000000111111' },
+    locations: [{ rua: 'Praça Vasco da Gama', n_porta: '1', codigo_postal: '4480-454', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Vila do Conde', pais: 'Portugal' }],
+    contacts: [{ contacto: '252631000', nome_contacto: 'Maria Santos', descricao: 'Diretora' }]
+  },
+  {
+    resource: { nif_nipc: '502345678' },
+    entity: { nif_nipc: '502345678', nome_entidade: 'Construções Nortense, S.A.', email_login: 'financeiro@nortense.pt', iban: 'PT50000201230000000222222' },
+    locations: [{ rua: 'Rua das Indústrias', n_porta: '45', codigo_postal: '4480-200', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Azurara', pais: 'Portugal' }],
+    contacts: [{ contacto: '252640200', nome_contacto: 'Carlos Ferreira', descricao: 'Diretor Financeiro' }]
+  },
+  {
+    resource: { nif_nipc: '210987654' },
+    entity: { nif_nipc: '210987654', nome_entidade: 'Ana Margarida Teixeira', email_login: 'ana.teixeira@gmail.com', iban: 'PT50000201230000000333333' },
+    locations: [{ rua: 'Rua de Santo António', n_porta: '12', codigo_postal: '4480-670', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Touguinhó', pais: 'Portugal' }],
+    contacts: [{ contacto: '916543210', nome_contacto: 'Ana Teixeira', descricao: 'Titular' }]
+  },
+  {
+    resource: { nif_nipc: '508765432' },
+    entity: { nif_nipc: '508765432', nome_entidade: 'Supermercados Atlântico, Lda.', email_login: 'geral@atlantico.pt', iban: 'PT50000201230000000444444' },
+    locations: [{ rua: 'Avenida do Brasil', n_porta: '100', codigo_postal: '4480-100', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Vila do Conde', pais: 'Portugal' }],
+    contacts: [{ contacto: '252610100', nome_contacto: 'Rui Monteiro', descricao: 'Sócio-Gerente' }]
+  },
+  {
+    resource: { nif_nipc: '504321098' },
+    entity: { nif_nipc: '504321098', nome_entidade: 'Clínica Saúde Norte, Lda.', email_login: 'clinica@saudenorte.pt', iban: 'PT50000201230000000555555' },
+    locations: [{ rua: 'Rua Dr. António Granjo', n_porta: '8', codigo_postal: '4480-668', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Vila do Conde', pais: 'Portugal' }],
+    contacts: [{ contacto: '252650050', nome_contacto: 'Dra. Sofia Lopes', descricao: 'Diretora Clínica' }]
+  }
+]
+
 const now = Date.now()
 
 export const mockLockers = [

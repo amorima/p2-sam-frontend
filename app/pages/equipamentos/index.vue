@@ -120,7 +120,7 @@ const columns: TableColumn<Locker>[] = [
     accessorKey: 'saude',
     header: 'Estado',
     cell: ({ row }) => {
-      const cfg = saudeConfig[row.original.saude] ?? saudeConfig.desligado
+      const cfg = saudeConfig[row.original.saude] ?? { color: 'neutral' as const, label: 'Desligado' }
       return h(UBadge, { variant: 'subtle', color: cfg.color, size: 'sm' }, () => cfg.label)
     }
   },

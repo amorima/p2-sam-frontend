@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import { mockPatrons } from '~/utils/mockData'
 
 interface Patron {
   resource: { nif_nipc: string }
@@ -25,7 +26,12 @@ const { data: patronsData, status: patronsStatus, refresh: refreshPatrons } = aw
   server: false
 })
 
-const patrons = computed(() => patronsData.value?.data ?? [])
+const patrons = computed(() => {
+  const real = patronsData.value?.data ?? []
+  const mockNifs = new Set(mockPatrons.map(p => p.resource.nif_nipc))
+  return [...mockPatrons, ...real.filter(p => !mockNifs.has(p.resource.nif_nipc))]
+})
+
 const patronOptions = computed(() =>
   patrons.value.map(p => ({
     label: `${p.entity.nome_entidade} — ${p.resource.nif_nipc}`,
@@ -231,15 +237,28 @@ async function onPatronSaved(nif: string) {
           <div class="lg:col-span-2">
             <UPageCard variant="subtle" class="h-full">
               <template #header>
-                <div class="flex items-center justify-between gap-2">
-                  <div class="flex items-center gap-2">
-                    <UIcon name="i-lucide-building-2" class="size-4 text-muted" />
-                    <h3 class="font-semibold text-highlighted">
-                      Mecenas
-                    </h3>
-                  </div>
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-lucide-building-2" class="size-4 text-muted" />
+                  <h3 class="font-semibold text-highlighted">
+                    Mecenas
+                  </h3>
+                </div>
+              </template>
+
+              <div class="space-y-4">
+                <div class="flex gap-2">
+                  <USelectMenu
+                    v-model="selectedNif"
+                    :items="patronOptions"
+                    value-key="value"
+                    label-key="label"
+                    placeholder="Pesquisar mecenas por nome ou NIF..."
+                    :loading="patronsStatus === 'pending'"
+                    search-placeholder="Pesquisar por nome ou NIF..."
+                    class="flex-1"
+                  />
                   <UButton
-                    :label="selectedPatron ? 'Editar Mecenas' : 'Novo Mecenas'"
+                    :label="selectedPatron ? 'Editar' : 'Novo Mecenas'"
                     :icon="selectedPatron ? 'i-lucide-pencil' : 'i-lucide-plus'"
                     color="neutral"
                     variant="outline"
@@ -247,20 +266,6 @@ async function onPatronSaved(nif: string) {
                     @click="showPatronModal = true"
                   />
                 </div>
-              </template>
-
-              <div class="space-y-4">
-                <USelect
-                  v-model="selectedNif"
-                  :items="patronOptions"
-                  value-key="value"
-                  label-key="label"
-                  placeholder="Pesquisar mecenas por nome ou NIF..."
-                  :loading="patronsStatus === 'pending'"
-                  searchable
-                  search-placeholder="Pesquisar..."
-                  class="w-full"
-                />
 
                 <template v-if="selectedPatron">
                   <USeparator />
