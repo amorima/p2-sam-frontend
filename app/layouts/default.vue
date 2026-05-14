@@ -112,6 +112,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
     {
       label: 'Estado de equipamentos',
       icon: 'i-lucide-monitor-cog',
+      to: '/equipamentos',
       onSelect: () => { open.value = false }
     },
     {

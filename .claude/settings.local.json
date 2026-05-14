@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(Get-ChildItem -Path \"c:\\\\SAM\\\\p2-sam-frontend\" -Directory)",
-      "Bash(xargs grep -l \"patron\\\\|mecena\")"
+      "Bash(xargs grep -l \"patron\\\\|mecena\")",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\SAM\\\\p2-sam-frontend\" -Recurse -Depth 3 -Force | Select-Object -Property FullName | ForEach-Object {$_.FullName})",
+      "PowerShell(head -80)"
     ]
   }
 }
