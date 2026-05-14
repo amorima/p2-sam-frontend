@@ -54,19 +54,31 @@ async function onFileChange(e: Event) {
     return
   }
 
+  const allowedTypes = ['image/jpeg', 'image/gif', 'image/png']
+  if (!allowedTypes.includes(file.type)) {
+    toast.add({ title: 'Formato inválido', description: 'Apenas JPG, GIF ou PNG são permitidos.', icon: 'i-lucide-x', color: 'error' })
+    return
+  }
+
+  if (file.size > 1 * 1024 * 1024) {
+    toast.add({ title: 'Ficheiro demasiado grande', description: 'O avatar não pode exceder 1 MB.', icon: 'i-lucide-x', color: 'error' })
+    return
+  }
+
   const previewUrl = URL.createObjectURL(file)
   profile.avatar = previewUrl
   userProfile.profile.value.avatar = previewUrl
 
   try {
     const filename = encodeURIComponent(file.name)
+    const { public: { backendBase } } = useRuntimeConfig()
 
-    const uploadRes = await fetch(`/api/upload/avatar?nome=${filename}`, {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const uploadRes = await fetch(`${backendBase}/api/upload/avatar?nome=${filename}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': file.type || 'application/octet-stream'
-      },
-      body: file
+      body: formData
     })
 
     if (!uploadRes.ok) {
