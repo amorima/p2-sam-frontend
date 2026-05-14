@@ -49,39 +49,8 @@ const links = computed<NavigationMenuItem[][]>(() => {
         ]
   }
 
-  const definicoesItem: NavigationMenuItem = {
-    label: 'Definições',
-    to: '/settings',
-    icon: 'i-lucide-settings',
-    defaultOpen: true,
-    type: 'trigger' as const,
-    children: [
-      {
-        label: 'Geral',
-        to: '/settings',
-        exact: true,
-        onSelect: () => { open.value = false }
-      },
-      {
-        label: 'Membros',
-        to: '/settings/members',
-        onSelect: () => { open.value = false }
-      },
-      {
-        label: 'Notificações',
-        to: '/settings/notifications',
-        onSelect: () => { open.value = false }
-      },
-      {
-        label: 'Segurança',
-        to: '/settings/security',
-        onSelect: () => { open.value = false }
-      }
-    ]
-  }
-
   if (!isAdmin.value) {
-    return [[notificacoesItem, mecenasItem, definicoesItem]]
+    return [[notificacoesItem, mecenasItem]]
   }
 
   return [[
@@ -112,6 +81,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
     {
       label: 'Estado de equipamentos',
       icon: 'i-lucide-monitor-cog',
+      to: '/equipamentos',
       onSelect: () => { open.value = false }
     },
     {
@@ -119,8 +89,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-lucide-users',
       to: '/customers',
       onSelect: () => { open.value = false }
-    },
-    definicoesItem
+    }
   ]]
 })
 
