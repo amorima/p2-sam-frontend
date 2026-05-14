@@ -2,7 +2,7 @@
 import type { NavigationMenuItem, CommandPaletteItem } from '@nuxt/ui'
 
 const toast = useToast()
-const { isAdmin } = useAuth()
+const { isAdmin, isInstitution } = useAuth()
 
 const open = ref(false)
 
@@ -49,6 +49,50 @@ const links = computed<NavigationMenuItem[][]>(() => {
         ]
   }
 
+  const instituicoesItem: NavigationMenuItem = {
+    label: 'Instituições',
+    icon: 'i-lucide-clipboard-list',
+    to: '/instituicoes',
+    type: 'trigger' as const,
+    defaultOpen: false,
+    children: isAdmin.value
+      ? [
+          {
+            label: 'Todos os Pedidos',
+            to: '/instituicoes',
+            exact: true,
+            onSelect: () => { open.value = false }
+          },
+          {
+            label: 'Aprovação de Pedidos',
+            to: '/instituicoes/aprovacao',
+            onSelect: () => { open.value = false }
+          },
+          {
+            label: 'Pedido Manual',
+            to: '/instituicoes/pedido_manual',
+            onSelect: () => { open.value = false }
+          }
+        ]
+      : [
+          {
+            label: 'Os Meus Pedidos',
+            to: '/instituicoes',
+            exact: true,
+            onSelect: () => { open.value = false }
+          },
+          {
+            label: 'Novo Pedido',
+            to: '/instituicoes/pedido',
+            onSelect: () => { open.value = false }
+          }
+        ]
+  }
+
+  if (isInstitution.value) {
+    return [[notificacoesItem, instituicoesItem]]
+  }
+
   if (!isAdmin.value) {
     return [[notificacoesItem, mecenasItem]]
   }
@@ -63,11 +107,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
     },
     notificacoesItem,
     mecenasItem,
-    {
-      label: 'Registo de pedidos',
-      icon: 'i-lucide-clipboard-list',
-      onSelect: () => { open.value = false }
-    },
+    instituicoesItem,
     {
       label: 'Doações de cidadãos',
       icon: 'i-lucide-heart-handshake',

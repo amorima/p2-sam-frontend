@@ -230,3 +230,150 @@ export const mockApprovedDonation = {
   url_comprovativo: '',
   estado: 'ACEITE' as const
 }
+
+export const mockInstitution = {
+  resource: {
+    nif_nipc: '500999888',
+    geo_latitude: 41.3526,
+    geo_longitude: -8.7396,
+    url_comprovativo_estatuto: ''
+  },
+  entity: {
+    nif_nipc: '500999888',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    email_login: 'instituicao@bsamaritano.pt',
+    iban: 'PT50000201230000000999888'
+  },
+  locations: [
+    {
+      rua: 'Rua da Solidariedade',
+      n_porta: '23',
+      codigo_postal: '4480-200',
+      concelho: 'Vila do Conde',
+      distrito: 'Porto',
+      freguesia: 'Vila do Conde',
+      pais: 'Portugal'
+    }
+  ],
+  contacts: [
+    {
+      contacto: '252631500',
+      nome_contacto: 'Padre João Mendes',
+      descricao: 'Diretor'
+    }
+  ]
+}
+
+export const mockInstitutions = [
+  mockInstitution,
+  {
+    resource: { nif_nipc: '500111222', geo_latitude: 41.3490, geo_longitude: -8.7430, url_comprovativo_estatuto: '' },
+    entity: { nif_nipc: '500111222', nome_entidade: 'Associação Mãos Solidárias', email_login: 'geral@maossolidarias.pt', iban: 'PT50000201230000000111222' },
+    locations: [{ rua: 'Travessa da Paz', n_porta: '5', codigo_postal: '4480-450', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Azurara', pais: 'Portugal' }],
+    contacts: [{ contacto: '252620111', nome_contacto: 'Marta Costa', descricao: 'Presidente' }]
+  },
+  {
+    resource: { nif_nipc: '500333444', geo_latitude: 41.3460, geo_longitude: -8.7350, url_comprovativo_estatuto: '' },
+    entity: { nif_nipc: '500333444', nome_entidade: 'Lar de São Vicente', email_login: 'direcao@larsvicente.pt', iban: 'PT50000201230000000333444' },
+    locations: [{ rua: 'Avenida do Mar', n_porta: '88', codigo_postal: '4480-100', concelho: 'Vila do Conde', distrito: 'Porto', freguesia: 'Vila do Conde', pais: 'Portugal' }],
+    contacts: [{ contacto: '252600333', nome_contacto: 'Helena Rocha', descricao: 'Diretora Técnica' }]
+  }
+]
+
+export type TipoBem = 'BEM' | 'SERVICO'
+export interface GoodsService {
+  tipo_bem_servico: string
+  tipo_bem: TipoBem
+}
+
+export const mockGoodsServices: GoodsService[] = [
+  { tipo_bem_servico: 'Cabazes alimentares', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Roupa de bebé', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Material escolar', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Produtos de higiene', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Cobertores e roupa de cama', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Medicamentos', tipo_bem: 'BEM' },
+  { tipo_bem_servico: 'Apoio psicológico', tipo_bem: 'SERVICO' },
+  { tipo_bem_servico: 'Consulta médica', tipo_bem: 'SERVICO' },
+  { tipo_bem_servico: 'Transporte adaptado', tipo_bem: 'SERVICO' },
+  { tipo_bem_servico: 'Aulas de explicação', tipo_bem: 'SERVICO' },
+  { tipo_bem_servico: 'Apoio jurídico', tipo_bem: 'SERVICO' }
+]
+
+export type EstadoPedido = 'PENDENTE' | 'ACEITE' | 'REJEITADO'
+export type MatchTipo = 'VOUCHER' | 'NEGOCIO' | 'PAINEL'
+export type ItemStatus = 'available' | 'pending' | 'completed'
+
+export interface NeedItem {
+  id_item: number
+  id_pedido: number
+  tipo_bem_servico: string
+  tipo_bem: TipoBem
+  status: ItemStatus
+  match_tipo: MatchTipo | null
+  match_ref: string | null
+}
+
+export interface Need {
+  id_pedido: number
+  nif_nipc: string
+  nome_entidade?: string
+  data: string
+  estado: EstadoPedido
+  urgente: boolean
+  motivo_recusa?: string
+  items: NeedItem[]
+}
+
+export const mockNeeds: Need[] = [
+  {
+    id_pedido: 2001,
+    nif_nipc: '500999888',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    data: '2026-04-12T10:30:00.000Z',
+    estado: 'ACEITE',
+    urgente: true,
+    items: [
+      { id_item: 1, id_pedido: 2001, tipo_bem_servico: 'Cabazes alimentares', tipo_bem: 'BEM', status: 'completed', match_tipo: 'VOUCHER', match_ref: 'VCH-2026-0042' },
+      { id_item: 2, id_pedido: 2001, tipo_bem_servico: 'Produtos de higiene', tipo_bem: 'BEM', status: 'pending', match_tipo: 'PAINEL', match_ref: 'Painel #3 - Praça Vasco da Gama' }
+    ]
+  },
+  {
+    id_pedido: 2002,
+    nif_nipc: '500111222',
+    nome_entidade: 'Associação Mãos Solidárias',
+    data: '2026-05-02T14:15:00.000Z',
+    estado: 'PENDENTE',
+    urgente: false,
+    items: [
+      { id_item: 3, id_pedido: 2002, tipo_bem_servico: 'Material escolar', tipo_bem: 'BEM', status: 'available', match_tipo: null, match_ref: null },
+      { id_item: 4, id_pedido: 2002, tipo_bem_servico: 'Aulas de explicação', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null }
+    ]
+  },
+  {
+    id_pedido: 2003,
+    nif_nipc: '500333444',
+    nome_entidade: 'Lar de São Vicente',
+    data: '2026-05-08T09:00:00.000Z',
+    estado: 'PENDENTE',
+    urgente: true,
+    items: [
+      { id_item: 5, id_pedido: 2003, tipo_bem_servico: 'Medicamentos', tipo_bem: 'BEM', status: 'available', match_tipo: null, match_ref: null },
+      { id_item: 6, id_pedido: 2003, tipo_bem_servico: 'Consulta médica', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null },
+      { id_item: 7, id_pedido: 2003, tipo_bem_servico: 'Transporte adaptado', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null }
+    ]
+  },
+  {
+    id_pedido: 2004,
+    nif_nipc: '500999888',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    data: '2026-03-25T11:00:00.000Z',
+    estado: 'REJEITADO',
+    urgente: false,
+    motivo_recusa: 'Pedido fora do âmbito do SAM.',
+    items: [
+      { id_item: 8, id_pedido: 2004, tipo_bem_servico: 'Apoio jurídico', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null }
+    ]
+  }
+]
+
