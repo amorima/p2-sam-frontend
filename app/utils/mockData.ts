@@ -480,3 +480,199 @@ export const mockNeeds: Need[] = [
     ]
   }
 ]
+
+export const LEAD_PIN_VALIDITY_HOURS = 168
+
+export type LeadEstado = 'PENDENTE' | 'ENTREGUE' | 'EXPIRADO'
+
+export interface SmartLocker {
+  id_locker: number
+  nome: string
+  estado: 'DISPONIVEL' | 'INDISPONIVEL' | 'OCUPADO' | 'MANUTENCAO'
+  geo_latitude: number
+  geo_longitude: number
+  localizacao: string
+  total_portas: number
+}
+
+export const mockSmartLockers: SmartLocker[] = [
+  { id_locker: 1, nome: 'Locker Centro', estado: 'DISPONIVEL', geo_latitude: 41.3526, geo_longitude: -8.7396, localizacao: 'Praça Vasco da Gama, Vila do Conde', total_portas: 12 },
+  { id_locker: 2, nome: 'Locker Mercado', estado: 'DISPONIVEL', geo_latitude: 41.3552, geo_longitude: -8.7444, localizacao: 'Mercado Municipal de Vila do Conde', total_portas: 8 },
+  { id_locker: 3, nome: 'Locker Estação', estado: 'OCUPADO', geo_latitude: 41.3493, geo_longitude: -8.7375, localizacao: 'Estação Ferroviária de Vila do Conde', total_portas: 10 },
+  { id_locker: 4, nome: 'Locker Azurara', estado: 'MANUTENCAO', geo_latitude: 41.3416, geo_longitude: -8.7479, localizacao: 'Centro Cívico de Azurara', total_portas: 6 }
+]
+
+export interface Lead {
+  id_lead: number
+  data: string
+  id_painel: number
+  painel_nome?: string
+  nome_cidadao: string
+  contacto_cidadao: string
+  id_pedido: number
+  id_item: number
+  item_pedido: string
+  estado: LeadEstado
+  pin_entrega: string
+  id_locker: number | null
+  locker_nome?: string
+  porta?: number | null
+  data_entrega?: string | null
+  nome_entidade?: string
+}
+
+const HOUR = 3_600_000
+const DAY = 24 * HOUR
+
+const NOW = new Date('2026-05-15T12:00:00.000Z').getTime()
+
+export const mockLeads: Lead[] = [
+  // ENTREGUE (já no locker) — pronto para levantamento
+  {
+    id_lead: 5001,
+    data: new Date(NOW - 2 * DAY).toISOString(),
+    id_painel: 1,
+    painel_nome: 'Painel #1 - Praça Vasco da Gama',
+    nome_cidadao: 'Joana Pereira',
+    contacto_cidadao: 'joana.pereira@gmail.com',
+    id_pedido: 2003,
+    id_item: 5,
+    item_pedido: 'Medicamentos',
+    nome_entidade: 'Lar de São Vicente',
+    estado: 'ENTREGUE',
+    pin_entrega: '482917',
+    id_locker: 1,
+    locker_nome: 'Locker Centro',
+    porta: 3,
+    data_entrega: new Date(NOW - 18 * HOUR).toISOString()
+  },
+  {
+    id_lead: 5002,
+    data: new Date(NOW - 4 * DAY).toISOString(),
+    id_painel: 2,
+    painel_nome: 'Painel #2 - Mercado Municipal',
+    nome_cidadao: 'Manuel Rodrigues',
+    contacto_cidadao: 'manuel.rodrigues@sapo.pt',
+    id_pedido: 2001,
+    id_item: 2,
+    item_pedido: 'Produtos de higiene',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    estado: 'ENTREGUE',
+    pin_entrega: '209384',
+    id_locker: 2,
+    locker_nome: 'Locker Mercado',
+    porta: 5,
+    data_entrega: new Date(NOW - 3 * DAY).toISOString()
+  },
+  {
+    id_lead: 5003,
+    data: new Date(NOW - 1 * DAY).toISOString(),
+    id_painel: 3,
+    painel_nome: 'Painel #3 - Estação CP',
+    nome_cidadao: 'Sofia Almeida',
+    contacto_cidadao: 'sofia.almeida@hotmail.com',
+    id_pedido: 2001,
+    id_item: 2,
+    item_pedido: 'Produtos de higiene',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    estado: 'ENTREGUE',
+    pin_entrega: '763412',
+    id_locker: 1,
+    locker_nome: 'Locker Centro',
+    porta: 7,
+    data_entrega: new Date(NOW - 6 * HOUR).toISOString()
+  },
+  // PENDENTE — dentro do prazo
+  {
+    id_lead: 5004,
+    data: new Date(NOW - 12 * HOUR).toISOString(),
+    id_painel: 1,
+    painel_nome: 'Painel #1 - Praça Vasco da Gama',
+    nome_cidadao: 'Tiago Marques',
+    contacto_cidadao: 'tiago.marques@gmail.com',
+    id_pedido: 2003,
+    id_item: 5,
+    item_pedido: 'Medicamentos',
+    nome_entidade: 'Lar de São Vicente',
+    estado: 'PENDENTE',
+    pin_entrega: '156302',
+    id_locker: 1,
+    locker_nome: 'Locker Centro',
+    porta: null,
+    data_entrega: null
+  },
+  {
+    id_lead: 5005,
+    data: new Date(NOW - 3 * DAY).toISOString(),
+    id_painel: 4,
+    painel_nome: 'Painel #4 - Centro de Saúde',
+    nome_cidadao: 'Catarina Lopes',
+    contacto_cidadao: 'catarina.lopes@outlook.pt',
+    id_pedido: 2002,
+    id_item: 3,
+    item_pedido: 'Material escolar',
+    nome_entidade: 'Associação Mãos Solidárias',
+    estado: 'PENDENTE',
+    pin_entrega: '928374',
+    id_locker: 2,
+    locker_nome: 'Locker Mercado',
+    porta: null,
+    data_entrega: null
+  },
+  // PENDENTE — quase a expirar
+  {
+    id_lead: 5006,
+    data: new Date(NOW - 6 * DAY - 12 * HOUR).toISOString(),
+    id_painel: 2,
+    painel_nome: 'Painel #2 - Mercado Municipal',
+    nome_cidadao: 'André Carvalho',
+    contacto_cidadao: 'andre.carvalho@gmail.com',
+    id_pedido: 2001,
+    id_item: 2,
+    item_pedido: 'Produtos de higiene',
+    nome_entidade: 'Centro Social Bom Samaritano',
+    estado: 'PENDENTE',
+    pin_entrega: '447721',
+    id_locker: 1,
+    locker_nome: 'Locker Centro',
+    porta: null,
+    data_entrega: null
+  },
+  // EXPIRADO
+  {
+    id_lead: 5007,
+    data: new Date(NOW - 9 * DAY).toISOString(),
+    id_painel: 3,
+    painel_nome: 'Painel #3 - Estação CP',
+    nome_cidadao: 'Margarida Sousa',
+    contacto_cidadao: 'margarida.sousa@gmail.com',
+    id_pedido: 2003,
+    id_item: 5,
+    item_pedido: 'Medicamentos',
+    nome_entidade: 'Lar de São Vicente',
+    estado: 'EXPIRADO',
+    pin_entrega: '601239',
+    id_locker: 3,
+    locker_nome: 'Locker Estação',
+    porta: null,
+    data_entrega: null
+  },
+  {
+    id_lead: 5008,
+    data: new Date(NOW - 12 * DAY).toISOString(),
+    id_painel: 1,
+    painel_nome: 'Painel #1 - Praça Vasco da Gama',
+    nome_cidadao: 'Bruno Pinto',
+    contacto_cidadao: 'bruno.pinto@sapo.pt',
+    id_pedido: 2002,
+    id_item: 3,
+    item_pedido: 'Material escolar',
+    nome_entidade: 'Associação Mãos Solidárias',
+    estado: 'EXPIRADO',
+    pin_entrega: '385720',
+    id_locker: 2,
+    locker_nome: 'Locker Mercado',
+    porta: null,
+    data_entrega: null
+  }
+]

@@ -111,6 +111,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
     {
       label: 'Doações de cidadãos',
       icon: 'i-lucide-heart-handshake',
+      to: '/doacoes',
       onSelect: () => { open.value = false }
     },
     {
