@@ -104,6 +104,11 @@ const links = computed<NavigationMenuItem[][]>(() => {
             onSelect: () => { open.value = false }
           },
           {
+            label: 'Gestão de Negócios',
+            to: '/negocios/gestao',
+            onSelect: () => { open.value = false }
+          },
+          {
             label: 'Registo Manual',
             to: '/negocios/registo',
             onSelect: () => { open.value = false }

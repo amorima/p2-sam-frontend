@@ -372,6 +372,8 @@ export interface BusinessOffer {
   desconto: number
 }
 
+export type BusinessStatus = 'ATIVO' | 'SUSPENSO'
+
 export interface Business {
   resource: {
     nif_nipc: string
@@ -385,6 +387,7 @@ export interface Business {
     iban: string
   }
   offers: BusinessOffer[]
+  status?: BusinessStatus
 }
 
 export const mockBusinesses: Business[] = [

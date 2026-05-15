@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import { getPaginationRowModel } from '@tanstack/table-core'
+import type { Column, SortingState, Table } from '@tanstack/table-core'
+import type { VNode } from 'vue'
 import { useNeeds } from '~/composables/useNeeds'
 import type { BusinessMatchEstado } from '~/utils/mockData'
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
+const UDropdownMenu = resolveComponent('UDropdownMenu')
 
-interface TableInstance {
-  tableApi?: {
-    getFilteredRowModel: () => { rows: unknown[] }
-  }
+type HideableColumnItem = {
+  label: string
+  type: 'checkbox'
+  checked: boolean
+  onUpdateChecked: (checked: boolean) => void
+  onSelect: (e?: Event) => void
 }
 
 interface BusinessPedido {
@@ -27,15 +32,21 @@ interface BusinessPedido {
   urgente: boolean
 }
 
+type PedidosTableRef = {
+  tableApi?: Table<BusinessPedido>
+}
+
 const toast = useToast()
 const { isAdmin, isBusiness, businessNif, businessName, setRole } = useAuth()
 const { needs, businesses, setBusinessResponse } = useNeeds()
 
 const filterState = ref<'TODOS' | BusinessMatchEstado>('TODOS')
 const globalFilter = ref('')
-const pagination = ref({ pageIndex: 0, pageSize: 20 })
+const columnVisibility = ref()
+const sorting = ref<SortingState>([])
+const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
-const tableRef = useTemplateRef<TableInstance>('tableRef')
+const tableRef = useTemplateRef<PedidosTableRef>('tableRef')
 
 const allBusinessPedidos = computed<BusinessPedido[]>(() => {
   const result: BusinessPedido[] = []
@@ -94,8 +105,6 @@ const tabItems = computed(() => [
   { label: `Recusados (${stats.value.recusados})`, value: 'RECUSADO' }
 ])
 
-const filteredCount = computed<number>(() => tableRef.value?.tableApi?.getFilteredRowModel().rows.length ?? visiblePedidos.value.length)
-
 watch([globalFilter, filterState], () => {
   pagination.value = { ...pagination.value, pageIndex: 0 }
 })
@@ -114,6 +123,53 @@ function formatDate(d: string) {
 function nomeNegocio(nif: string): string {
   return businesses.value.find(b => b.resource.nif_nipc === nif)?.entity.nome_entidade ?? nif
 }
+
+function getColumnLabel(columnId: string) {
+  return (
+    {
+      id_pedido: 'Pedido',
+      tipo_bem_servico: 'Bem / Serviço',
+      nome_entidade: 'Instituição',
+      business: 'Negócio',
+      urgente: 'Prioridade',
+      estado: 'Estado'
+    }[columnId] || columnId
+  )
+}
+
+function renderSortableHeader(column: Column<BusinessPedido, unknown>, label: string) {
+  const isSorted = column.getIsSorted()
+  return h(UButton, {
+    color: 'neutral',
+    variant: 'ghost',
+    label,
+    icon: isSorted
+      ? isSorted === 'asc'
+        ? 'i-lucide-arrow-up-narrow-wide'
+        : 'i-lucide-arrow-down-wide-narrow'
+      : 'i-lucide-arrow-up-down',
+    class: '-mx-2.5',
+    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+  })
+}
+
+const hideableColumns = computed<HideableColumnItem[]>(() => {
+  return (tableRef.value?.tableApi?.getAllColumns() ?? [])
+    .filter((column: Column<BusinessPedido, unknown>) => column.getCanHide())
+    .map((column: Column<BusinessPedido, unknown>) => ({
+      label: getColumnLabel(column.id),
+      type: 'checkbox' as const,
+      checked: column.getIsVisible(),
+      onUpdateChecked(checked: boolean) {
+        tableRef.value?.tableApi
+          ?.getColumn(column.id)
+          ?.toggleVisibility(!!checked)
+      },
+      onSelect(e?: Event) {
+        e?.preventDefault()
+      }
+    }))
+})
 
 const showRefuseModal = ref(false)
 const refuseTarget = ref<BusinessPedido | null>(null)
@@ -150,7 +206,7 @@ function complete(p: BusinessPedido) {
 const columns: TableColumn<BusinessPedido>[] = [
   {
     accessorKey: 'id_pedido',
-    header: 'Pedido',
+    header: ({ column }) => renderSortableHeader(column, 'Pedido'),
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_pedido}`),
@@ -159,7 +215,7 @@ const columns: TableColumn<BusinessPedido>[] = [
   },
   {
     accessorKey: 'tipo_bem_servico',
-    header: 'Bem / Serviço',
+    header: ({ column }) => renderSortableHeader(column, 'Bem / Serviço'),
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium text-highlighted' }, row.original.tipo_bem_servico),
@@ -168,7 +224,7 @@ const columns: TableColumn<BusinessPedido>[] = [
   },
   {
     accessorKey: 'nome_entidade',
-    header: 'Instituição',
+    header: ({ column }) => renderSortableHeader(column, 'Instituição'),
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium' }, row.original.nome_entidade),
@@ -177,7 +233,8 @@ const columns: TableColumn<BusinessPedido>[] = [
   },
   {
     id: 'business',
-    header: 'Negócio',
+    accessorFn: row => nomeNegocio(row.business_nif),
+    header: ({ column }) => renderSortableHeader(column, 'Negócio'),
     cell: ({ row }) => {
       if (isBusiness.value) return h('span', { class: 'text-xs text-muted italic' }, '—')
       return h('span', { class: 'text-sm' }, nomeNegocio(row.original.business_nif))
@@ -185,7 +242,7 @@ const columns: TableColumn<BusinessPedido>[] = [
   },
   {
     accessorKey: 'urgente',
-    header: 'Prioridade',
+    header: ({ column }) => renderSortableHeader(column, 'Prioridade'),
     cell: ({ row }) =>
       row.original.urgente
         ? h(UBadge, { variant: 'subtle', color: 'error', size: 'sm', icon: 'i-lucide-zap' }, () => 'Urgente')
@@ -193,7 +250,8 @@ const columns: TableColumn<BusinessPedido>[] = [
   },
   {
     accessorKey: 'estado',
-    header: 'Estado',
+    header: ({ column }) => renderSortableHeader(column, 'Estado'),
+    filterFn: 'equals',
     cell: ({ row }) => {
       const b = estadoBadge(row.original.estado)
       return h(UBadge, { variant: 'subtle', color: b.color, icon: b.icon, size: 'sm' }, () => b.label)
@@ -201,6 +259,7 @@ const columns: TableColumn<BusinessPedido>[] = [
   },
   {
     id: 'actions',
+    enableHiding: false,
     cell: ({ row }) => {
       const p = row.original
       const canAct = isBusiness.value && (!businessNif.value || p.business_nif === businessNif.value)
@@ -210,7 +269,7 @@ const columns: TableColumn<BusinessPedido>[] = [
         }
         return h('span', { class: 'text-xs text-muted italic' }, '—')
       }
-      const children: unknown[] = []
+      const children: VNode[] = []
       if (p.estado === 'PENDENTE') {
         children.push(
           h(UButton, { label: 'Aceitar', icon: 'i-lucide-check', color: 'primary', variant: 'subtle', size: 'sm', onClick: () => accept(p) }),
@@ -248,6 +307,14 @@ const firstBusiness = computed(() => businesses.value[0])
             color="primary"
             variant="outline"
             to="/negocios/meu"
+          />
+          <UButton
+            v-if="isAdmin"
+            label="Gerir Negócios"
+            icon="i-lucide-store"
+            color="primary"
+            variant="outline"
+            to="/negocios/gestao"
           />
           <UButton
             v-if="isAdmin"
@@ -335,45 +402,73 @@ const firstBusiness = computed(() => businesses.value[0])
       </div>
 
       <div class="space-y-4">
-        <div class="flex flex-wrap gap-2 items-center justify-between">
-          <UTabs
-            v-model="filterState"
-            :items="tabItems"
-            value-key="value"
-            color="primary"
-            variant="pill"
-            size="sm"
-            class="w-full sm:w-auto"
-          />
+        <UTabs
+          v-model="filterState"
+          :items="tabItems"
+          value-key="value"
+          color="primary"
+          variant="pill"
+          size="sm"
+          class="w-full"
+        />
+
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
           <UInput
             v-model="globalFilter"
+            class="max-w-sm"
             icon="i-lucide-search"
-            placeholder="Pesquisar..."
-            class="w-full sm:w-72"
+            placeholder="Pesquisar pedidos..."
           />
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <UDropdownMenu :items="hideableColumns" :content="{ align: 'end' }">
+              <UButton
+                label="Colunas"
+                color="neutral"
+                variant="outline"
+                trailing-icon="i-lucide-settings-2"
+              />
+            </UDropdownMenu>
+          </div>
         </div>
 
         <UTable
           ref="tableRef"
           v-model:global-filter="globalFilter"
+          v-model:column-visibility="columnVisibility"
+          v-model:sorting="sorting"
           v-model:pagination="pagination"
           :data="visiblePedidos"
           :columns="columns"
           :pagination-options="paginationOptions"
+          class="shrink-0"
           :ui="{
             base: 'table-fixed border-separate border-spacing-0',
             thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
             tbody: '[&>tr]:last:[&>td]:border-b-0',
             th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-            td: 'border-b border-default'
+            td: 'border-b border-default',
+            separator: 'h-0'
           }"
         />
 
-        <TablePagination
+        <div
           v-if="visiblePedidos.length > 0"
-          v-model="pagination"
-          :total="filteredCount"
-        />
+          class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
+        >
+          <div class="text-sm text-muted">
+            {{ tableRef?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s)
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <UPagination
+              :default-page="(tableRef?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+              :items-per-page="tableRef?.tableApi?.getState().pagination.pageSize"
+              :total="tableRef?.tableApi?.getFilteredRowModel().rows.length"
+              @update:page="(p: number) => tableRef?.tableApi?.setPageIndex(p - 1)"
+            />
+          </div>
+        </div>
 
         <div
           v-if="visiblePedidos.length === 0"

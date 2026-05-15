@@ -223,9 +223,9 @@ function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'wa
         <!-- Offers / Categories -->
         <UPageCard variant="subtle">
           <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UIcon name="i-lucide-tags" class="size-4 text-muted" />
+            <div class="flex items-center justify-between gap-4 flex-wrap">
+              <div class="flex items-center gap-2 min-w-0">
+                <UIcon name="i-lucide-tags" class="size-4 text-muted shrink-0" />
                 <h3 class="font-semibold text-highlighted">
                   Categorias e Ofertas
                 </h3>
@@ -236,6 +236,7 @@ function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'wa
                 color="primary"
                 variant="subtle"
                 size="sm"
+                class="ml-auto shrink-0"
                 @click="showAddOffer = !showAddOffer"
               />
             </div>

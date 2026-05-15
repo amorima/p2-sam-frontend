@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { type Row, getPaginationRowModel } from '@tanstack/table-core'
+import { type Column, type Row, type SortingState, type Table, getPaginationRowModel } from '@tanstack/table-core'
 import { printVoucher } from '~/utils/voucherPDF'
 import type { Need, NeedItem } from '~/utils/mockData'
 import { useNeeds } from '~/composables/useNeeds'
@@ -8,6 +8,18 @@ import { useNeeds } from '~/composables/useNeeds'
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
+
+type HideableColumnItem = {
+  label: string
+  type: 'checkbox'
+  checked: boolean
+  onUpdateChecked: (checked: boolean) => void
+  onSelect: (e?: Event) => void
+}
+
+type NeedsTableRef = {
+  tableApi?: Table<Need>
+}
 
 const { isAdmin, isInstitution, institutionNif, setRole } = useAuth()
 const { needs, institutions } = useNeeds()
@@ -30,6 +42,35 @@ function badgeColor(estado: string): 'warning' | 'success' | 'error' {
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('pt-PT')
+}
+
+function renderSortableHeader<T>(column: Column<T, unknown>, label: string) {
+  const isSorted = column.getIsSorted()
+  return h(UButton, {
+    color: 'neutral',
+    variant: 'ghost',
+    label,
+    icon: isSorted
+      ? isSorted === 'asc'
+        ? 'i-lucide-arrow-up-narrow-wide'
+        : 'i-lucide-arrow-down-wide-narrow'
+      : 'i-lucide-arrow-up-down',
+    class: '-mx-2.5',
+    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+  })
+}
+
+function getColumnLabel(columnId: string) {
+  return (
+    {
+      id_pedido: 'N.º',
+      nome_entidade: 'Instituição',
+      data: 'Data',
+      items: 'Itens',
+      urgente: 'Urgente',
+      estado: 'Estado'
+    }[columnId] || columnId
+  )
 }
 
 function openStatusModal(need: Need) {
@@ -96,12 +137,12 @@ function getRowItems(row: Row<Need>) {
 const adminColumns: TableColumn<Need>[] = [
   {
     accessorKey: 'id_pedido',
-    header: 'N.º',
+    header: ({ column }) => renderSortableHeader(column, 'N.º'),
     cell: ({ row }) => h('span', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_pedido}`)
   },
   {
     accessorKey: 'nome_entidade',
-    header: 'Instituição',
+    header: ({ column }) => renderSortableHeader(column, 'Instituição'),
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium text-highlighted' }, row.original.nome_entidade ?? nomeInstituicao(row.original.nif_nipc)),
@@ -110,18 +151,19 @@ const adminColumns: TableColumn<Need>[] = [
   },
   {
     accessorKey: 'data',
-    header: 'Data',
+    header: ({ column }) => renderSortableHeader(column, 'Data'),
     cell: ({ row }) => h('span', undefined, formatDate(row.original.data))
   },
   {
-    accessorKey: 'items',
-    header: 'Itens',
+    id: 'items',
+    accessorFn: row => row.items.length,
+    header: ({ column }) => renderSortableHeader(column, 'Itens'),
     cell: ({ row }) =>
       h('span', { class: 'tabular-nums' }, `${row.original.items.length}`)
   },
   {
     accessorKey: 'urgente',
-    header: 'Urgente',
+    header: ({ column }) => renderSortableHeader(column, 'Urgente'),
     cell: ({ row }) =>
       row.original.urgente
         ? h(UBadge, { variant: 'subtle', color: 'error', size: 'sm', icon: 'i-lucide-zap' }, () => 'Urgente')
@@ -129,7 +171,7 @@ const adminColumns: TableColumn<Need>[] = [
   },
   {
     accessorKey: 'estado',
-    header: 'Estado',
+    header: ({ column }) => renderSortableHeader(column, 'Estado'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: badgeColor(row.original.estado), size: 'sm' },
         () => row.original.estado
@@ -137,6 +179,7 @@ const adminColumns: TableColumn<Need>[] = [
   },
   {
     id: 'actions',
+    enableHiding: false,
     cell: ({ row }) =>
       h('div', { class: 'text-right' },
         h(UDropdownMenu, { content: { align: 'end' }, items: getRowItems(row) },
@@ -149,22 +192,23 @@ const adminColumns: TableColumn<Need>[] = [
 const institutionColumns: TableColumn<Need>[] = [
   {
     accessorKey: 'id_pedido',
-    header: 'N.º',
+    header: ({ column }) => renderSortableHeader(column, 'N.º'),
     cell: ({ row }) => h('span', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_pedido}`)
   },
   {
     accessorKey: 'data',
-    header: 'Data',
+    header: ({ column }) => renderSortableHeader(column, 'Data'),
     cell: ({ row }) => h('span', undefined, formatDate(row.original.data))
   },
   {
-    accessorKey: 'items',
-    header: 'Itens',
+    id: 'items',
+    accessorFn: row => row.items.length,
+    header: ({ column }) => renderSortableHeader(column, 'Itens'),
     cell: ({ row }) => h('span', { class: 'tabular-nums' }, `${row.original.items.length}`)
   },
   {
     accessorKey: 'urgente',
-    header: 'Urgente',
+    header: ({ column }) => renderSortableHeader(column, 'Urgente'),
     cell: ({ row }) =>
       row.original.urgente
         ? h(UBadge, { variant: 'subtle', color: 'error', size: 'sm', icon: 'i-lucide-zap' }, () => 'Urgente')
@@ -172,7 +216,7 @@ const institutionColumns: TableColumn<Need>[] = [
   },
   {
     accessorKey: 'estado',
-    header: 'Estado',
+    header: ({ column }) => renderSortableHeader(column, 'Estado'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: badgeColor(row.original.estado), size: 'sm' },
         () => row.original.estado
@@ -180,6 +224,7 @@ const institutionColumns: TableColumn<Need>[] = [
   },
   {
     id: 'actions',
+    enableHiding: false,
     cell: ({ row }) => {
       const need = row.original
       const vouchers = need.items.filter(i => i.match_tipo === 'VOUCHER' && i.match_ref)
@@ -221,17 +266,30 @@ const stats = computed(() => {
   }
 })
 
-interface TableInstance {
-  tableApi?: {
-    getFilteredRowModel: () => { rows: unknown[] }
-  }
-}
-
 const globalFilter = ref('')
-const pagination = ref({ pageIndex: 0, pageSize: 20 })
+const columnVisibility = ref()
+const sorting = ref<SortingState>([])
+const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
-const tableRef = useTemplateRef<TableInstance>('tableRef')
-const filteredCount = computed<number>(() => tableRef.value?.tableApi?.getFilteredRowModel().rows.length ?? filteredNeeds.value.length)
+const tableRef = useTemplateRef<NeedsTableRef>('tableRef')
+
+const hideableColumns = computed<HideableColumnItem[]>(() => {
+  return (tableRef.value?.tableApi?.getAllColumns() ?? [])
+    .filter((column: Column<Need, unknown>) => column.getCanHide())
+    .map((column: Column<Need, unknown>) => ({
+      label: getColumnLabel(column.id),
+      type: 'checkbox' as const,
+      checked: column.getIsVisible(),
+      onUpdateChecked(checked: boolean) {
+        tableRef.value?.tableApi
+          ?.getColumn(column.id)
+          ?.toggleVisibility(!!checked)
+      },
+      onSelect(e?: Event) {
+        e?.preventDefault()
+      }
+    }))
+})
 
 watch(globalFilter, () => {
   pagination.value = { ...pagination.value, pageIndex: 0 }
@@ -325,34 +383,63 @@ const firstInstitution = computed(() => institutions.value[0])
       </div>
 
       <div class="space-y-4">
-        <UInput
-          v-model="globalFilter"
-          icon="i-lucide-search"
-          :placeholder="isAdmin ? 'Pesquisar por instituição, NIF...' : 'Pesquisar pedidos...'"
-          class="max-w-sm"
-        />
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <UInput
+            v-model="globalFilter"
+            class="max-w-sm"
+            icon="i-lucide-search"
+            :placeholder="isAdmin ? 'Pesquisar por instituição, NIF...' : 'Pesquisar pedidos...'"
+          />
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <UDropdownMenu :items="hideableColumns" :content="{ align: 'end' }">
+              <UButton
+                label="Colunas"
+                color="neutral"
+                variant="outline"
+                trailing-icon="i-lucide-settings-2"
+              />
+            </UDropdownMenu>
+          </div>
+        </div>
 
         <UTable
           ref="tableRef"
           v-model:global-filter="globalFilter"
+          v-model:column-visibility="columnVisibility"
+          v-model:sorting="sorting"
           v-model:pagination="pagination"
           :data="filteredNeeds"
           :columns="columns"
           :pagination-options="paginationOptions"
+          class="shrink-0"
           :ui="{
             base: 'table-fixed border-separate border-spacing-0',
             thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
             tbody: '[&>tr]:last:[&>td]:border-b-0',
             th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-            td: 'border-b border-default'
+            td: 'border-b border-default',
+            separator: 'h-0'
           }"
         />
 
-        <TablePagination
+        <div
           v-if="filteredNeeds.length > 0"
-          v-model="pagination"
-          :total="filteredCount"
-        />
+          class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
+        >
+          <div class="text-sm text-muted">
+            {{ tableRef?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s)
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <UPagination
+              :default-page="(tableRef?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+              :items-per-page="tableRef?.tableApi?.getState().pagination.pageSize"
+              :total="tableRef?.tableApi?.getFilteredRowModel().rows.length"
+              @update:page="(p: number) => tableRef?.tableApi?.setPageIndex(p - 1)"
+            />
+          </div>
+        </div>
 
         <div
           v-if="filteredNeeds.length === 0"

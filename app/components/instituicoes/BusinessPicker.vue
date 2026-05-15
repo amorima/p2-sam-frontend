@@ -21,11 +21,13 @@ const open = ref(false)
 const search = ref('')
 
 const allOptions = computed<PartnerOption[]>(() =>
-  props.businesses.flatMap(b =>
-    b.offers
-      .filter(o => o.tipo_bem_servico === props.category)
-      .map(o => ({ business: b, offer: o }))
-  )
+  props.businesses
+    .filter(b => (b.status ?? 'ATIVO') === 'ATIVO')
+    .flatMap(b =>
+      b.offers
+        .filter(o => o.tipo_bem_servico === props.category)
+        .map(o => ({ business: b, offer: o }))
+    )
 )
 
 const filteredOptions = computed(() => {

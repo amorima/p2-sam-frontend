@@ -177,6 +177,27 @@ const _useNeeds = () => {
     }
   }
 
+  function setBusinessStatus(nif: string, status: 'ATIVO' | 'SUSPENSO') {
+    updateBusiness(nif, b => ({ ...b, status }))
+  }
+
+  function removeBusiness(nif: string) {
+    businesses.value = businesses.value.filter(b => b.resource.nif_nipc !== nif)
+    // Clear any pending business matches that pointed at this NIF
+    needs.value.forEach((need) => {
+      need.items.forEach((item) => {
+        if (item.match_tipo === 'NEGOCIO' && item.match_business_nif === nif) {
+          item.match_tipo = null
+          item.match_ref = null
+          item.match_business_nif = null
+          item.match_business_estado = null
+          item.match_business_motivo = null
+          item.status = 'available'
+        }
+      })
+    })
+  }
+
   return {
     needs,
     institutions,
@@ -191,7 +212,9 @@ const _useNeeds = () => {
     approveNeed,
     rejectNeed,
     addBusiness,
-    updateBusiness
+    updateBusiness,
+    setBusinessStatus,
+    removeBusiness
   }
 }
 
