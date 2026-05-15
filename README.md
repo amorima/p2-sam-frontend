@@ -26,6 +26,15 @@
       <img src="https://img.shields.io/badge/GitHub-Gerador_de_Dados-181717?style=flat-square&logo=github" alt="Repositório Data Generator" />
     </a>
   </p>
+
+  <p>
+    <a href="https://github.com/amorima/p2-sam-frontend/actions/workflows/deploy.yml">
+      <img src="https://github.com/amorima/p2-sam-frontend/actions/workflows/deploy.yml/badge.svg" alt="deploy frontend" />
+    </a>
+    <a href="https://github.com/amorima/p2-sam-frontend/actions/workflows/ci.yml">
+      <img src="https://github.com/amorima/p2-sam-frontend/actions/workflows/ci.yml/badge.svg" alt="ci" />
+    </a>
+  </p>
 </div>
 
 ---
@@ -40,13 +49,13 @@ Projeto Interdisciplinar WebPII desenvolvido no âmbito da:
 
 Unidades curriculares envolvidas:
 
-| Unidade Curricular | Âmbito no projeto |
-|---|---|
-| Engenharia de Software | Arquitetura, modelação e boas práticas de desenvolvimento |
-| Base de Dados | Modelação de dados, esquema relacional e persistência |
-| Programação Web II | Implementação do back-end e integração com API REST |
-| Projeto II | Gestão de projeto, documentação e entrega |
-| Testes e Performance Web | Testes funcionais, de performance e de usabilidade |
+| Unidade Curricular       | Âmbito no projeto                                         |
+| ------------------------ | --------------------------------------------------------- |
+| Engenharia de Software   | Arquitetura, modelação e boas práticas de desenvolvimento |
+| Base de Dados            | Modelação de dados, esquema relacional e persistência     |
+| Programação Web II       | Implementação do back-end e integração com API REST       |
+| Projeto II               | Gestão de projeto, documentação e entrega                 |
+| Testes e Performance Web | Testes funcionais, de performance e de usabilidade        |
 
 ### Docentes
 
@@ -106,23 +115,23 @@ Interface pública pensada para ecrãs tácteis de tipo quiosque, com:
 
 ## Stack Tecnológica
 
-| Tecnologia | Versão | Para quê |
-|---|---|---|
-| [Nuxt](https://nuxt.com/) | 4 | Framework principal, SSR e file-based routing |
-| [Vue](https://vuejs.org/) | 3 | UI reativa com Composition API |
-| [TypeScript](https://www.typescriptlang.org/) | 5 | Tipagem estática em todo o projeto |
-| [Nuxt UI](https://ui.nuxt.com/) | 4 | Componentes de interface (Dashboard, Table, Modal, Form...) |
-| [Tailwind CSS](https://tailwindcss.com/) | 4 | Estilos utilitários |
-| [VueUse](https://vueuse.org/) | 14 | Composables utilitários para Vue |
-| [Zod](https://zod.dev/) | 4 | Validação de formulários e esquemas de dados |
-| [TanStack Table](https://tanstack.com/table) | 8 | Tabelas com ordenação, filtros e paginação |
-| [Unovis](https://unovis.dev/) | 1.6 | Gráficos e visualizações de dados |
-| [Leaflet](https://leafletjs.com/) | 1.9 | Mapa interativo no painel do cidadão |
-| [date-fns](https://date-fns.org/) | 4 | Formatação e manipulação de datas |
-| [Lucide Icons](https://lucide.dev/) | - | Ícones via Iconify |
-| [MinIO SDK](https://min.io/docs/minio/linux/developers/javascript/) | 8 | Armazenamento de comprovativos |
-| [pnpm](https://pnpm.io/) | 10 | Gestor de pacotes |
-| [ESLint](https://eslint.org/) | 10 | Linting e formatação de código |
+| Tecnologia                                                          | Versão | Para quê                                                    |
+| ------------------------------------------------------------------- | ------ | ----------------------------------------------------------- |
+| [Nuxt](https://nuxt.com/)                                           | 4      | Framework principal, SSR e file-based routing               |
+| [Vue](https://vuejs.org/)                                           | 3      | UI reativa com Composition API                              |
+| [TypeScript](https://www.typescriptlang.org/)                       | 5      | Tipagem estática em todo o projeto                          |
+| [Nuxt UI](https://ui.nuxt.com/)                                     | 4      | Componentes de interface (Dashboard, Table, Modal, Form...) |
+| [Tailwind CSS](https://tailwindcss.com/)                            | 4      | Estilos utilitários                                         |
+| [VueUse](https://vueuse.org/)                                       | 14     | Composables utilitários para Vue                            |
+| [Zod](https://zod.dev/)                                             | 4      | Validação de formulários e esquemas de dados                |
+| [TanStack Table](https://tanstack.com/table)                        | 8      | Tabelas com ordenação, filtros e paginação                  |
+| [Unovis](https://unovis.dev/)                                       | 1.6    | Gráficos e visualizações de dados                           |
+| [Leaflet](https://leafletjs.com/)                                   | 1.9    | Mapa interativo no painel do cidadão                        |
+| [date-fns](https://date-fns.org/)                                   | 4      | Formatação e manipulação de datas                           |
+| [Lucide Icons](https://lucide.dev/)                                 | -      | Ícones via Iconify                                          |
+| [MinIO SDK](https://min.io/docs/minio/linux/developers/javascript/) | 8      | Armazenamento de comprovativos                              |
+| [pnpm](https://pnpm.io/)                                            | 10     | Gestor de pacotes                                           |
+| [ESLint](https://eslint.org/)                                       | 10     | Linting e formatação de código                              |
 
 ### Comunicação com o Back-end
 
@@ -134,10 +143,10 @@ NUXT_BACKEND_BASE=https://apisam.netdw.tech
 
 ### Outros Repositórios
 
-| Repositório | Descrição |
-|---|---|
-| [p2-sam-frontend](https://github.com/amorima/p2-sam-frontend) | Este repositório |
-| [p2-sam-backend](https://github.com/amorima/p2-sam-backend) | API REST e base de dados |
+| Repositório                                                               | Descrição                               |
+| ------------------------------------------------------------------------- | --------------------------------------- |
+| [p2-sam-frontend](https://github.com/amorima/p2-sam-frontend)             | Este repositório                        |
+| [p2-sam-backend](https://github.com/amorima/p2-sam-backend)               | API REST e base de dados                |
 | [p2-SAM-data-generator](https://github.com/amorima/p2-SAM-data-generator) | Scripts de geração de dados para testes |
 
 ---
@@ -229,26 +238,26 @@ pnpm preview     # pré-visualização do build
 
 ## Variáveis de Ambiente
 
-| Variável | Descrição |
-|---|---|
-| `NUXT_BACKEND_BASE` | URL base da API REST |
+| Variável                           | Descrição                                       |
+| ---------------------------------- | ----------------------------------------------- |
+| `NUXT_BACKEND_BASE`                | URL base da API REST                            |
 | `NUXT_PUBLIC_OPEN_WEATHER_API_KEY` | Chave da OpenWeatherMap API (painel do cidadão) |
 
 ---
 
 ## Perfis de Utilizador
 
-| Funcionalidade | Administrador | Mecenas |
-|---|---|---|
-| Dashboard com estatísticas | ✅ | ❌ |
-| Todas as doações | ✅ | ❌ |
-| As minhas doações | ❌ | ✅ |
-| Doação manual | ✅ | ❌ |
-| Nova doação | ❌ | ✅ |
-| Mudar estado de doação | ✅ | ❌ |
-| Download de comprovativo | ✅ | ✅ (só aceites) |
-| Gestão de utilizadores | ✅ | ❌ |
-| Painel do cidadão | ✅ | ✅ (público) |
+| Funcionalidade             | Administrador | Mecenas         |
+| -------------------------- | ------------- | --------------- |
+| Dashboard com estatísticas | ✅            | ❌              |
+| Todas as doações           | ✅            | ❌              |
+| As minhas doações          | ❌            | ✅              |
+| Doação manual              | ✅            | ❌              |
+| Nova doação                | ❌            | ✅              |
+| Mudar estado de doação     | ✅            | ❌              |
+| Download de comprovativo   | ✅            | ✅ (só aceites) |
+| Gestão de utilizadores     | ✅            | ❌              |
+| Painel do cidadão          | ✅            | ✅ (público)    |
 
 ---
 
