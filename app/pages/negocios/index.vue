@@ -1,0 +1,426 @@
+<script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
+import { getPaginationRowModel } from '@tanstack/table-core'
+import { useNeeds } from '~/composables/useNeeds'
+import type { BusinessMatchEstado } from '~/utils/mockData'
+
+const UBadge = resolveComponent('UBadge')
+const UButton = resolveComponent('UButton')
+
+interface TableInstance {
+  tableApi?: {
+    getFilteredRowModel: () => { rows: unknown[] }
+  }
+}
+
+interface BusinessPedido {
+  id_pedido: number
+  id_item: number
+  data: string
+  nome_entidade: string
+  nif_instituicao: string
+  tipo_bem_servico: string
+  match_ref: string
+  business_nif: string
+  estado: BusinessMatchEstado
+  motivo?: string | null
+  urgente: boolean
+}
+
+const toast = useToast()
+const { isAdmin, isBusiness, businessNif, businessName, setRole } = useAuth()
+const { needs, businesses, setBusinessResponse } = useNeeds()
+
+const filterState = ref<'TODOS' | BusinessMatchEstado>('TODOS')
+const globalFilter = ref('')
+const pagination = ref({ pageIndex: 0, pageSize: 20 })
+const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
+const tableRef = useTemplateRef<TableInstance>('tableRef')
+
+const allBusinessPedidos = computed<BusinessPedido[]>(() => {
+  const result: BusinessPedido[] = []
+  for (const need of needs.value) {
+    if (need.estado !== 'ACEITE') continue
+    for (const item of need.items) {
+      if (item.match_tipo === 'NEGOCIO' && item.match_business_nif) {
+        result.push({
+          id_pedido: need.id_pedido,
+          id_item: item.id_item,
+          data: need.data,
+          nome_entidade: need.nome_entidade ?? need.nif_nipc,
+          nif_instituicao: need.nif_nipc,
+          tipo_bem_servico: item.tipo_bem_servico,
+          match_ref: item.match_ref ?? '',
+          business_nif: item.match_business_nif,
+          estado: item.match_business_estado ?? 'PENDENTE',
+          motivo: item.match_business_motivo,
+          urgente: need.urgente
+        })
+      }
+    }
+  }
+  return result
+})
+
+const visiblePedidos = computed<BusinessPedido[]>(() => {
+  let list = allBusinessPedidos.value
+  if (isBusiness.value && businessNif.value) {
+    list = list.filter(p => p.business_nif === businessNif.value)
+  }
+  if (filterState.value !== 'TODOS') {
+    list = list.filter(p => p.estado === filterState.value)
+  }
+  return list
+})
+
+const stats = computed(() => {
+  const list = isBusiness.value && businessNif.value
+    ? allBusinessPedidos.value.filter(p => p.business_nif === businessNif.value)
+    : allBusinessPedidos.value
+  return {
+    total: list.length,
+    pendentes: list.filter(p => p.estado === 'PENDENTE').length,
+    aceites: list.filter(p => p.estado === 'ACEITE').length,
+    recusados: list.filter(p => p.estado === 'RECUSADO').length,
+    concluidos: list.filter(p => p.estado === 'CONCLUIDO').length
+  }
+})
+
+const tabItems = computed(() => [
+  { label: `Todos (${stats.value.total})`, value: 'TODOS' },
+  { label: `Pendentes (${stats.value.pendentes})`, value: 'PENDENTE' },
+  { label: `Aceites (${stats.value.aceites})`, value: 'ACEITE' },
+  { label: `Concluídos (${stats.value.concluidos})`, value: 'CONCLUIDO' },
+  { label: `Recusados (${stats.value.recusados})`, value: 'RECUSADO' }
+])
+
+const filteredCount = computed<number>(() => tableRef.value?.tableApi?.getFilteredRowModel().rows.length ?? visiblePedidos.value.length)
+
+watch([globalFilter, filterState], () => {
+  pagination.value = { ...pagination.value, pageIndex: 0 }
+})
+
+function estadoBadge(e: BusinessMatchEstado): { color: 'warning' | 'success' | 'error' | 'info', label: string, icon: string } {
+  if (e === 'ACEITE') return { color: 'info', label: 'Aceite', icon: 'i-lucide-thumbs-up' }
+  if (e === 'RECUSADO') return { color: 'error', label: 'Recusado', icon: 'i-lucide-thumbs-down' }
+  if (e === 'CONCLUIDO') return { color: 'success', label: 'Concluído', icon: 'i-lucide-check-circle' }
+  return { color: 'warning', label: 'Pendente', icon: 'i-lucide-clock' }
+}
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+function nomeNegocio(nif: string): string {
+  return businesses.value.find(b => b.resource.nif_nipc === nif)?.entity.nome_entidade ?? nif
+}
+
+const showRefuseModal = ref(false)
+const refuseTarget = ref<BusinessPedido | null>(null)
+const refuseReason = ref('')
+
+function openRefuse(p: BusinessPedido) {
+  refuseTarget.value = p
+  refuseReason.value = ''
+  showRefuseModal.value = true
+}
+
+function confirmRefuse() {
+  if (!refuseTarget.value) return
+  if (!refuseReason.value.trim()) {
+    toast.add({ title: 'Motivo obrigatório', description: 'Indique o motivo da recusa.', icon: 'i-lucide-alert-circle', color: 'warning' })
+    return
+  }
+  setBusinessResponse(refuseTarget.value.id_pedido, refuseTarget.value.id_item, 'RECUSADO', refuseReason.value.trim())
+  toast.add({ title: 'Pedido recusado', icon: 'i-lucide-thumbs-down', color: 'error' })
+  showRefuseModal.value = false
+  refuseTarget.value = null
+}
+
+function accept(p: BusinessPedido) {
+  setBusinessResponse(p.id_pedido, p.id_item, 'ACEITE')
+  toast.add({ title: 'Pedido aceite', description: `${p.tipo_bem_servico} para ${p.nome_entidade}`, icon: 'i-lucide-thumbs-up', color: 'success' })
+}
+
+function complete(p: BusinessPedido) {
+  setBusinessResponse(p.id_pedido, p.id_item, 'CONCLUIDO')
+  toast.add({ title: 'Pedido concluído', description: `Marcado como concluído.`, icon: 'i-lucide-check-circle', color: 'success' })
+}
+
+const columns: TableColumn<BusinessPedido>[] = [
+  {
+    accessorKey: 'id_pedido',
+    header: 'Pedido',
+    cell: ({ row }) =>
+      h('div', undefined, [
+        h('p', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_pedido}`),
+        h('p', { class: 'text-xs text-muted' }, formatDate(row.original.data))
+      ])
+  },
+  {
+    accessorKey: 'tipo_bem_servico',
+    header: 'Bem / Serviço',
+    cell: ({ row }) =>
+      h('div', undefined, [
+        h('p', { class: 'font-medium text-highlighted' }, row.original.tipo_bem_servico),
+        h('p', { class: 'text-xs text-muted truncate' }, row.original.match_ref)
+      ])
+  },
+  {
+    accessorKey: 'nome_entidade',
+    header: 'Instituição',
+    cell: ({ row }) =>
+      h('div', undefined, [
+        h('p', { class: 'font-medium' }, row.original.nome_entidade),
+        h('p', { class: 'text-xs text-muted font-mono' }, row.original.nif_instituicao)
+      ])
+  },
+  {
+    id: 'business',
+    header: 'Negócio',
+    cell: ({ row }) => {
+      if (isBusiness.value) return h('span', { class: 'text-xs text-muted italic' }, '—')
+      return h('span', { class: 'text-sm' }, nomeNegocio(row.original.business_nif))
+    }
+  },
+  {
+    accessorKey: 'urgente',
+    header: 'Prioridade',
+    cell: ({ row }) =>
+      row.original.urgente
+        ? h(UBadge, { variant: 'subtle', color: 'error', size: 'sm', icon: 'i-lucide-zap' }, () => 'Urgente')
+        : h('span', { class: 'text-xs text-muted' }, '—')
+  },
+  {
+    accessorKey: 'estado',
+    header: 'Estado',
+    cell: ({ row }) => {
+      const b = estadoBadge(row.original.estado)
+      return h(UBadge, { variant: 'subtle', color: b.color, icon: b.icon, size: 'sm' }, () => b.label)
+    }
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const p = row.original
+      const canAct = isBusiness.value && (!businessNif.value || p.business_nif === businessNif.value)
+      if (!canAct) {
+        if (p.estado === 'RECUSADO' && p.motivo) {
+          return h('span', { class: 'text-xs text-muted italic truncate block' }, `Motivo: ${p.motivo}`)
+        }
+        return h('span', { class: 'text-xs text-muted italic' }, '—')
+      }
+      const children: unknown[] = []
+      if (p.estado === 'PENDENTE') {
+        children.push(
+          h(UButton, { label: 'Aceitar', icon: 'i-lucide-check', color: 'primary', variant: 'subtle', size: 'sm', onClick: () => accept(p) }),
+          h(UButton, { label: 'Recusar', icon: 'i-lucide-x', color: 'error', variant: 'subtle', size: 'sm', onClick: () => openRefuse(p) })
+        )
+      } else if (p.estado === 'ACEITE') {
+        children.push(
+          h(UButton, { label: 'Marcar concluído', icon: 'i-lucide-check-circle', color: 'success', variant: 'subtle', size: 'sm', onClick: () => complete(p) })
+        )
+      } else if (p.estado === 'RECUSADO') {
+        children.push(h('span', { class: 'text-xs text-muted italic' }, p.motivo ?? 'Recusado'))
+      } else {
+        children.push(h('span', { class: 'text-xs text-success italic' }, 'Concluído'))
+      }
+      return h('div', { class: 'flex gap-1 justify-end flex-wrap' }, children)
+    }
+  }
+]
+
+const firstBusiness = computed(() => businesses.value[0])
+</script>
+
+<template>
+  <UDashboardPanel id="negocios">
+    <template #header>
+      <UDashboardNavbar :title="isAdmin ? 'Gestão de Pedidos a Negócios' : 'Pedidos Atribuídos'">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+        <template #right>
+          <UButton
+            v-if="isBusiness"
+            label="O Meu Negócio"
+            icon="i-lucide-store"
+            color="primary"
+            variant="outline"
+            to="/negocios/meu"
+          />
+          <UButton
+            v-if="isAdmin"
+            label="Registo Manual"
+            icon="i-lucide-plus"
+            color="primary"
+            to="/negocios/registo"
+          />
+        </template>
+      </UDashboardNavbar>
+    </template>
+
+    <template #body>
+      <UAlert
+        icon="i-lucide-flask-conical"
+        color="info"
+        variant="subtle"
+        title="Modo de demonstração"
+        :description="`Vista atual: ${isAdmin ? 'Administrador' : (isBusiness ? `Negócio (${businessName})` : 'Outro')}`"
+        class="mb-6"
+      >
+        <template #actions>
+          <UButton
+            v-if="isAdmin"
+            label="Ver como Negócio"
+            size="sm"
+            color="info"
+            variant="subtle"
+            icon="i-lucide-store"
+            @click="setRole('business', firstBusiness?.resource.nif_nipc ?? '510100200', firstBusiness?.entity.nome_entidade ?? 'Advogados Costa & Associados')"
+          />
+          <UButton
+            v-else
+            label="Ver como Admin"
+            size="sm"
+            color="info"
+            variant="subtle"
+            icon="i-lucide-shield"
+            @click="setRole('admin')"
+          />
+        </template>
+      </UAlert>
+
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
+        <UPageCard variant="subtle" class="p-4">
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Total
+          </p>
+          <p class="text-xl font-bold text-highlighted">
+            {{ stats.total }}
+          </p>
+        </UPageCard>
+        <UPageCard variant="subtle" class="p-4">
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Pendentes
+          </p>
+          <p class="text-xl font-bold text-warning">
+            {{ stats.pendentes }}
+          </p>
+        </UPageCard>
+        <UPageCard variant="subtle" class="p-4">
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Aceites
+          </p>
+          <p class="text-xl font-bold text-info">
+            {{ stats.aceites }}
+          </p>
+        </UPageCard>
+        <UPageCard variant="subtle" class="p-4">
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Concluídos
+          </p>
+          <p class="text-xl font-bold text-success">
+            {{ stats.concluidos }}
+          </p>
+        </UPageCard>
+        <UPageCard variant="subtle" class="p-4">
+          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
+            Recusados
+          </p>
+          <p class="text-xl font-bold text-error">
+            {{ stats.recusados }}
+          </p>
+        </UPageCard>
+      </div>
+
+      <div class="space-y-4">
+        <div class="flex flex-wrap gap-2 items-center justify-between">
+          <UTabs
+            v-model="filterState"
+            :items="tabItems"
+            value-key="value"
+            color="primary"
+            variant="pill"
+            size="sm"
+            class="w-full sm:w-auto"
+          />
+          <UInput
+            v-model="globalFilter"
+            icon="i-lucide-search"
+            placeholder="Pesquisar..."
+            class="w-full sm:w-72"
+          />
+        </div>
+
+        <UTable
+          ref="tableRef"
+          v-model:global-filter="globalFilter"
+          v-model:pagination="pagination"
+          :data="visiblePedidos"
+          :columns="columns"
+          :pagination-options="paginationOptions"
+          :ui="{
+            base: 'table-fixed border-separate border-spacing-0',
+            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+            tbody: '[&>tr]:last:[&>td]:border-b-0',
+            th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+            td: 'border-b border-default'
+          }"
+        />
+
+        <TablePagination
+          v-if="visiblePedidos.length > 0"
+          v-model="pagination"
+          :total="filteredCount"
+        />
+
+        <div
+          v-if="visiblePedidos.length === 0"
+          class="flex flex-col items-center justify-center py-16 text-center"
+        >
+          <UIcon name="i-lucide-briefcase" class="size-12 text-muted mb-3" />
+          <p class="font-medium text-highlighted">
+            Sem pedidos atribuídos
+          </p>
+          <p class="text-sm text-muted mt-1">
+            {{ isBusiness ? 'O SAM ainda não atribuiu pedidos ao seu negócio.' : 'Nenhum pedido encontrado com este filtro.' }}
+          </p>
+        </div>
+      </div>
+
+      <UModal
+        v-model:open="showRefuseModal"
+        title="Recusar Pedido"
+        :description="refuseTarget ? `${refuseTarget.tipo_bem_servico} — ${refuseTarget.nome_entidade}` : ''"
+      >
+        <template #body>
+          <div class="space-y-4">
+            <UFormField label="Motivo da Recusa" required>
+              <UTextarea
+                v-model="refuseReason"
+                :rows="4"
+                placeholder="Indique o motivo pelo qual está a recusar este pedido..."
+                class="w-full"
+              />
+            </UFormField>
+            <div class="flex justify-end gap-2">
+              <UButton
+                label="Cancelar"
+                color="neutral"
+                variant="subtle"
+                @click="showRefuseModal = false"
+              />
+              <UButton
+                label="Confirmar Recusa"
+                icon="i-lucide-x"
+                color="error"
+                @click="confirmRefuse"
+              />
+            </div>
+          </div>
+        </template>
+      </UModal>
+    </template>
+  </UDashboardPanel>
+</template>

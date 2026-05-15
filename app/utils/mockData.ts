@@ -304,6 +304,8 @@ export type EstadoPedido = 'PENDENTE' | 'ACEITE' | 'REJEITADO'
 export type MatchTipo = 'VOUCHER' | 'NEGOCIO' | 'PAINEL'
 export type ItemStatus = 'available' | 'pending' | 'completed'
 
+export type BusinessMatchEstado = 'PENDENTE' | 'ACEITE' | 'RECUSADO' | 'CONCLUIDO'
+
 export interface NeedItem {
   id_item: number
   id_pedido: number
@@ -312,6 +314,9 @@ export interface NeedItem {
   status: ItemStatus
   match_tipo: MatchTipo | null
   match_ref: string | null
+  match_business_nif?: string | null
+  match_business_estado?: BusinessMatchEstado | null
+  match_business_motivo?: string | null
 }
 
 export interface Need {
@@ -477,6 +482,19 @@ export const mockNeeds: Need[] = [
     motivo_recusa: 'Pedido fora do âmbito do SAM.',
     items: [
       { id_item: 8, id_pedido: 2004, tipo_bem_servico: 'Apoio jurídico', tipo_bem: 'SERVICO', status: 'available', match_tipo: null, match_ref: null }
+    ]
+  },
+  {
+    id_pedido: 2005,
+    nif_nipc: '500111222',
+    nome_entidade: 'Associação Mãos Solidárias',
+    data: '2026-05-10T09:00:00.000Z',
+    estado: 'ACEITE',
+    urgente: false,
+    items: [
+      { id_item: 9, id_pedido: 2005, tipo_bem_servico: 'Apoio jurídico', tipo_bem: 'SERVICO', status: 'pending', match_tipo: 'NEGOCIO', match_ref: 'Advogados Costa & Associados · Pro bono', match_business_nif: '510100200', match_business_estado: 'PENDENTE' },
+      { id_item: 10, id_pedido: 2005, tipo_bem_servico: 'Consulta médica', tipo_bem: 'SERVICO', status: 'pending', match_tipo: 'NEGOCIO', match_ref: 'Clínica Norte+ Saúde · Pro bono', match_business_nif: '510100400', match_business_estado: 'ACEITE' },
+      { id_item: 11, id_pedido: 2005, tipo_bem_servico: 'Apoio psicológico', tipo_bem: 'SERVICO', status: 'pending', match_tipo: 'NEGOCIO', match_ref: 'Psicologia Vila do Conde · Pro bono', match_business_nif: '510100500', match_business_estado: 'CONCLUIDO' }
     ]
   }
 ]

@@ -5,7 +5,7 @@ import { printVoucher } from '~/utils/voucherPDF'
 
 const route = useRoute()
 const { isAdmin, isInstitution, institutionNif } = useAuth()
-const { needs, institutions, businesses, panels, setItemMatch } = useNeeds()
+const { needs, institutions, businesses, panels, setItemMatch, setBusinessMatch } = useNeeds()
 
 const id = Number(route.params.id)
 
@@ -103,9 +103,9 @@ function updateMatch(id_item: number, tipo: MatchTipo) {
   setItemMatch(need.value.id_pedido, id_item, tipo, reference)
 }
 
-function setBusinessRef(id_item: number, label: string) {
+function setBusinessRef(id_item: number, nif: string, label: string) {
   if (!need.value) return
-  setItemMatch(need.value.id_pedido, id_item, 'NEGOCIO', label)
+  setBusinessMatch(need.value.id_pedido, id_item, nif, label)
 }
 
 function setPanelRef(id_item: number, label: string | null) {
@@ -423,7 +423,7 @@ const summary = computed(() => {
                   :model-value="item.match_ref"
                   :businesses="businesses"
                   :category="item.tipo_bem_servico"
-                  @select="(v) => setBusinessRef(item.id_item, v.label)"
+                  @select="(v) => setBusinessRef(item.id_item, v.nif, v.label)"
                 />
               </div>
 

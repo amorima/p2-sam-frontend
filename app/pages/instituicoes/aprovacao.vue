@@ -5,7 +5,7 @@ import { printVoucher } from '~/utils/voucherPDF'
 
 const toast = useToast()
 const { isAdmin } = useAuth()
-const { needs, businesses, panels, institutions, setItemMatch, approveNeed, rejectNeed } = useNeeds()
+const { needs, businesses, panels, institutions, setItemMatch, setBusinessMatch, approveNeed, rejectNeed } = useNeeds()
 
 if (!isAdmin.value) {
   await navigateTo('/instituicoes')
@@ -72,8 +72,8 @@ function updateMatch(need: Need, id_item: number, tipo: MatchTipo | null, ref?: 
   setItemMatch(need.id_pedido, id_item, tipo, reference)
 }
 
-function setBusinessRef(need: Need, id_item: number, label: string | null) {
-  setItemMatch(need.id_pedido, id_item, 'NEGOCIO', label)
+function setBusinessRef(need: Need, id_item: number, nif: string, label: string) {
+  setBusinessMatch(need.id_pedido, id_item, nif, label)
 }
 
 function setPanelRef(need: Need, id_item: number, label: string | null) {
@@ -291,7 +291,7 @@ function formatDate(d: string) {
                   :model-value="item.match_ref"
                   :businesses="businesses"
                   :category="item.tipo_bem_servico"
-                  @select="(v) => setBusinessRef(need, item.id_item, v.label)"
+                  @select="(v) => setBusinessRef(need, item.id_item, v.nif, v.label)"
                 />
               </div>
 
