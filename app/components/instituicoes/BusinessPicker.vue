@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | null]
-  'select': [value: { business: Business, offer: BusinessOffer, label: string }]
+  'select': [value: { business: Business, offer: BusinessOffer, label: string, nif: string }]
 }>()
 
 const open = ref(false)
@@ -50,7 +50,7 @@ function selectOption(opt: PartnerOption) {
   const d = descontoLabel(opt.offer)
   const label = `${opt.business.entity.nome_entidade} · ${d.text}`
   emit('update:modelValue', label)
-  emit('select', { business: opt.business, offer: opt.offer, label })
+  emit('select', { business: opt.business, offer: opt.offer, label, nif: opt.business.resource.nif_nipc })
   open.value = false
   search.value = ''
 }

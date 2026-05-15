@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { Row } from '@tanstack/table-core'
+import { type Row, getPaginationRowModel } from '@tanstack/table-core'
 import { printVoucher } from '~/utils/voucherPDF'
 import type { Need, NeedItem } from '~/utils/mockData'
 import { useNeeds } from '~/composables/useNeeds'
@@ -221,7 +221,21 @@ const stats = computed(() => {
   }
 })
 
+interface TableInstance {
+  tableApi?: {
+    getFilteredRowModel: () => { rows: unknown[] }
+  }
+}
+
 const globalFilter = ref('')
+const pagination = ref({ pageIndex: 0, pageSize: 20 })
+const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
+const tableRef = useTemplateRef<TableInstance>('tableRef')
+const filteredCount = computed<number>(() => tableRef.value?.tableApi?.getFilteredRowModel().rows.length ?? filteredNeeds.value.length)
+
+watch(globalFilter, () => {
+  pagination.value = { ...pagination.value, pageIndex: 0 }
+})
 
 const firstInstitution = computed(() => institutions.value[0])
 </script>
@@ -319,9 +333,12 @@ const firstInstitution = computed(() => institutions.value[0])
         />
 
         <UTable
+          ref="tableRef"
           v-model:global-filter="globalFilter"
+          v-model:pagination="pagination"
           :data="filteredNeeds"
           :columns="columns"
+          :pagination-options="paginationOptions"
           :ui="{
             base: 'table-fixed border-separate border-spacing-0',
             thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
@@ -329,6 +346,12 @@ const firstInstitution = computed(() => institutions.value[0])
             th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
             td: 'border-b border-default'
           }"
+        />
+
+        <TablePagination
+          v-if="filteredNeeds.length > 0"
+          v-model="pagination"
+          :total="filteredCount"
         />
 
         <div

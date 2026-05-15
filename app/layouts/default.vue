@@ -2,7 +2,7 @@
 import type { NavigationMenuItem, CommandPaletteItem } from '@nuxt/ui'
 
 const toast = useToast()
-const { isAdmin, isInstitution } = useAuth()
+const { isAdmin, isInstitution, isBusiness } = useAuth()
 
 const open = ref(false)
 
@@ -89,8 +89,47 @@ const links = computed<NavigationMenuItem[][]>(() => {
         ]
   }
 
+  const negociosItem: NavigationMenuItem = {
+    label: 'Negócios',
+    icon: 'i-lucide-briefcase',
+    to: '/negocios',
+    type: 'trigger' as const,
+    defaultOpen: false,
+    children: isAdmin.value
+      ? [
+          {
+            label: 'Pedidos',
+            to: '/negocios',
+            exact: true,
+            onSelect: () => { open.value = false }
+          },
+          {
+            label: 'Registo Manual',
+            to: '/negocios/registo',
+            onSelect: () => { open.value = false }
+          }
+        ]
+      : [
+          {
+            label: 'Pedidos',
+            to: '/negocios',
+            exact: true,
+            onSelect: () => { open.value = false }
+          },
+          {
+            label: 'O Meu Negócio',
+            to: '/negocios/meu',
+            onSelect: () => { open.value = false }
+          }
+        ]
+  }
+
   if (isInstitution.value) {
     return [[notificacoesItem, instituicoesItem]]
+  }
+
+  if (isBusiness.value) {
+    return [[notificacoesItem, negociosItem]]
   }
 
   if (!isAdmin.value) {
@@ -111,13 +150,10 @@ const links = computed<NavigationMenuItem[][]>(() => {
     {
       label: 'Doações de cidadãos',
       icon: 'i-lucide-heart-handshake',
+      to: '/doacoes',
       onSelect: () => { open.value = false }
     },
-    {
-      label: 'Registo de negócios',
-      icon: 'i-lucide-briefcase',
-      onSelect: () => { open.value = false }
-    },
+    negociosItem,
     {
       label: 'Estado de equipamentos',
       icon: 'i-lucide-monitor-cog',

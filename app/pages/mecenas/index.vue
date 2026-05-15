@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { Row } from '@tanstack/table-core'
+import { type Row, getPaginationRowModel } from '@tanstack/table-core'
 import { printDonationReceipt, type ReceiptDonation } from '~/utils/donationPDF'
 import { mockApprovedDonation } from '~/utils/mockData'
 
@@ -229,7 +229,21 @@ const stats = computed(() => {
   }
 })
 
+interface TableInstance {
+  tableApi?: {
+    getFilteredRowModel: () => { rows: unknown[] }
+  }
+}
+
 const globalFilter = ref('')
+const pagination = ref({ pageIndex: 0, pageSize: 20 })
+const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
+const tableRef = useTemplateRef<TableInstance>('tableRef')
+const filteredCount = computed<number>(() => tableRef.value?.tableApi?.getFilteredRowModel().rows.length ?? donations.value.length)
+
+watch(globalFilter, () => {
+  pagination.value = { ...pagination.value, pageIndex: 0 }
+})
 </script>
 
 <template>
@@ -328,9 +342,12 @@ const globalFilter = ref('')
         />
 
         <UTable
+          ref="tableRef"
           v-model:global-filter="globalFilter"
+          v-model:pagination="pagination"
           :data="donations"
           :columns="columns"
+          :pagination-options="paginationOptions"
           :loading="status === 'pending'"
           :ui="{
             base: 'table-fixed border-separate border-spacing-0',
@@ -339,6 +356,12 @@ const globalFilter = ref('')
             th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
             td: 'border-b border-default'
           }"
+        />
+
+        <TablePagination
+          v-if="donations.length > 0"
+          v-model="pagination"
+          :total="filteredCount"
         />
 
         <div

@@ -102,6 +102,11 @@ const _useNeeds = () => {
     if (!item) return
     item.match_tipo = match_tipo
     item.match_ref = match_ref
+    if (match_tipo !== 'NEGOCIO') {
+      item.match_business_nif = null
+      item.match_business_estado = null
+      item.match_business_motivo = null
+    }
     if (match_tipo === 'VOUCHER') {
       item.status = 'completed'
     } else if (match_tipo) {
@@ -109,6 +114,31 @@ const _useNeeds = () => {
     } else {
       item.status = 'available'
     }
+  }
+
+  function setBusinessMatch(id_pedido: number, id_item: number, nif: string, label: string) {
+    const need = needs.value.find(n => n.id_pedido === id_pedido)
+    if (!need) return
+    const item = need.items.find(i => i.id_item === id_item)
+    if (!item) return
+    item.match_tipo = 'NEGOCIO'
+    item.match_ref = label
+    item.match_business_nif = nif
+    item.match_business_estado = 'PENDENTE'
+    item.match_business_motivo = null
+    item.status = 'pending'
+  }
+
+  function setBusinessResponse(id_pedido: number, id_item: number, estado: 'ACEITE' | 'RECUSADO' | 'CONCLUIDO', motivo?: string) {
+    const need = needs.value.find(n => n.id_pedido === id_pedido)
+    if (!need) return
+    const item = need.items.find(i => i.id_item === id_item)
+    if (!item || item.match_tipo !== 'NEGOCIO') return
+    item.match_business_estado = estado
+    item.match_business_motivo = estado === 'RECUSADO' ? (motivo ?? null) : null
+    if (estado === 'CONCLUIDO') item.status = 'completed'
+    else if (estado === 'RECUSADO') item.status = 'available'
+    else item.status = 'pending'
   }
 
   function approveNeed(id_pedido: number) {
@@ -135,6 +165,18 @@ const _useNeeds = () => {
     need.motivo_recusa = motivo
   }
 
+  function addBusiness(business: Business) {
+    if (businesses.value.some(b => b.resource.nif_nipc === business.resource.nif_nipc)) return
+    businesses.value.push(business)
+  }
+
+  function updateBusiness(nif: string, updater: (b: Business) => Business) {
+    const idx = businesses.value.findIndex(b => b.resource.nif_nipc === nif)
+    if (idx >= 0) {
+      businesses.value.splice(idx, 1, updater(businesses.value[idx]!))
+    }
+  }
+
   return {
     needs,
     institutions,
@@ -144,8 +186,12 @@ const _useNeeds = () => {
     createNeed,
     updateNeedStatus,
     setItemMatch,
+    setBusinessMatch,
+    setBusinessResponse,
     approveNeed,
-    rejectNeed
+    rejectNeed,
+    addBusiness,
+    updateBusiness
   }
 }
 
