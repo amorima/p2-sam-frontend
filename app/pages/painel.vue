@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import QRCode from 'qrcode'
 
 const config = useRuntimeConfig()
 
@@ -178,8 +177,9 @@ const isPrintEnabled = (): boolean => {
   return val === null ? true : val === 'true'
 }
 
-const esc = (s: string) =>
-  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+type PrintState = 'idle' | 'printing' | 'ok' | 'error'
+const printState = ref<PrintState>('idle')
+const printError = ref('')
 
 const printReceipt = async () => {
   if (!isPrintEnabled()) return
@@ -188,73 +188,42 @@ const printReceipt = async () => {
   const goodName = selectedGood?.name || selectedGoodId.value
 
   const now = new Date()
-  const dateStr = now.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
-  const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', hour12: false })
+  const date = now.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  const time = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', hour12: false })
+  const printerName = localStorage.getItem('sam_print_receipt_printer') || undefined
 
-  const qrUrl = await QRCode.toDataURL(pin.value, {
-    width: 200,
-    margin: 1,
-    color: { dark: '#000000', light: '#ffffff' }
-  })
+  printState.value = 'printing'
+  printError.value = ''
 
-  const origin = window.location.origin
-
-  const html = `<!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="UTF-8">
-<title>Talão</title>
-<style>
-@page { size: 80mm auto; margin: 4mm; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 72mm; background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; }
-.logo { display: block; width: 58mm; margin: 2mm auto 3mm; filter: brightness(0); }
-hr { border: none; border-top: 1px dashed #000; margin: 2.5mm 0; }
-.title { text-align: center; font-size: 12pt; font-weight: 700; margin: 2mm 0 1mm; }
-.subtitle { text-align: center; font-size: 9pt; color: #555; margin-bottom: 1mm; }
-.row { display: flex; justify-content: space-between; margin: 1.2mm 0; font-size: 9.5pt; }
-.val { font-weight: 600; text-align: right; max-width: 44mm; word-break: break-all; }
-.pin-lbl { text-align: center; font-size: 8pt; letter-spacing: 2px; color: #555; margin: 2mm 0 1mm; }
-.pin { text-align: center; font-size: 28pt; font-weight: 700; letter-spacing: 8px; margin: 1mm 0 2mm; }
-.qr { display: block; width: 44mm; height: 44mm; margin: 2mm auto; }
-.footer { text-align: center; font-size: 8.5pt; color: #555; margin-top: 3mm; line-height: 1.6; }
-</style>
-</head>
-<body>
-<img class="logo" src="${origin}/logo_big.svg" alt="SAM">
-<hr>
-<div class="title">COMPROVATIVO DE DOAÇÃO</div>
-<div class="subtitle">Município de Vila do Conde</div>
-<hr>
-<div class="row"><span>Data:</span><span class="val">${dateStr}</span></div>
-<div class="row"><span>Hora:</span><span class="val">${timeStr}</span></div>
-<hr>
-<div class="row"><span>Nome:</span><span class="val">${esc(donorName.value)}</span></div>
-<div class="row"><span>Email:</span><span class="val">${esc(donorEmail.value)}</span></div>
-<div class="row"><span>Bem:</span><span class="val">${esc(goodName)}</span></div>
-<hr>
-<div class="pin-lbl">CÓDIGO DE REFERÊNCIA</div>
-<div class="pin">${pin.value}</div>
-<hr>
-<img class="qr" src="${qrUrl}" alt="QR Code">
-<hr>
-<div class="footer">Obrigado pela sua doação!<br>Use o código acima para rastrear a sua doação.</div>
-<script>
-window.addEventListener('afterprint', function () { window.close(); });
-window.onload = function () { setTimeout(function () { window.print(); }, 300); };
-<\/script>
-</body>
-</html>`
-
-  const w = window.open('', '_blank', 'width=340,height=750,left=0,top=0,toolbar=0,menubar=0,scrollbars=0,status=0')
-  if (!w) return
-  w.document.write(html)
-  w.document.close()
+  try {
+    await $fetch('/api/print/receipt', {
+      method: 'POST',
+      body: {
+        printerName,
+        donorName: donorName.value,
+        donorEmail: donorEmail.value,
+        goodName,
+        date,
+        time,
+        pin: pin.value
+      }
+    })
+    printState.value = 'ok'
+  }
+  catch (err: unknown) {
+    const fetchErr = err as { data?: { message?: string }; message?: string }
+    const msg = fetchErr?.data?.message || fetchErr?.message || String(err)
+    console.error('[SAM] Print failed:', err)
+    printState.value = 'error'
+    printError.value = msg
+  }
 }
 
 const submitDonation = () => {
   if (!isDonateEnabled.value) return
   pin.value = generatePin()
+  printState.value = 'idle'
+  printError.value = ''
   thanksOpen.value = true
   if (modalTimerId) clearTimeout(modalTimerId)
   if (resetTimerId) clearTimeout(resetTimerId)
@@ -705,6 +674,16 @@ onBeforeUnmount(() => {
             <p class="thanks-note">
               Obrigado por ajudar a comunidade de Vila do Conde!
             </p>
+            <div v-if="isPrintEnabled()" class="thanks-print-status" :class="printState">
+              <UIcon
+                :name="printState === 'printing' ? 'i-lucide-loader-circle' : printState === 'ok' ? 'i-lucide-printer' : printState === 'error' ? 'i-lucide-printer' : 'i-lucide-printer'"
+                :class="{ 'animate-spin': printState === 'printing' }"
+              />
+              <span v-if="printState === 'idle'">A enviar para impressora…</span>
+              <span v-else-if="printState === 'printing'">A imprimir talão…</span>
+              <span v-else-if="printState === 'ok'">Talão impresso</span>
+              <span v-else>Erro de impressão: {{ printError }}</span>
+            </div>
           </div>
         </div>
       </Transition>
@@ -1366,6 +1345,40 @@ onBeforeUnmount(() => {
   color: rgba(255,255,255,0.4);
   font-style: italic;
   margin: 0;
+}
+
+.thanks-print-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.5);
+}
+
+.thanks-print-status.printing {
+  background: rgba(96,165,250,0.1);
+  border-color: rgba(96,165,250,0.3);
+  color: #93c5fd;
+}
+
+.thanks-print-status.ok {
+  background: rgba(52,211,153,0.1);
+  border-color: rgba(52,211,153,0.3);
+  color: #6ee7b7;
+}
+
+.thanks-print-status.error {
+  background: rgba(239,68,68,0.1);
+  border-color: rgba(239,68,68,0.3);
+  color: #fca5a5;
+  max-width: 320px;
+  text-align: left;
 }
 
 /* ── SCROLLBAR ── */
