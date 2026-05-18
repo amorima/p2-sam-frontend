@@ -4,6 +4,50 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 
 const fileRef = ref<HTMLInputElement>()
 const userProfile = useUserProfile()
+const { isAdmin } = useAuth()
+
+const printReceiptEnabled = ref(true)
+const selectedPrinter = ref('')
+const settingPrinter = ref(false)
+
+const { data: printersData, refresh: refreshPrinters, status: printersStatus } = await useFetch<{ printers: string[] }>('/api/printers')
+
+const printerItems = computed(() =>
+  (printersData.value?.printers ?? []).map(name => ({ label: name, value: name }))
+)
+
+onMounted(() => {
+  const stored = localStorage.getItem('sam_print_receipt_enabled')
+  if (stored !== null) {
+    printReceiptEnabled.value = stored === 'true'
+  }
+  const storedPrinter = localStorage.getItem('sam_print_receipt_printer')
+  if (storedPrinter) {
+    selectedPrinter.value = storedPrinter
+  }
+})
+
+function savePrintSetting(val: boolean) {
+  localStorage.setItem('sam_print_receipt_enabled', String(val))
+}
+
+async function onPrinterChange(name: string) {
+  if (!name) return
+  settingPrinter.value = true
+  try {
+    await $fetch('/api/printers/default', { method: 'POST', body: { name } })
+    localStorage.setItem('sam_print_receipt_printer', name)
+    toast.add({ title: 'Impressora definida', description: `"${name}" é agora a impressora predefinida.`, icon: 'i-lucide-printer', color: 'success' })
+  }
+  catch {
+    toast.add({ title: 'Erro', description: 'Não foi possível definir a impressora predefinida.', icon: 'i-lucide-x', color: 'error' })
+    // Revert UI to stored value
+    selectedPrinter.value = localStorage.getItem('sam_print_receipt_printer') ?? ''
+  }
+  finally {
+    settingPrinter.value = false
+  }
+}
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Demasiado curto'),
@@ -207,4 +251,51 @@ function onFileClick() {
       </UFormField>
     </UPageCard>
   </UForm>
+
+  <template v-if="isAdmin">
+    <UPageCard
+      title="Impressora de Talões"
+      description="Configurações para impressão automática de talões térmicos de 80mm."
+      variant="naked"
+      orientation="horizontal"
+      class="mt-8 mb-4"
+    />
+    <UPageCard variant="subtle" :ui="{ container: 'divide-y divide-default' }">
+      <UFormField
+        name="print_receipt"
+        label="Imprimir talão após confirmação de doação"
+        description="Imprime automaticamente um talão térmico quando uma doação é confirmada no Painel do Cidadão."
+        class="flex items-center justify-between not-last:pb-4 gap-2"
+      >
+        <USwitch v-model="printReceiptEnabled" @update:model-value="savePrintSetting" />
+      </UFormField>
+
+      <UFormField
+        name="printer_select"
+        label="Impressora predefinida"
+        description="A impressora selecionada passa a ser a impressora predefinida do sistema. Requer o Chrome com --kiosk-printing para impressão silenciosa."
+        class="flex max-sm:flex-col justify-between items-start not-last:pb-4 gap-4 pt-4"
+      >
+        <div class="flex items-center gap-2 min-w-64">
+          <USelect
+            v-model="selectedPrinter"
+            :items="printerItems"
+            placeholder="Selecionar impressora..."
+            :loading="printersStatus === 'pending' || settingPrinter"
+            :disabled="printersStatus === 'pending' || settingPrinter"
+            class="flex-1"
+            @update:model-value="onPrinterChange"
+          />
+          <UButton
+            icon="i-lucide-refresh-cw"
+            color="neutral"
+            variant="ghost"
+            :loading="printersStatus === 'pending'"
+            aria-label="Atualizar lista de impressoras"
+            @click="() => refreshPrinters()"
+          />
+        </div>
+      </UFormField>
+    </UPageCard>
+  </template>
 </template>

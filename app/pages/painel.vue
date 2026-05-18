@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import QRCode from 'qrcode'
 
 const config = useRuntimeConfig()
 
@@ -40,6 +41,7 @@ const currentDate = ref('')
 let modalTimerId: ReturnType<typeof setTimeout> | null = null
 let resetTimerId: ReturnType<typeof setTimeout> | null = null
 let clockInterval: ReturnType<typeof setInterval> | null = null
+
 
 const goods: Good[] = [
   { id: 'food', name: 'Alimentos', emoji: '🍽️' },
@@ -170,6 +172,86 @@ const toggleGood = (goodId: string) => {
   selectedGoodId.value = selectedGoodId.value === goodId ? '' : goodId
 }
 
+const isPrintEnabled = (): boolean => {
+  if (!import.meta.client) return false
+  const val = localStorage.getItem('sam_print_receipt_enabled')
+  return val === null ? true : val === 'true'
+}
+
+const esc = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+const printReceipt = async () => {
+  if (!isPrintEnabled()) return
+
+  const selectedGood = goods.find(g => g.id === selectedGoodId.value)
+  const goodName = selectedGood?.name || selectedGoodId.value
+
+  const now = new Date()
+  const dateStr = now.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', hour12: false })
+
+  const qrUrl = await QRCode.toDataURL(pin.value, {
+    width: 200,
+    margin: 1,
+    color: { dark: '#000000', light: '#ffffff' }
+  })
+
+  const origin = window.location.origin
+
+  const html = `<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Talão</title>
+<style>
+@page { size: 80mm auto; margin: 4mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 72mm; background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; }
+.logo { display: block; width: 58mm; margin: 2mm auto 3mm; filter: brightness(0); }
+hr { border: none; border-top: 1px dashed #000; margin: 2.5mm 0; }
+.title { text-align: center; font-size: 12pt; font-weight: 700; margin: 2mm 0 1mm; }
+.subtitle { text-align: center; font-size: 9pt; color: #555; margin-bottom: 1mm; }
+.row { display: flex; justify-content: space-between; margin: 1.2mm 0; font-size: 9.5pt; }
+.val { font-weight: 600; text-align: right; max-width: 44mm; word-break: break-all; }
+.pin-lbl { text-align: center; font-size: 8pt; letter-spacing: 2px; color: #555; margin: 2mm 0 1mm; }
+.pin { text-align: center; font-size: 28pt; font-weight: 700; letter-spacing: 8px; margin: 1mm 0 2mm; }
+.qr { display: block; width: 44mm; height: 44mm; margin: 2mm auto; }
+.footer { text-align: center; font-size: 8.5pt; color: #555; margin-top: 3mm; line-height: 1.6; }
+</style>
+</head>
+<body>
+<img class="logo" src="${origin}/logo_big.svg" alt="SAM">
+<hr>
+<div class="title">COMPROVATIVO DE DOAÇÃO</div>
+<div class="subtitle">Município de Vila do Conde</div>
+<hr>
+<div class="row"><span>Data:</span><span class="val">${dateStr}</span></div>
+<div class="row"><span>Hora:</span><span class="val">${timeStr}</span></div>
+<hr>
+<div class="row"><span>Nome:</span><span class="val">${esc(donorName.value)}</span></div>
+<div class="row"><span>Email:</span><span class="val">${esc(donorEmail.value)}</span></div>
+<div class="row"><span>Bem:</span><span class="val">${esc(goodName)}</span></div>
+<hr>
+<div class="pin-lbl">CÓDIGO DE REFERÊNCIA</div>
+<div class="pin">${pin.value}</div>
+<hr>
+<img class="qr" src="${qrUrl}" alt="QR Code">
+<hr>
+<div class="footer">Obrigado pela sua doação!<br>Use o código acima para rastrear a sua doação.</div>
+<script>
+window.addEventListener('afterprint', function () { window.close(); });
+window.onload = function () { setTimeout(function () { window.print(); }, 300); };
+<\/script>
+</body>
+</html>`
+
+  const w = window.open('', '_blank', 'width=340,height=750,left=0,top=0,toolbar=0,menubar=0,scrollbars=0,status=0')
+  if (!w) return
+  w.document.write(html)
+  w.document.close()
+}
+
 const submitDonation = () => {
   if (!isDonateEnabled.value) return
   pin.value = generatePin()
@@ -178,11 +260,12 @@ const submitDonation = () => {
   if (resetTimerId) clearTimeout(resetTimerId)
   modalTimerId = setTimeout(() => {
     thanksOpen.value = false
-  }, 5000)
+  }, 8000)
   resetTimerId = setTimeout(() => {
     resetDonation()
     screen.value = 'panel'
   }, 30000)
+  printReceipt()
 }
 
 const resetDonation = () => {
