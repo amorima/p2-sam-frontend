@@ -7,44 +7,23 @@ const userProfile = useUserProfile()
 const { isAdmin } = useAuth()
 
 const printReceiptEnabled = ref(true)
-const selectedPrinter = ref('')
-const settingPrinter = ref(false)
+const baudRate = ref('9600')
+const baudRateOptions = ['9600', '19200', '38400', '57600', '115200'].map(v => ({ label: `${v} baud`, value: v }))
 
-const { data: printersData, refresh: refreshPrinters, status: printersStatus } = await useFetch<{ printers: string[] }>('/api/printers')
-
-const printerItems = computed(() =>
-  (printersData.value?.printers ?? []).map(name => ({ label: name, value: name }))
-)
+const { isSupported: serialSupported, hasPort, requestPort } = useSerialPrint()
 
 onMounted(() => {
   const stored = localStorage.getItem('sam_print_receipt_enabled')
-  if (stored !== null) {
-    printReceiptEnabled.value = stored === 'true'
-  }
-  const storedPrinter = localStorage.getItem('sam_print_receipt_printer')
-  if (storedPrinter) {
-    selectedPrinter.value = storedPrinter
-  }
+  if (stored !== null) printReceiptEnabled.value = stored === 'true'
+  baudRate.value = localStorage.getItem('sam_print_baud_rate') ?? '9600'
 })
 
 function savePrintSetting(val: boolean) {
   localStorage.setItem('sam_print_receipt_enabled', String(val))
 }
 
-async function onPrinterChange(name: string) {
-  if (!name) return
-  settingPrinter.value = true
-  try {
-    await $fetch('/api/printers/default', { method: 'POST', body: { name } })
-    localStorage.setItem('sam_print_receipt_printer', name)
-    toast.add({ title: 'Impressora definida', description: `"${name}" é agora a impressora predefinida.`, icon: 'i-lucide-printer', color: 'success' })
-  } catch {
-    toast.add({ title: 'Erro', description: 'Não foi possível definir a impressora predefinida.', icon: 'i-lucide-x', color: 'error' })
-    // Revert UI to stored value
-    selectedPrinter.value = localStorage.getItem('sam_print_receipt_printer') ?? ''
-  } finally {
-    settingPrinter.value = false
-  }
+function saveBaudRate(val: string) {
+  localStorage.setItem('sam_print_baud_rate', val)
 }
 
 const profileSchema = z.object({
@@ -269,30 +248,43 @@ function onFileClick() {
       </UFormField>
 
       <UFormField
-        name="printer_select"
-        label="Impressora predefinida"
-        description="A impressora selecionada passa a ser a impressora predefinida do sistema. Requer o Chrome com --kiosk-printing para impressão silenciosa."
+        name="serial_port"
+        label="Porta da impressora"
+        description="Selecione a porta USB/Serial da impressora térmica. O browser pedirá permissão na primeira vez."
         class="flex max-sm:flex-col justify-between items-start not-last:pb-4 gap-4 pt-4"
       >
-        <div class="flex items-center gap-2 min-w-64">
-          <USelect
-            v-model="selectedPrinter"
-            :items="printerItems"
-            placeholder="Selecionar impressora..."
-            :loading="printersStatus === 'pending' || settingPrinter"
-            :disabled="printersStatus === 'pending' || settingPrinter"
-            class="flex-1"
-            @update:model-value="onPrinterChange"
+        <div class="flex items-center gap-3">
+          <UBadge
+            :color="hasPort ? 'success' : 'neutral'"
+            :label="hasPort ? 'Ligada' : 'Não ligada'"
+            :icon="hasPort ? 'i-lucide-printer' : 'i-lucide-printer'"
+            variant="subtle"
           />
           <UButton
-            icon="i-lucide-refresh-cw"
+            label="Selecionar porta"
+            icon="i-lucide-plug"
             color="neutral"
-            variant="ghost"
-            :loading="printersStatus === 'pending'"
-            aria-label="Atualizar lista de impressoras"
-            @click="() => refreshPrinters()"
+            :disabled="!serialSupported"
+            @click="requestPort"
           />
+          <UTooltip v-if="!serialSupported" text="Web Serial requer Chrome ou Edge">
+            <UIcon name="i-lucide-alert-circle" class="text-warning" />
+          </UTooltip>
         </div>
+      </UFormField>
+
+      <UFormField
+        name="baud_rate"
+        label="Velocidade de comunicação"
+        description="9600 é o valor padrão para a maioria das impressoras térmicas. Ajuste se necessário."
+        class="flex max-sm:flex-col justify-between items-start not-last:pb-4 gap-4 pt-4"
+      >
+        <USelect
+          v-model="baudRate"
+          :items="baudRateOptions"
+          class="min-w-40"
+          @update:model-value="saveBaudRate"
+        />
       </UFormField>
     </UPageCard>
   </template>

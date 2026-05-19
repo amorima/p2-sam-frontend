@@ -180,6 +180,8 @@ type PrintState = 'idle' | 'printing' | 'ok' | 'error'
 const printState = ref<PrintState>('idle')
 const printError = ref('')
 
+const { print: serialPrint } = useSerialPrint()
+
 const printReceipt = async () => {
   if (!isPrintEnabled()) return
 
@@ -189,16 +191,14 @@ const printReceipt = async () => {
   const now = new Date()
   const date = now.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
   const time = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', hour12: false })
-  const printerName = localStorage.getItem('sam_print_receipt_printer') || undefined
 
   printState.value = 'printing'
   printError.value = ''
 
   try {
-    await $fetch('/api/print/receipt', {
+    const result = await $fetch<{ bytes: number[] }>('/api/print/bytes', {
       method: 'POST',
       body: {
-        printerName,
         donorName: donorName.value,
         donorEmail: donorEmail.value,
         goodName,
@@ -207,6 +207,7 @@ const printReceipt = async () => {
         pin: pin.value
       }
     })
+    await serialPrint(result.bytes)
     printState.value = 'ok'
   } catch (err: unknown) {
     const fetchErr = err as { data?: { message?: string }, message?: string }
