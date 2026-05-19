@@ -7,23 +7,36 @@ const userProfile = useUserProfile()
 const { isAdmin } = useAuth()
 
 const printReceiptEnabled = ref(true)
-const baudRate = ref('9600')
-const baudRateOptions = ['9600', '19200', '38400', '57600', '115200'].map(v => ({ label: `${v} baud`, value: v }))
+const { isAvailable: agentAvailable, selectedPrinter, fetchPrinters, checkAvailability } = usePrintAgent()
+const printerItems = ref<{ label: string, value: string }[]>([])
+const loadingPrinters = ref(false)
 
-const { isSupported: serialSupported, hasPort, requestPort } = useSerialPrint()
-
-onMounted(() => {
+onMounted(async () => {
   const stored = localStorage.getItem('sam_print_receipt_enabled')
   if (stored !== null) printReceiptEnabled.value = stored === 'true'
-  baudRate.value = localStorage.getItem('sam_print_baud_rate') ?? '9600'
+  selectedPrinter.value = localStorage.getItem('sam_print_receipt_printer') ?? ''
+  if (agentAvailable.value) await loadPrinters()
 })
+
+watch(agentAvailable, async (val) => {
+  if (val) await loadPrinters()
+})
+
+async function loadPrinters() {
+  loadingPrinters.value = true
+  try {
+    printerItems.value = (await fetchPrinters()).map(p => ({ label: p, value: p }))
+  } catch { /* agent unavailable */ } finally {
+    loadingPrinters.value = false
+  }
+}
 
 function savePrintSetting(val: boolean) {
   localStorage.setItem('sam_print_receipt_enabled', String(val))
 }
 
-function saveBaudRate(val: string) {
-  localStorage.setItem('sam_print_baud_rate', val)
+function onPrinterChange(name: string) {
+  localStorage.setItem('sam_print_receipt_printer', name)
 }
 
 const profileSchema = z.object({
@@ -248,43 +261,54 @@ function onFileClick() {
       </UFormField>
 
       <UFormField
-        name="serial_port"
-        label="Porta da impressora"
-        description="Selecione a porta USB/Serial da impressora térmica. O browser pedirá permissão na primeira vez."
+        name="agent_status"
+        label="Agente de impressão"
+        description="Execute 'node print-agent.js' na máquina do kiosk. O agente comunica com a impressora via Windows."
         class="flex max-sm:flex-col justify-between items-start not-last:pb-4 gap-4 pt-4"
       >
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
           <UBadge
-            :color="hasPort ? 'success' : 'neutral'"
-            :label="hasPort ? 'Ligada' : 'Não ligada'"
-            :icon="hasPort ? 'i-lucide-printer' : 'i-lucide-printer'"
+            :color="agentAvailable ? 'success' : 'error'"
+            :label="agentAvailable ? 'Agente ativo' : 'Agente offline'"
+            icon="i-lucide-circle-dot"
             variant="subtle"
           />
           <UButton
-            label="Selecionar porta"
-            icon="i-lucide-plug"
+            icon="i-lucide-refresh-cw"
             color="neutral"
-            :disabled="!serialSupported"
-            @click="requestPort"
+            variant="ghost"
+            aria-label="Verificar agente"
+            @click="checkAvailability"
           />
-          <UTooltip v-if="!serialSupported" text="Web Serial requer Chrome ou Edge">
-            <UIcon name="i-lucide-alert-circle" class="text-warning" />
-          </UTooltip>
         </div>
       </UFormField>
 
       <UFormField
-        name="baud_rate"
-        label="Velocidade de comunicação"
-        description="9600 é o valor padrão para a maioria das impressoras térmicas. Ajuste se necessário."
+        name="printer_select"
+        label="Impressora"
+        description="Impressora a usar para os talões térmicos."
         class="flex max-sm:flex-col justify-between items-start not-last:pb-4 gap-4 pt-4"
       >
-        <USelect
-          v-model="baudRate"
-          :items="baudRateOptions"
-          class="min-w-40"
-          @update:model-value="saveBaudRate"
-        />
+        <div class="flex items-center gap-2 min-w-64">
+          <USelect
+            v-model="selectedPrinter"
+            :items="printerItems"
+            placeholder="Selecionar impressora..."
+            :loading="loadingPrinters"
+            :disabled="!agentAvailable || loadingPrinters"
+            class="flex-1"
+            @update:model-value="onPrinterChange"
+          />
+          <UButton
+            icon="i-lucide-refresh-cw"
+            color="neutral"
+            variant="ghost"
+            :loading="loadingPrinters"
+            :disabled="!agentAvailable"
+            aria-label="Atualizar lista"
+            @click="loadPrinters"
+          />
+        </div>
       </UFormField>
     </UPageCard>
   </template>

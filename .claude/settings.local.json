@@ -6,7 +6,8 @@
       "PowerShell(Get-ChildItem -Path \"c:\\\\SAM\\\\p2-sam-frontend\" -Recurse -Depth 3 -Force | Select-Object -Property FullName | ForEach-Object {$_.FullName})",
       "PowerShell(head -80)",
       "Bash(pnpm lint *)",
-      "Bash(pnpm add *)"
+      "Bash(pnpm add *)",
+      "Bash(pnpm typecheck *)"
     ]
   }
 }

@@ -5,7 +5,7 @@ type SerialPortLike = {
   open(options: { baudRate: number }): Promise<void>
   close(): Promise<void>
   readable: { getReader(): unknown } | null
-  writable: { getWriter(): { write(data: Uint8Array): Promise<void>; releaseLock(): void } } | null
+  writable: { getWriter(): { write(data: Uint8Array): Promise<void>, releaseLock(): void } } | null
 }
 
 type SerialAPI = {
