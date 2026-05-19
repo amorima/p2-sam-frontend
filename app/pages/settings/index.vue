@@ -38,13 +38,11 @@ async function onPrinterChange(name: string) {
     await $fetch('/api/printers/default', { method: 'POST', body: { name } })
     localStorage.setItem('sam_print_receipt_printer', name)
     toast.add({ title: 'Impressora definida', description: `"${name}" é agora a impressora predefinida.`, icon: 'i-lucide-printer', color: 'success' })
-  }
-  catch {
+  } catch {
     toast.add({ title: 'Erro', description: 'Não foi possível definir a impressora predefinida.', icon: 'i-lucide-x', color: 'error' })
     // Revert UI to stored value
     selectedPrinter.value = localStorage.getItem('sam_print_receipt_printer') ?? ''
-  }
-  finally {
+  } finally {
     settingPrinter.value = false
   }
 }

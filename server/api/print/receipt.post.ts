@@ -12,8 +12,7 @@ export default eventHandler(async (event) => {
     const buffer = buildEscPos(body)
     sendRawToPrinter(buffer, body.printerName)
     return { ok: true }
-  }
-  catch (err: unknown) {
+  } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
     throw createError({ statusCode: 500, message: msg })
   }

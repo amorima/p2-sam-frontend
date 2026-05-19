@@ -41,7 +41,6 @@ let modalTimerId: ReturnType<typeof setTimeout> | null = null
 let resetTimerId: ReturnType<typeof setTimeout> | null = null
 let clockInterval: ReturnType<typeof setInterval> | null = null
 
-
 const goods: Good[] = [
   { id: 'food', name: 'Alimentos', emoji: '🍽️' },
   { id: 'rice', name: 'Arroz', emoji: '🍚' },
@@ -135,7 +134,7 @@ const updateClock = () => {
 
 const fetchWeather = async () => {
   try {
-    const apiKey = config.public.openWeatherApiKey
+    const apiKey = config.public.openweatherApiKey
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=Vila%20do%20Conde,PT&units=metric&lang=pt&appid=${apiKey}`
     )
@@ -209,9 +208,8 @@ const printReceipt = async () => {
       }
     })
     printState.value = 'ok'
-  }
-  catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string }; message?: string }
+  } catch (err: unknown) {
+    const fetchErr = err as { data?: { message?: string }, message?: string }
     const msg = fetchErr?.data?.message || fetchErr?.message || String(err)
     printState.value = 'error'
     printError.value = msg

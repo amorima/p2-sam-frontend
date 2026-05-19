@@ -15,8 +15,7 @@ export default eventHandler(async (event) => {
       { encoding: 'utf8', timeout: 5000 }
     )
     available = raw.split('\n').map(p => p.trim()).filter(Boolean)
-  }
-  catch {
+  } catch {
     throw createError({ statusCode: 500, message: 'Could not list printers' })
   }
 
@@ -25,7 +24,7 @@ export default eventHandler(async (event) => {
   }
 
   // Escape single quotes inside the printer name for PowerShell
-  const safeName = body.name.replace(/'/g, "''")
+  const safeName = body.name.replace(/'/g, '\'\'')
 
   try {
     execSync(
@@ -33,8 +32,7 @@ export default eventHandler(async (event) => {
       { encoding: 'utf8', timeout: 5000 }
     )
     return { ok: true }
-  }
-  catch {
+  } catch {
     throw createError({ statusCode: 500, message: 'Could not set default printer' })
   }
 })

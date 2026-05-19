@@ -98,9 +98,12 @@ export function sendRawToPrinter(data: Buffer, printerName?: string): void {
 
     if (r.error) throw r.error
     if (r.status !== 0) throw new Error(`PowerShell exited ${r.status}: ${err || out}`)
-  }
-  finally {
-    try { unlinkSync(dataFile) } catch {}
-    try { unlinkSync(psFile) } catch {}
+  } finally {
+    try {
+      unlinkSync(dataFile)
+    } catch { /* ignore */ }
+    try {
+      unlinkSync(psFile)
+    } catch { /* ignore */ }
   }
 }

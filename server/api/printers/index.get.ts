@@ -12,8 +12,7 @@ export default eventHandler(async () => {
       .filter(Boolean)
 
     return { printers }
-  }
-  catch {
+  } catch {
     return { printers: [] }
   }
 })
