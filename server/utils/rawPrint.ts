@@ -56,11 +56,9 @@ public class RawPrint {
 
 try {
     $bytes = [System.IO.File]::ReadAllBytes($DataFile)
-    Write-Host "SAM-PRINT: sending $($bytes.Length) bytes to '$Printer'"
     [RawPrint]::Send($Printer, $bytes)
-    Write-Host "SAM-PRINT: success"
 } catch {
-    Write-Error "SAM-PRINT ERROR: $_"
+    Write-Error $_
     exit 1
 }
 `.trimStart()
@@ -76,7 +74,6 @@ function getDefaultPrinter(): string {
 
 export function sendRawToPrinter(data: Buffer, printerName?: string): void {
   const name = printerName?.trim() || getDefaultPrinter()
-  console.log(`[SAM print] printer="${name}" bytes=${data.length}`)
   if (!name) throw new Error('No printer name available')
 
   const id = Date.now()
@@ -87,8 +84,6 @@ export function sendRawToPrinter(data: Buffer, printerName?: string): void {
     writeFileSync(dataFile, data)
     // BOM-less UTF-8 so PowerShell reads the param block correctly
     writeFileSync(psFile, PS_SCRIPT, { encoding: 'utf8' })
-
-    console.log(`[SAM print] running PowerShell script: ${psFile}`)
 
     const r = spawnSync('powershell', [
       '-NoProfile',
@@ -101,13 +96,8 @@ export function sendRawToPrinter(data: Buffer, printerName?: string): void {
     const out = (r.stdout ?? '').trim()
     const err = (r.stderr ?? '').trim()
 
-    if (out) console.log(`[SAM print] stdout: ${out}`)
-    if (err) console.error(`[SAM print] stderr: ${err}`)
     if (r.error) throw r.error
-
-    if (r.status !== 0) {
-      throw new Error(`PowerShell exited ${r.status}: ${err || out}`)
-    }
+    if (r.status !== 0) throw new Error(`PowerShell exited ${r.status}: ${err || out}`)
   }
   finally {
     try { unlinkSync(dataFile) } catch {}

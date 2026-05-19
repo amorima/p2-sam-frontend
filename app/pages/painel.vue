@@ -213,7 +213,6 @@ const printReceipt = async () => {
   catch (err: unknown) {
     const fetchErr = err as { data?: { message?: string }; message?: string }
     const msg = fetchErr?.data?.message || fetchErr?.message || String(err)
-    console.error('[SAM] Print failed:', err)
     printState.value = 'error'
     printError.value = msg
   }
