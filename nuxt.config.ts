@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     backendBase: 'https://apisam.netdw.tech',
     public: {
-      openWeatherApiKey: '',
+      openweatherApiKey: '',
       backendBase: 'https://apisam.netdw.tech'
     }
   },

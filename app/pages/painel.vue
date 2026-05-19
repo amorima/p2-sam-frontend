@@ -134,7 +134,7 @@ const updateClock = () => {
 
 const fetchWeather = async () => {
   try {
-    const apiKey = config.public.openWeatherApiKey
+    const apiKey = config.public.openweatherApiKey
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=Vila%20do%20Conde,PT&units=metric&lang=pt&appid=${apiKey}`
     )
@@ -170,19 +170,68 @@ const toggleGood = (goodId: string) => {
   selectedGoodId.value = selectedGoodId.value === goodId ? '' : goodId
 }
 
+const isPrintEnabled = (): boolean => {
+  if (!import.meta.client) return false
+  const val = localStorage.getItem('sam_print_receipt_enabled')
+  return val === null ? true : val === 'true'
+}
+
+type PrintState = 'idle' | 'printing' | 'ok' | 'error'
+const printState = ref<PrintState>('idle')
+const printError = ref('')
+
+const printReceipt = async () => {
+  if (!isPrintEnabled()) return
+
+  const selectedGood = goods.find(g => g.id === selectedGoodId.value)
+  const goodName = selectedGood?.name || selectedGoodId.value
+
+  const now = new Date()
+  const date = now.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  const time = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', hour12: false })
+  const printerName = localStorage.getItem('sam_print_receipt_printer') || undefined
+
+  printState.value = 'printing'
+  printError.value = ''
+
+  try {
+    await $fetch('/api/print/receipt', {
+      method: 'POST',
+      body: {
+        printerName,
+        donorName: donorName.value,
+        donorEmail: donorEmail.value,
+        goodName,
+        date,
+        time,
+        pin: pin.value
+      }
+    })
+    printState.value = 'ok'
+  } catch (err: unknown) {
+    const fetchErr = err as { data?: { message?: string }, message?: string }
+    const msg = fetchErr?.data?.message || fetchErr?.message || String(err)
+    printState.value = 'error'
+    printError.value = msg
+  }
+}
+
 const submitDonation = () => {
   if (!isDonateEnabled.value) return
   pin.value = generatePin()
+  printState.value = 'idle'
+  printError.value = ''
   thanksOpen.value = true
   if (modalTimerId) clearTimeout(modalTimerId)
   if (resetTimerId) clearTimeout(resetTimerId)
   modalTimerId = setTimeout(() => {
     thanksOpen.value = false
-  }, 5000)
+  }, 8000)
   resetTimerId = setTimeout(() => {
     resetDonation()
     screen.value = 'panel'
   }, 30000)
+  printReceipt()
 }
 
 const resetDonation = () => {
@@ -622,6 +671,16 @@ onBeforeUnmount(() => {
             <p class="thanks-note">
               Obrigado por ajudar a comunidade de Vila do Conde!
             </p>
+            <div v-if="isPrintEnabled()" class="thanks-print-status" :class="printState">
+              <UIcon
+                :name="printState === 'printing' ? 'i-lucide-loader-circle' : printState === 'ok' ? 'i-lucide-printer' : printState === 'error' ? 'i-lucide-printer' : 'i-lucide-printer'"
+                :class="{ 'animate-spin': printState === 'printing' }"
+              />
+              <span v-if="printState === 'idle'">A enviar para impressora…</span>
+              <span v-else-if="printState === 'printing'">A imprimir talão…</span>
+              <span v-else-if="printState === 'ok'">Talão impresso</span>
+              <span v-else>Erro de impressão: {{ printError }}</span>
+            </div>
           </div>
         </div>
       </Transition>
@@ -1283,6 +1342,40 @@ onBeforeUnmount(() => {
   color: rgba(255,255,255,0.4);
   font-style: italic;
   margin: 0;
+}
+
+.thanks-print-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.5);
+}
+
+.thanks-print-status.printing {
+  background: rgba(96,165,250,0.1);
+  border-color: rgba(96,165,250,0.3);
+  color: #93c5fd;
+}
+
+.thanks-print-status.ok {
+  background: rgba(52,211,153,0.1);
+  border-color: rgba(52,211,153,0.3);
+  color: #6ee7b7;
+}
+
+.thanks-print-status.error {
+  background: rgba(239,68,68,0.1);
+  border-color: rgba(239,68,68,0.3);
+  color: #fca5a5;
+  max-width: 320px;
+  text-align: left;
 }
 
 /* ── SCROLLBAR ── */

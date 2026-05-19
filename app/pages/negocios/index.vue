@@ -284,7 +284,7 @@ const columns: TableColumn<BusinessPedido>[] = [
       } else {
         children.push(h('span', { class: 'text-xs text-success italic' }, 'Concluído'))
       }
-      return h('div', { class: 'flex gap-1 justify-end flex-wrap' }, children)
+      return h('div', { class: 'flex gap-1 justify-end flex-wrap' }, children as import('vue').VNodeArrayChildren)
     }
   }
 ]
