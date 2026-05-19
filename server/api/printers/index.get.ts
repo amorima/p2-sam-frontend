@@ -1,18 +1,20 @@
-import { execSync } from 'node:child_process'
+import { spawnSync } from 'node:child_process'
 
-export default eventHandler(async () => {
-  try {
-    const raw = execSync(
-      'powershell -NoProfile -Command "Get-Printer | Select-Object -ExpandProperty Name"',
-      { encoding: 'utf8', timeout: 5000 }
-    )
-    const printers = raw
-      .split('\n')
-      .map(p => p.trim())
-      .filter(Boolean)
+export default eventHandler(() => {
+  const r = spawnSync('powershell', [
+    '-NoProfile',
+    '-Command',
+    'Get-WmiObject Win32_Printer | Select-Object -ExpandProperty Name'
+  ], { encoding: 'utf8', timeout: 8000 })
 
-    return { printers }
-  } catch {
+  if (r.error || r.status !== 0) {
     return { printers: [] }
   }
+
+  const printers = (r.stdout ?? '')
+    .split('\n')
+    .map(p => p.trim())
+    .filter(Boolean)
+
+  return { printers }
 })
