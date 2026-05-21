@@ -74,7 +74,7 @@ async function onSubmit() {
   }
   isSubmitting.value = true
   try {
-    createNeed({
+    await createNeed({
       nif_nipc: selectedInstitution.value.resource.nif_nipc,
       nome_entidade: selectedInstitution.value.entity.nome_entidade,
       data: new Date(dataPedido.value).toISOString(),

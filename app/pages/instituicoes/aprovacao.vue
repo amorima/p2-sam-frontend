@@ -46,13 +46,13 @@ function openReject(need: Need) {
   showRejectModal.value = true
 }
 
-function confirmReject() {
+async function confirmReject() {
   if (!rejectTarget.value) return
   if (!rejectReason.value.trim()) {
     toast.add({ title: 'Motivo obrigatório', description: 'Indique o motivo da recusa.', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
-  rejectNeed(rejectTarget.value.id_pedido, rejectReason.value.trim())
+  await rejectNeed(rejectTarget.value.id_pedido, rejectReason.value.trim())
   toast.add({ title: 'Pedido rejeitado', description: `Pedido #${rejectTarget.value.id_pedido} foi recusado.`, icon: 'i-lucide-x', color: 'error' })
   showRejectModal.value = false
   rejectTarget.value = null
@@ -88,7 +88,7 @@ function institutionCoords(nif: string): { lat: number, lng: number } {
   }
 }
 
-function approve(need: Need) {
+async function approve(need: Need) {
   const unmatched = need.items.filter(i => !i.match_tipo)
   if (unmatched.length > 0 && !need.urgente) {
     toast.add({
@@ -99,7 +99,7 @@ function approve(need: Need) {
     })
     return
   }
-  approveNeed(need.id_pedido)
+  await approveNeed(need.id_pedido)
   toast.add({
     title: 'Pedido aprovado',
     description: need.urgente

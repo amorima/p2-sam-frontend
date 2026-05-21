@@ -24,8 +24,9 @@ export default defineEventHandler(async () => {
     $fetch<{ data: PatronItem[], _links: object }>(`${config.backendBase}/patrons`)
   ])
 
+  // Backend returns flat format (nif_nipc and nome_entidade at top level)
   const nameMap = new Map(
-    (patronsRes.data ?? []).map(p => [p.resource.nif_nipc, p.entity.nome_entidade])
+    (patronsRes.data ?? []).map((p: any) => [p.nif_nipc, p.nome_entidade])
   )
 
   const enriched = (donationsRes.donations ?? []).map(d => ({

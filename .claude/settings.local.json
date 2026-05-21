@@ -7,7 +7,13 @@
       "PowerShell(head -80)",
       "Bash(pnpm lint *)",
       "Bash(pnpm add *)",
-      "Bash(pnpm typecheck *)"
+      "Bash(pnpm typecheck *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\SAM\\\\p2-sam-backend\" -Force)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Get-ChildItem -Path \"C:\\\\SAM\\\\p2-sam-frontend\\\\app\" -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(npx nuxi *)"
     ]
   }
 }

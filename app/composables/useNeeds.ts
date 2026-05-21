@@ -1,9 +1,5 @@
 import { createSharedComposable } from '@vueuse/core'
 import {
-  mockNeeds,
-  mockInstitutions,
-  mockGoodsServices,
-  mockBusinesses,
   mockPanels,
   type Need,
   type NeedItem,
@@ -29,11 +25,43 @@ interface CreateNeedInput {
 }
 
 const _useNeeds = () => {
-  const needs = useState<Need[]>('needs.list', () => [...mockNeeds])
-  const institutions = useState('needs.institutions', () => [...mockInstitutions])
-  const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [...mockGoodsServices])
-  const businesses = useState<Business[]>('needs.businesses', () => [...mockBusinesses])
+  const needs = useState<Need[]>('needs.list', () => [])
+  const institutions = useState<any[]>('needs.institutions', () => [])
+  const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [])
+  const businesses = useState<Business[]>('needs.businesses', () => [])
   const panels = useState<Panel[]>('needs.panels', () => [...mockPanels])
+
+  // Fetch all data from API (deduped by key — runs once per SSR + once on client if needed)
+  useAsyncData('needs-initial-data', async () => {
+    try {
+      const [needsRes, institutionsRes, businessRes] = await Promise.all([
+        $fetch<{ needs: Need[] }>('/api/needs'),
+        $fetch<{ data: any[] }>('/api/institutions'),
+        $fetch<{ data: Business[] }>('/api/business')
+      ])
+
+      needs.value = needsRes.needs ?? []
+      institutions.value = institutionsRes.data ?? []
+      businesses.value = businessRes.data ?? []
+
+      // Derive goods services from the need items returned by backend
+      const gsMap = new Map<string, GoodsService>()
+      for (const need of needs.value) {
+        for (const item of need.items) {
+          if (!gsMap.has(item.tipo_bem_servico)) {
+            gsMap.set(item.tipo_bem_servico, {
+              tipo_bem_servico: item.tipo_bem_servico,
+              tipo_bem: item.tipo_bem
+            })
+          }
+        }
+      }
+      goodsServices.value = Array.from(gsMap.values())
+    } catch (e) {
+      console.error('[useNeeds] Failed to load initial data:', e)
+    }
+    return null
+  })
 
   const nextNeedId = () => Math.max(2000, ...needs.value.map(n => n.id_pedido)) + 1
   const nextItemId = () => {
@@ -48,7 +76,7 @@ const _useNeeds = () => {
     }
   }
 
-  function createNeed(input: CreateNeedInput): Need {
+  async function createNeed(input: CreateNeedInput): Promise<Need> {
     input.items.forEach(ensureGoodsService)
     const id_pedido = nextNeedId()
     let id_item = nextItemId()
@@ -70,7 +98,6 @@ const _useNeeds = () => {
       urgente: input.urgente,
       items
     }
-    // If created already accepted and urgent, auto-issue voucher on BEM items as a courtesy
     if (need.estado === 'ACEITE' && need.urgente) {
       need.items.forEach((it) => {
         if (it.tipo_bem === 'BEM' && !it.match_tipo) {
@@ -81,10 +108,27 @@ const _useNeeds = () => {
       })
     }
     needs.value = [need, ...needs.value]
+
+    try {
+      await $fetch('/api/needs', {
+        method: 'POST',
+        body: {
+          nif_nipc: input.nif_nipc,
+          estado: input.estado,
+          items: input.items.map(it => ({
+            tipo_bem_servico: it.tipo_bem_servico,
+            tipo_bem: it.tipo_bem
+          }))
+        }
+      })
+    } catch (e) {
+      console.error('[useNeeds] Failed to persist need:', e)
+    }
+
     return need
   }
 
-  function updateNeedStatus(id: number, estado: EstadoPedido, motivo_recusa?: string) {
+  async function updateNeedStatus(id: number, estado: EstadoPedido, motivo_recusa?: string) {
     const need = needs.value.find(n => n.id_pedido === id)
     if (!need) return
     need.estado = estado
@@ -92,6 +136,15 @@ const _useNeeds = () => {
       need.motivo_recusa = motivo_recusa ?? need.motivo_recusa
     } else {
       need.motivo_recusa = undefined
+    }
+
+    try {
+      await $fetch(`/api/needs/${id}`, {
+        method: 'PATCH',
+        body: { estado }
+      })
+    } catch (e) {
+      console.error('[useNeeds] Failed to update need status:', e)
     }
   }
 
@@ -141,12 +194,11 @@ const _useNeeds = () => {
     else item.status = 'pending'
   }
 
-  function approveNeed(id_pedido: number) {
+  async function approveNeed(id_pedido: number) {
     const need = needs.value.find(n => n.id_pedido === id_pedido)
     if (!need) return
     need.estado = 'ACEITE'
     need.motivo_recusa = undefined
-    // For urgent needs, auto-issue vouchers for any BEM item without a match yet
     if (need.urgente) {
       need.items.forEach((it) => {
         if (it.tipo_bem === 'BEM' && !it.match_tipo) {
@@ -156,13 +208,31 @@ const _useNeeds = () => {
         }
       })
     }
+
+    try {
+      await $fetch(`/api/needs/${id_pedido}`, {
+        method: 'PATCH',
+        body: { estado: 'ACEITE' }
+      })
+    } catch (e) {
+      console.error('[useNeeds] Failed to approve need:', e)
+    }
   }
 
-  function rejectNeed(id_pedido: number, motivo: string) {
+  async function rejectNeed(id_pedido: number, motivo: string) {
     const need = needs.value.find(n => n.id_pedido === id_pedido)
     if (!need) return
     need.estado = 'REJEITADO'
     need.motivo_recusa = motivo
+
+    try {
+      await $fetch(`/api/needs/${id_pedido}`, {
+        method: 'PATCH',
+        body: { estado: 'REJEITADO' }
+      })
+    } catch (e) {
+      console.error('[useNeeds] Failed to reject need:', e)
+    }
   }
 
   function addBusiness(business: Business) {
@@ -183,7 +253,6 @@ const _useNeeds = () => {
 
   function removeBusiness(nif: string) {
     businesses.value = businesses.value.filter(b => b.resource.nif_nipc !== nif)
-    // Clear any pending business matches that pointed at this NIF
     needs.value.forEach((need) => {
       need.items.forEach((item) => {
         if (item.match_tipo === 'NEGOCIO' && item.match_business_nif === nif) {
