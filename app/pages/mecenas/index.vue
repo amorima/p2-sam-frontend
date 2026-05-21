@@ -2,7 +2,6 @@
 import type { TableColumn } from '@nuxt/ui'
 import { type Row, getPaginationRowModel } from '@tanstack/table-core'
 import { printDonationReceipt, type ReceiptDonation } from '~/utils/donationPDF'
-import { mockApprovedDonation } from '~/utils/mockData'
 
 interface Donation {
   id_doacao: number
@@ -20,7 +19,7 @@ const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 
-const { isAdmin, patronNif, setRole } = useAuth()
+const { isAdmin, patronNif } = useAuth()
 
 const statusModalOpen = ref(false)
 const selectedDonation = ref<Donation | null>(null)
@@ -36,12 +35,7 @@ const { data: rawData, status, refresh } = await useFetch<{ donations: Donation[
   { lazy: true, server: false }
 )
 
-const donations = computed<Donation[]>(() => {
-  const real = rawData.value?.donations ?? []
-  // Inject mock approved donation for demo (removed when real data is available)
-  const alreadyHasMock = real.some(d => d.id_doacao === mockApprovedDonation.id_doacao)
-  return alreadyHasMock ? real : [mockApprovedDonation as Donation, ...real]
-})
+const donations = computed<Donation[]>(() => rawData.value?.donations ?? [])
 
 function badgeColor(estado: string): 'warning' | 'success' | 'error' {
   if (estado === 'ACEITE') return 'success'
@@ -265,37 +259,6 @@ watch(globalFilter, () => {
     </template>
 
     <template #body>
-      <!-- Demo role switcher -->
-      <UAlert
-        icon="i-lucide-flask-conical"
-        color="info"
-        variant="subtle"
-        title="Modo de demonstração"
-        :description="`Vista atual: ${isAdmin ? 'Administrador' : 'Mecenas'}`"
-        class="mb-6"
-      >
-        <template #actions>
-          <UButton
-            v-if="isAdmin"
-            label="Ver como Mecenas"
-            size="sm"
-            color="info"
-            variant="subtle"
-            icon="i-lucide-user"
-            @click="setRole('patron', '123456789', 'Patron Organization, Lda.')"
-          />
-          <UButton
-            v-else
-            label="Ver como Admin"
-            size="sm"
-            color="info"
-            variant="subtle"
-            icon="i-lucide-shield"
-            @click="setRole('admin')"
-          />
-        </template>
-      </UAlert>
-
       <!-- Stats -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <UPageCard variant="subtle" class="p-4">

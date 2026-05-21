@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { mockLockers } from '~/utils/mockData'
 
 interface Locker {
   locker_id: number
@@ -28,12 +27,7 @@ const { data: rawData, status, refresh } = await useFetch<{ lockers: Locker[] }>
 
 useIntervalFn(() => refresh(), 15000)
 
-const lockers = computed<Locker[]>(() => {
-  const real = rawData.value?.lockers ?? []
-  const mockIds = new Set(mockLockers.map(l => l.locker_id))
-  const realFiltered = real.filter(l => !mockIds.has(l.locker_id))
-  return [...mockLockers as Locker[], ...realFiltered]
-})
+const lockers = computed<Locker[]>(() => rawData.value?.lockers ?? [])
 
 const globalFilter = ref('')
 

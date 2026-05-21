@@ -1,6 +1,5 @@
 import { createSharedComposable } from '@vueuse/core'
 import {
-  mockSmartLockers,
   LEAD_PIN_VALIDITY_HOURS,
   type Lead,
   type SmartLocker
@@ -10,7 +9,7 @@ const HOUR = 3_600_000
 
 const _useLeads = () => {
   const leads = useState<Lead[]>('leads.list', () => [])
-  const smartLockers = useState<SmartLocker[]>('leads.smartLockers', () => [...mockSmartLockers])
+  const smartLockers = useState<SmartLocker[]>('leads.smartLockers', () => [])
 
   // Fetch leads from API on mount (smart lockers kept as mock — no backend endpoint)
   useAsyncData('leads-initial-data', async () => {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { printDonationReceipt, type ReceiptDonation } from '~/utils/donationPDF'
-import { mockApprovedDonation } from '~/utils/mockData'
 
 interface Donation {
   id_doacao: number
@@ -15,22 +14,25 @@ interface Donation {
 }
 
 const route = useRoute()
-const { isAdmin } = useAuth()
+const { isAdmin, patronNif } = useAuth()
 const id = Number(route.params.id)
 
 const statusModalOpen = ref(false)
 
+const fetchUrl = computed(() =>
+  isAdmin.value
+    ? '/api/donations'
+    : `/api/patrons/${patronNif.value}/donations`
+)
+
 const { data: rawData, status, refresh } = await useFetch<{ donations: Donation[] }>(
-  '/api/donations',
+  fetchUrl,
   { lazy: true, server: false }
 )
 
 const donation = computed<Donation | null>(() => {
   const list = rawData.value?.donations ?? []
-  const found = list.find(d => d.id_doacao === id)
-  if (found) return found
-  if (mockApprovedDonation.id_doacao === id) return mockApprovedDonation as Donation
-  return null
+  return list.find(d => d.id_doacao === id) ?? null
 })
 
 const modoLabel: Record<string, string> = {

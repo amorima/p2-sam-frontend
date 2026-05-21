@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { mockPatrons } from '~/utils/mockData'
 
 interface Patron {
   resource: { nif_nipc: string }
@@ -26,11 +25,7 @@ const { data: patronsData, status: patronsStatus, refresh: refreshPatrons } = aw
   server: false
 })
 
-const patrons = computed(() => {
-  const real = patronsData.value?.data ?? []
-  const mockNifs = new Set(mockPatrons.map(p => p.resource.nif_nipc))
-  return [...mockPatrons, ...real.filter(p => !mockNifs.has(p.resource.nif_nipc))]
-})
+const patrons = computed(() => patronsData.value?.data ?? [])
 
 const patronOptions = computed(() =>
   patrons.value.map(p => ({

@@ -1,20 +1,36 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { mockPatron } from '~/utils/mockData'
 
 const paymentMethods = ['Numerário', 'Transferência Bancária', 'Referência Multibanco', 'Cheque'] as const
 
 const toast = useToast()
 const router = useRouter()
-const { isAdmin } = useAuth()
+const { isAdmin, patronNif } = useAuth()
 
 if (isAdmin.value) {
   await navigateTo('/mecenas/doacao_manual')
 }
 
-// TODO: Replace mockPatron with data fetched from auth session + API
-const patronData = reactive({ ...mockPatron.entity, ...mockPatron.locations[0]! })
+const { data: patronRes } = await useFetch<{
+  entity: { nif_nipc: string; nome_entidade: string; email_login: string; iban: string }
+  locations: Array<{ rua: string; n_porta: string; codigo_postal: string; concelho: string }>
+}>(`/api/patrons/${patronNif.value}`, { server: false, lazy: true })
+
+const patronData = reactive<Record<string, string>>({
+  nif_nipc: patronNif.value,
+  nome_entidade: '',
+  email_login: '',
+  iban: '',
+  rua: '',
+  n_porta: '',
+  codigo_postal: '',
+  concelho: ''
+})
+
+watch(patronRes, (res) => {
+  if (res) Object.assign(patronData, { ...res.entity, ...res.locations?.[0] })
+}, { immediate: true })
 
 function metodoToTipo(metodo: string): string {
   const map: Record<string, string> = {
@@ -81,7 +97,7 @@ const formattedTotal = computed(() =>
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   isSubmitting.value = true
   try {
-    await $fetch(`/api/patrons/${patronData.nif_nipc}/donations`, {
+    await $fetch(`/api/patrons/${patronNif.value}/donations`, {
       method: 'POST',
       body: {
         data: event.data.data,

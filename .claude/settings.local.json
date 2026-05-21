@@ -19,7 +19,9 @@
       "Bash(xargs grep -l \"jwt\\\\|passport\\\\|auth\\\\|login\\\\|register\")",
       "Bash(python3 -c ' *)",
       "Bash(node -e ' *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(Get-ChildItem -Path \"C:/SAM/p2-sam-frontend/app/composables\" -Filter \"*.ts\")",
+      "Bash(Select-Object -ExpandProperty Name)"
     ]
   }
 }

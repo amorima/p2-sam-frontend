@@ -1,6 +1,5 @@
 import { createSharedComposable } from '@vueuse/core'
 import {
-  mockPanels,
   type Need,
   type NeedItem,
   type EstadoPedido,
@@ -29,7 +28,7 @@ const _useNeeds = () => {
   const institutions = useState<any[]>('needs.institutions', () => [])
   const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [])
   const businesses = useState<Business[]>('needs.businesses', () => [])
-  const panels = useState<Panel[]>('needs.panels', () => [...mockPanels])
+  const panels = useState<Panel[]>('needs.panels', () => [])
 
   // Fetch all data from API (deduped by key — runs once per SSR + once on client if needed)
   useAsyncData('needs-initial-data', async () => {

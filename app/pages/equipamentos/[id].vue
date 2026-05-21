@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { mockTelemetryPings } from '~/utils/mockData'
 
 interface TelemetryStatus {
   sensor_porta: string
@@ -42,13 +41,7 @@ const { data, status, refresh } = await useFetch<TelemetryResponse>(
 const { pause } = useIntervalFn(() => refresh(), 5000)
 onUnmounted(() => pause())
 
-const pings = computed<TelemetryPing[]>(() => {
-  const real = data.value?.pings ?? []
-  const mockPings = (mockTelemetryPings[Number(lockerId)] ?? []) as TelemetryPing[]
-  const mockIds = new Set(mockPings.map(p => p._id))
-  const realFiltered = real.filter(p => !mockIds.has(p._id))
-  return [...realFiltered, ...mockPings]
-})
+const pings = computed<TelemetryPing[]>(() => data.value?.pings ?? [])
 const latestPing = computed(() => pings.value[0] ?? null)
 
 const globalFilter = ref('')
