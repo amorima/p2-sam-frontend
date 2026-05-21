@@ -11,70 +11,27 @@ const userProfile = useUserProfile()
 const { logout } = useAuth()
 const isCollapsed = computed(() => !!props.collapsed)
 
-const displayName = computed(
-  () => userProfile.profile.value?.name || userProfile.defaultName
-)
-const displayAvatar = computed(
-  () => userProfile.profile.value?.avatar || userProfile.defaultAvatar
-)
+const displayName = computed(() => userProfile.name.value)
+const displayAvatar = computed(() => userProfile.avatar.value)
 
 const colors = [
-  'red',
-  'orange',
-  'amber',
-  'yellow',
-  'lime',
-  'green',
-  'emerald',
-  'teal',
-  'cyan',
-  'sky',
-  'blue',
-  'indigo',
-  'violet',
-  'purple',
-  'fuchsia',
-  'pink',
-  'rose'
+  'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald',
+  'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple',
+  'fuchsia', 'pink', 'rose'
 ]
 const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone']
 
-const userButton = computed(() => ({
-  name: displayName.value,
-  avatar: {
-    src: displayAvatar.value,
-    alt: displayName.value
-  },
-  label: isCollapsed.value ? undefined : displayName.value,
-  trailingIcon: isCollapsed.value ? undefined : 'i-lucide-chevrons-up-down'
-}))
-
 const primaryColors = {
-  red: 'Vermelho',
-  orange: 'Laranja',
-  amber: 'Âmbar',
-  yellow: 'Amarelo',
-  lime: 'Lima',
-  green: 'Verde',
-  emerald: 'Esmeralda',
-  teal: 'Azul-petróleo',
-  cyan: 'Ciano',
-  sky: 'Céu',
-  blue: 'Azul',
-  indigo: 'Índigo',
-  violet: 'Violeta',
-  purple: 'Roxo',
-  fuchsia: 'Fúcsia',
-  pink: 'Rosa',
+  red: 'Vermelho', orange: 'Laranja', amber: 'Âmbar', yellow: 'Amarelo',
+  lime: 'Lima', green: 'Verde', emerald: 'Esmeralda', teal: 'Azul-petróleo',
+  cyan: 'Ciano', sky: 'Céu', blue: 'Azul', indigo: 'Índigo',
+  violet: 'Violeta', purple: 'Roxo', fuchsia: 'Fúcsia', pink: 'Rosa',
   rose: 'Rosa-escuro'
 } as const
 
 const neutralColors = {
-  slate: 'Lousa',
-  gray: 'Cinzento',
-  zinc: 'Zinco',
-  neutral: 'Neutro',
-  stone: 'Pedra'
+  slate: 'Lousa', gray: 'Cinzento', zinc: 'Zinco',
+  neutral: 'Neutro', stone: 'Pedra'
 } as const
 
 const items = computed<DropdownMenuItem[][]>(() => [
@@ -82,10 +39,9 @@ const items = computed<DropdownMenuItem[][]>(() => [
     {
       type: 'label',
       label: displayName.value,
-      avatar: {
-        src: displayAvatar.value,
-        alt: displayName.value
-      }
+      avatar: displayAvatar.value !== '/user.svg'
+        ? { src: displayAvatar.value, alt: displayName.value }
+        : { alt: displayName.value }
     }
   ],
   [
@@ -108,19 +64,15 @@ const items = computed<DropdownMenuItem[][]>(() => [
           label: 'Cor primária',
           slot: 'chip',
           chip: appConfig.ui.colors.primary,
-          content: {
-            align: 'center',
-            collisionPadding: 16
-          },
+          content: { align: 'center', collisionPadding: 16 },
           children: colors.map(color => ({
             label: primaryColors[color as keyof typeof primaryColors],
             chip: color,
             slot: 'chip',
             checked: appConfig.ui.colors.primary === color,
             type: 'checkbox',
-            onSelect: (e) => {
+            onSelect: (e: Event) => {
               e.preventDefault()
-
               appConfig.ui.colors.primary = color
             }
           }))
@@ -128,23 +80,16 @@ const items = computed<DropdownMenuItem[][]>(() => [
         {
           label: 'Cor neutra',
           slot: 'chip',
-          chip:
-            appConfig.ui.colors.neutral === 'neutral'
-              ? 'old-neutral'
-              : appConfig.ui.colors.neutral,
-          content: {
-            align: 'end',
-            collisionPadding: 16
-          },
+          chip: appConfig.ui.colors.neutral === 'neutral' ? 'old-neutral' : appConfig.ui.colors.neutral,
+          content: { align: 'end', collisionPadding: 16 },
           children: neutrals.map(color => ({
             label: neutralColors[color as keyof typeof neutralColors],
             chip: color === 'neutral' ? 'old-neutral' : color,
             slot: 'chip',
             type: 'checkbox',
             checked: appConfig.ui.colors.neutral === color,
-            onSelect: (e) => {
+            onSelect: (e: Event) => {
               e.preventDefault()
-
               appConfig.ui.colors.neutral = color
             }
           }))
@@ -162,7 +107,6 @@ const items = computed<DropdownMenuItem[][]>(() => [
           checked: colorMode.value === 'light',
           onSelect(e: Event) {
             e.preventDefault()
-
             colorMode.preference = 'light'
           }
         },
@@ -172,9 +116,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
           type: 'checkbox',
           checked: colorMode.value === 'dark',
           onUpdateChecked(checked: boolean) {
-            if (checked) {
-              colorMode.preference = 'dark'
-            }
+            if (checked) colorMode.preference = 'dark'
           },
           onSelect(e: Event) {
             e.preventDefault()
@@ -201,17 +143,21 @@ const items = computed<DropdownMenuItem[][]>(() => [
       content: isCollapsed ? 'w-48' : 'w-(--reka-dropdown-menu-trigger-width)'
     }"
   >
+    <!-- Trigger button with theme-adaptive avatar -->
     <UButton
-      v-bind="userButton"
+      :label="isCollapsed ? undefined : displayName"
+      :trailing-icon="isCollapsed ? undefined : 'i-lucide-chevrons-up-down'"
       color="neutral"
       variant="ghost"
       block
       :square="isCollapsed"
       class="data-[state=open]:bg-elevated"
-      :ui="{
-        trailingIcon: 'text-dimmed'
-      }"
-    />
+      :ui="{ trailingIcon: 'text-dimmed' }"
+    >
+      <template #leading>
+        <AppUserAvatar :src="displayAvatar" :alt="displayName" size="xs" />
+      </template>
+    </UButton>
 
     <template #chip-leading="{ item }">
       <div class="inline-flex items-center justify-center shrink-0 size-5">

@@ -55,23 +55,13 @@ export function useAuth() {
     })
     session.value = result
     setRole(result.role, result.nif, result.name)
-
-    // Sync display name in profile
-    const profile = useState<{ name: string, avatar: string }>('user-profile')
-    if (profile.value && result.name) {
-      profile.value.name = result.name
-    }
-
     return result
   }
 
   async function logout() {
+    useUserProfile().clearAvatar()
     session.value = null
     setRole('admin')
-    const profile = useState<{ name: string, avatar: string }>('user-profile')
-    if (profile.value) {
-      profile.value.name = 'António Amorim'
-    }
     await navigateTo('/login')
   }
 
