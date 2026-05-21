@@ -7,7 +7,28 @@
       "PowerShell(head -80)",
       "Bash(pnpm lint *)",
       "Bash(pnpm add *)",
-      "Bash(pnpm typecheck *)"
+      "Bash(pnpm typecheck *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\SAM\\\\p2-sam-backend\" -Force)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Get-ChildItem -Path \"C:\\\\SAM\\\\p2-sam-frontend\\\\app\" -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(npx nuxi *)",
+      "Bash(Get-ChildItem -Path \"C:/SAM/p2-sam-backend\" -Recurse -Directory -ErrorAction SilentlyContinue)",
+      "Bash(Format-Table FullName)",
+      "Bash(xargs grep -l \"jwt\\\\|passport\\\\|auth\\\\|login\\\\|register\")",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(node *)",
+      "Bash(Get-ChildItem -Path \"C:/SAM/p2-sam-frontend/app/composables\" -Filter \"*.ts\")",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "PowerShell(pm2 logs *)",
+      "PowerShell(pm2 list *)",
+      "PowerShell(Get-ChildItem \"C:\\\\SAM\\\\p2-SAM-data-generator\" -Recurse -Name -Depth 2 | Where-Object { $_ -notmatch \"node_modules\" -and $_ -notmatch \"\\\\.git\" })",
+      "PowerShell(\\(Get-Content \"C:\\\\SAM\\\\p2-SAM-data-generator\\\\output\\\\doacao.json\" | ConvertFrom-Json\\) | Select-Object -ExpandProperty tipo_donativo | Sort-Object -Unique)",
+      "PowerShell(\\(Get-Content \"C:\\\\SAM\\\\p2-SAM-data-generator\\\\output\\\\doacao.json\" | ConvertFrom-Json\\) | Select-Object -First 1)",
+      "Bash(grep -v \"^$\")",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }

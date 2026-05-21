@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)
 
-  return await authBackendFetch(event, `${config.backendBase}/donations/${id}`, {
+  return await authBackendFetch(event, `${config.backendBase}/needs/${id}`, {
     method: 'PATCH',
     body
   })

@@ -5,6 +5,7 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 const fileRef = ref<HTMLInputElement>()
 const userProfile = useUserProfile()
 const { isAdmin } = useAuth()
+const { name: authName, avatar: authAvatar, updateAvatar } = userProfile
 
 const printReceiptEnabled = ref(true)
 const { isAvailable: agentAvailable, selectedPrinter, fetchPrinters, checkAvailability } = usePrintAgent()
@@ -41,7 +42,7 @@ function onPrinterChange(name: string) {
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Demasiado curto'),
-  email: z.string().email('Email inválido'),
+  email: z.string().email('Email inválido').optional().or(z.literal('')),
   username: z.string().min(2, 'Demasiado curto'),
   avatar: z.string().optional(),
   bio: z.string().optional()
@@ -50,29 +51,27 @@ const profileSchema = z.object({
 type ProfileSchema = z.output<typeof profileSchema>
 
 const profile = reactive<Partial<ProfileSchema>>({
-  name: userProfile.profile.value.name,
-  email: 'ben@nuxtlabs.com',
-  username: userProfile.defaultName,
-  avatar: userProfile.profile.value.avatar,
+  name: authName.value,
+  email: '',
+  username: authName.value,
+  avatar: authAvatar.value,
   bio: undefined
 })
 
 const toast = useToast()
 
-async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
-  userProfile.profile.value.name
-    = profile.name || userProfile.profile.value.name
-  userProfile.profile.value.avatar
-    = profile.avatar || userProfile.profile.value.avatar
+// Sync preview when localStorage loads the stored avatar on mount
+watch(authAvatar, (url) => {
+  profile.avatar = url
+})
 
+async function onSubmit(_event: FormSubmitEvent<ProfileSchema>) {
   toast.add({
     title: 'Sucesso',
     description: 'As tuas definições foram atualizadas.',
     icon: 'i-lucide-check',
     color: 'success'
   })
-
-  console.log(event.data)
 }
 
 async function onFileChange(e: Event) {
@@ -99,35 +98,20 @@ async function onFileChange(e: Event) {
     return
   }
 
-  const previewUrl = URL.createObjectURL(file)
-  profile.avatar = previewUrl
-  userProfile.profile.value.avatar = previewUrl
+  // Optimistic preview while uploading
+  profile.avatar = URL.createObjectURL(file)
 
   try {
-    const filename = encodeURIComponent(file.name)
-    const { public: { backendBase } } = useRuntimeConfig()
-
     const formData = new FormData()
     formData.append('file', file)
 
-    const uploadRes = await fetch(`${backendBase}/api/upload/avatar?nome=${filename}`, {
-      method: 'POST',
-      body: formData
-    })
+    const uploadData = await $fetch<{ url: string, fileName: string }>(
+      `/api/upload/avatar?nome=${encodeURIComponent(file.name)}`,
+      { method: 'POST', body: formData }
+    )
 
-    if (!uploadRes.ok) {
-      const text = await uploadRes.text()
-      throw new Error(text || uploadRes.statusText)
-    }
-
-    const uploadData: { url?: string } = await uploadRes.json()
-
-    if (!uploadData.url) {
-      throw new Error('Nenhuma URL retornada pelo servidor')
-    }
-
-    profile.avatar = uploadData.url
-    userProfile.profile.value.avatar = uploadData.url
+    // updateAvatar stores the fileName in DB + localStorage and updates the sidebar
+    updateAvatar(uploadData.fileName)
 
     toast.add({
       title: 'Sucesso',
@@ -137,7 +121,7 @@ async function onFileChange(e: Event) {
     })
   } catch (err) {
     console.error('Upload failed', err)
-
+    profile.avatar = authAvatar.value
     toast.add({
       title: 'Erro',
       description: 'Não foi possível carregar a imagem.',
@@ -213,7 +197,7 @@ function onFileClick() {
         class="flex max-sm:flex-col justify-between sm:items-center gap-4"
       >
         <div class="flex flex-wrap items-center gap-3">
-          <UAvatar :src="profile.avatar" :alt="profile.name" size="lg" />
+          <AppUserAvatar :src="profile.avatar" :alt="profile.name" size="lg" />
           <UButton label="Escolher" color="neutral" @click="onFileClick" />
           <input
             ref="fileRef"

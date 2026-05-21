@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { mockPatrons } from '~/utils/mockData'
 
 interface Patron {
   resource: { nif_nipc: string }
@@ -26,11 +25,7 @@ const { data: patronsData, status: patronsStatus, refresh: refreshPatrons } = aw
   server: false
 })
 
-const patrons = computed(() => {
-  const real = patronsData.value?.data ?? []
-  const mockNifs = new Set(mockPatrons.map(p => p.resource.nif_nipc))
-  return [...mockPatrons, ...real.filter(p => !mockNifs.has(p.resource.nif_nipc))]
-})
+const patrons = computed(() => patronsData.value?.data ?? [])
 
 const patronOptions = computed(() =>
   patrons.value.map(p => ({
@@ -139,8 +134,16 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     toast.add({ title: 'Doação registada', description: 'A doação foi registada com sucesso.', icon: 'i-lucide-check', color: 'success' })
     router.push('/mecenas')
-  } catch {
-    toast.add({ title: 'Erro ao registar', description: 'Não foi possível registar a doação.', icon: 'i-lucide-x', color: 'error' })
+  } catch (err: unknown) {
+    const e = err as { status?: number, statusCode?: number, response?: { status?: number }, data?: { statusMessage?: string }, statusMessage?: string }
+    const status = e?.status ?? e?.statusCode ?? e?.response?.status
+    if (status === 401) {
+      toast.add({ title: 'Sessão expirada', description: 'Por favor inicie sessão novamente.', icon: 'i-lucide-log-in', color: 'warning' })
+      await navigateTo('/login')
+      return
+    }
+    const msg = e?.data?.statusMessage ?? e?.statusMessage ?? 'Não foi possível registar a doação.'
+    toast.add({ title: 'Erro ao registar', description: msg, icon: 'i-lucide-x', color: 'error' })
   } finally {
     isSubmitting.value = false
   }

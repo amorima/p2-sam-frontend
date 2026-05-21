@@ -363,6 +363,35 @@ export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: numb
   return 2 * R * Math.asin(Math.sqrt(a))
 }
 
+export interface Institution {
+  resource: {
+    nif_nipc: string
+    geo_latitude: number
+    geo_longitude: number
+    url_comprovativo_estatuto: string
+  }
+  entity: {
+    nif_nipc: string
+    nome_entidade: string
+    email_login: string
+    iban: string
+  }
+  locations: Array<{
+    codigo_postal: string
+    concelho: string
+    distrito: string
+    freguesia: string
+    pais: string
+    rua: string
+    n_porta: string
+  }>
+  contacts: Array<{
+    contacto: string
+    nome_contacto: string
+    descricao: string
+  }>
+}
+
 export interface BusinessOffer {
   id_oferta: number
   negocio_nif_nipc: string

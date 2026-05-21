@@ -1,33 +1,22 @@
+interface FlatPatron {
+  nif_nipc: string
+  nome_entidade: string
+  email_login: string
+  iban: string
+  locations: unknown[]
+  contacts: unknown[]
+}
+
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
+  const res = await $fetch<{ data: FlatPatron[] }>(`${config.backendBase}/patrons`)
 
-  const response = await $fetch<{ data: PatronResponse[] }>(
-    `${config.backendBase}/patrons`
-  )
+  const data = (res.data ?? []).map(p => ({
+    resource: { nif_nipc: p.nif_nipc },
+    entity: { nif_nipc: p.nif_nipc, nome_entidade: p.nome_entidade, email_login: p.email_login, iban: p.iban },
+    locations: p.locations ?? [],
+    contacts: p.contacts ?? []
+  }))
 
-  return response
+  return { data }
 })
-
-interface PatronResponse {
-  resource: { nif_nipc: string }
-  entity: {
-    nif_nipc: string
-    nome_entidade: string
-    email_login: string
-    iban: string
-  }
-  locations: Array<{
-    codigo_postal: string
-    concelho: string
-    distrito: string
-    freguesia: string
-    pais: string
-    rua: string
-    n_porta: string
-  }>
-  contacts: Array<{
-    contacto: string
-    nome_contacto: string
-    descricao: string
-  }>
-}

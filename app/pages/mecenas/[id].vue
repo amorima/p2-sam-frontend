@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { printDonationReceipt, type ReceiptDonation } from '~/utils/donationPDF'
-import { mockApprovedDonation } from '~/utils/mockData'
-
 interface Donation {
   id_doacao: number
   mecena_nif_nipc: string
@@ -15,22 +12,25 @@ interface Donation {
 }
 
 const route = useRoute()
-const { isAdmin } = useAuth()
+const { isAdmin, patronNif } = useAuth()
 const id = Number(route.params.id)
 
 const statusModalOpen = ref(false)
 
+const fetchUrl = computed(() =>
+  isAdmin.value
+    ? '/api/donations'
+    : `/api/patrons/${patronNif.value}/donations`
+)
+
 const { data: rawData, status, refresh } = await useFetch<{ donations: Donation[] }>(
-  '/api/donations',
+  fetchUrl,
   { lazy: true, server: false }
 )
 
 const donation = computed<Donation | null>(() => {
   const list = rawData.value?.donations ?? []
-  const found = list.find(d => d.id_doacao === id)
-  if (found) return found
-  if (mockApprovedDonation.id_doacao === id) return mockApprovedDonation as Donation
-  return null
+  return list.find(d => d.id_doacao === id) ?? null
 })
 
 const modoLabel: Record<string, string> = {
@@ -54,18 +54,21 @@ function formatEUR(v: number) {
   return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(v)
 }
 
+const toast = useToast()
+
 function downloadPDF() {
   if (!donation.value) return
-  const receipt: ReceiptDonation = {
-    id_doacao: donation.value.id_doacao,
-    mecena_nif_nipc: donation.value.mecena_nif_nipc,
-    nome_entidade: donation.value.nome_entidade,
-    data: donation.value.data,
-    valor_transacao: donation.value.valor_transacao,
-    tipo_donativo: donation.value.tipo_donativo,
-    estado: donation.value.estado
+  if (!donation.value.url_comprovativo) {
+    toast.add({
+      title: 'Comprovativo não disponível',
+      description: 'O comprovativo ainda não foi gerado para esta doação.',
+      icon: 'i-lucide-alert-circle',
+      color: 'warning'
+    })
+    return
   }
-  printDonationReceipt(receipt)
+  const fileName = donation.value.url_comprovativo.split('/').pop()!
+  window.open(`/api/download/files?nome=${encodeURIComponent(fileName)}`, '_blank')
 }
 
 const docNumber = computed(() =>

@@ -59,11 +59,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
   try {
     if (event.data.estado === 'ACEITE') {
-      approveNeed(props.need.id_pedido)
+      await approveNeed(props.need.id_pedido)
     } else if (event.data.estado === 'REJEITADO') {
-      rejectNeed(props.need.id_pedido, event.data.motivo_recusa ?? '')
+      await rejectNeed(props.need.id_pedido, event.data.motivo_recusa ?? '')
     } else {
-      updateNeedStatus(props.need.id_pedido, 'PENDENTE')
+      await updateNeedStatus(props.need.id_pedido, 'PENDENTE')
     }
 
     toast.add({

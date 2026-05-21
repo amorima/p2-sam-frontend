@@ -9,11 +9,9 @@ interface Donation {
   estado: 'ACEITE' | 'REJEITADO' | 'PENDENTE'
 }
 
-interface PatronItem {
-  resource: { nif_nipc: string }
-  entity: { nif_nipc: string, nome_entidade: string, email_login: string, iban: string }
-  locations: object[]
-  contacts: object[]
+interface FlatPatron {
+  nif_nipc: string
+  nome_entidade: string
 }
 
 export default defineEventHandler(async () => {
@@ -21,11 +19,12 @@ export default defineEventHandler(async () => {
 
   const [donationsRes, patronsRes] = await Promise.all([
     $fetch<{ donations: Donation[] }>(`${config.backendBase}/donations`),
-    $fetch<{ data: PatronItem[], _links: object }>(`${config.backendBase}/patrons`)
+    $fetch<{ data: FlatPatron[] }>(`${config.backendBase}/patrons`)
   ])
 
+  // Backend returns flat format (nif_nipc and nome_entidade at top level)
   const nameMap = new Map(
-    (patronsRes.data ?? []).map(p => [p.resource.nif_nipc, p.entity.nome_entidade])
+    (patronsRes.data ?? []).map(p => [p.nif_nipc, p.nome_entidade])
   )
 
   const enriched = (donationsRes.donations ?? []).map(d => ({

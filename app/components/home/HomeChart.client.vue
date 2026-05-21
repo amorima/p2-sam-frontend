@@ -3,14 +3,17 @@ import {
   eachDayOfInterval,
   eachWeekOfInterval,
   eachMonthOfInterval,
+  isSameDay,
+  isSameWeek,
+  isSameMonth,
   format
 } from 'date-fns'
 import { pt } from 'date-fns/locale'
 import {
   VisXYContainer,
   VisLine,
-  VisAxis,
   VisArea,
+  VisAxis,
   VisCrosshair,
   VisTooltip
 } from '@unovis/vue'
@@ -23,19 +26,35 @@ const props = defineProps<{
   range: Range
 }>()
 
-type DataRecord = {
-  date: Date
-  amount: number
+interface Donation {
+  data: string
+  valor_transacao: number
+  estado: string
 }
 
-const { width } = useElementSize(cardRef)
+type DataRecord = { date: Date, amount: number }
 
-const data = ref<DataRecord[]>([])
+const { width } = useElementSize(cardRef)
+const chartData = ref<DataRecord[]>([])
+
+const { data: donations } = await useAsyncData<Donation[]>(
+  'home-chart-donations',
+  () => $fetch<{ donations: Donation[] }>('/api/donations').then(r => r.donations ?? []).catch(() => []),
+  { server: false, default: () => [] }
+)
+
+function isSameBucket(bucketDate: Date, donationDate: Date): boolean {
+  if (props.period === 'daily') return isSameDay(bucketDate, donationDate)
+  if (props.period === 'weekly') return isSameWeek(bucketDate, donationDate, { weekStartsOn: 1 })
+  return isSameMonth(bucketDate, donationDate)
+}
 
 watch(
-  [() => props.period, () => props.range],
+  [donations, () => props.period, () => props.range],
   () => {
-    const dates = (
+    const accepted = (donations.value ?? []).filter(d => d.estado === 'ACEITE')
+
+    const buckets = (
       {
         daily: eachDayOfInterval,
         weekly: eachWeekOfInterval,
@@ -43,12 +62,11 @@ watch(
       } as Record<Period, typeof eachDayOfInterval>
     )[props.period](props.range)
 
-    const min = 1000
-    const max = 10000
-
-    data.value = dates.map(date => ({
+    chartData.value = buckets.map(date => ({
       date,
-      amount: Math.floor(Math.random() * (max - min + 1)) + min
+      amount: accepted
+        .filter(d => isSameBucket(date, new Date(d.data)))
+        .reduce((sum, d) => sum + Number(d.valor_transacao), 0)
     }))
   },
   { immediate: true }
@@ -58,16 +76,16 @@ const x = (_: DataRecord, i: number) => i
 const y = (d: DataRecord) => d.amount
 
 const total = computed(() =>
-  data.value.reduce((acc: number, { amount }) => acc + amount, 0)
+  chartData.value.reduce((acc, { amount }) => acc + amount, 0)
 )
 
-const formatNumber = new Intl.NumberFormat('pt-PT', {
+const formatEUR = new Intl.NumberFormat('pt-PT', {
   style: 'currency',
   currency: 'EUR',
   maximumFractionDigits: 0
 }).format
 
-const formatDate = (date: Date): string => {
+function formatDate(date: Date): string {
   return {
     daily: format(date, 'd MMM', { locale: pt }),
     weekly: format(date, 'd MMM', { locale: pt }),
@@ -76,15 +94,11 @@ const formatDate = (date: Date): string => {
 }
 
 const xTicks = (i: number) => {
-  if (i === 0 || i === data.value.length - 1 || !data.value[i]) {
-    return ''
-  }
-
-  return formatDate(data.value[i].date)
+  if (i === 0 || i === chartData.value.length - 1 || !chartData.value[i]) return ''
+  return formatDate(chartData.value[i].date)
 }
 
-const template = (d: DataRecord) =>
-  `${formatDate(d.date)}: ${formatNumber(d.amount)}`
+const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatEUR(d.amount)}`
 </script>
 
 <template>
@@ -95,16 +109,16 @@ const template = (d: DataRecord) =>
     <template #header>
       <div>
         <p class="text-xs text-muted uppercase mb-1.5">
-          Revenue
+          Valor das Doações Aceites
         </p>
         <p class="text-3xl text-highlighted font-semibold">
-          {{ formatNumber(total) }}
+          {{ formatEUR(total) }}
         </p>
       </div>
     </template>
 
     <VisXYContainer
-      :data="data"
+      :data="chartData"
       :padding="{ top: 40 }"
       class="h-96"
       :width="width"
@@ -116,11 +130,8 @@ const template = (d: DataRecord) =>
         color="var(--ui-primary)"
         :opacity="0.1"
       />
-
       <VisAxis type="x" :x="x" :tick-format="xTicks" />
-
       <VisCrosshair color="var(--ui-primary)" :template="template" />
-
       <VisTooltip />
     </VisXYContainer>
   </UCard>
@@ -130,11 +141,9 @@ const template = (d: DataRecord) =>
 .unovis-xy-container {
   --vis-crosshair-line-stroke-color: var(--ui-primary);
   --vis-crosshair-circle-stroke-color: var(--ui-bg);
-
   --vis-axis-grid-color: var(--ui-border);
   --vis-axis-tick-color: var(--ui-border);
   --vis-axis-tick-label-color: var(--ui-text-dimmed);
-
   --vis-tooltip-background-color: var(--ui-bg);
   --vis-tooltip-border-color: var(--ui-border);
   --vis-tooltip-text-color: var(--ui-text-highlighted);

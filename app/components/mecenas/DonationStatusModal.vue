@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import { generateDonationPDFBlob, donationDocNumber, type ReceiptDonation } from '~/utils/donationPDF'
 
 interface Donation {
   id_doacao: number
@@ -70,7 +71,29 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
     const body: Record<string, unknown> = { estado: event.data.estado }
 
-    if (event.data.estado === 'REJEITADO' && event.data.motivo_recusa) {
+    if (event.data.estado === 'ACEITE') {
+      const receipt: ReceiptDonation = {
+        id_doacao: props.donation.id_doacao,
+        mecena_nif_nipc: props.donation.mecena_nif_nipc,
+        nome_entidade: props.donation.nome_entidade,
+        data: props.donation.data,
+        valor_transacao: props.donation.valor_transacao,
+        tipo_donativo: props.donation.tipo_donativo,
+        estado: 'ACEITE'
+      }
+
+      const pdfBlob = generateDonationPDFBlob(receipt)
+      const fileName = `${donationDocNumber(receipt)}.pdf`
+      const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' })
+      const formData = new FormData()
+      formData.append('file', pdfFile, fileName)
+
+      const uploadResult = await $fetch<{ url: string }>(
+        `/api/upload/files?nome=${encodeURIComponent(fileName)}`,
+        { method: 'POST', body: formData }
+      )
+      body.url_comprovativo = uploadResult.url
+    } else if (event.data.estado === 'REJEITADO' && event.data.motivo_recusa) {
       body.url_comprovativo = event.data.motivo_recusa
     }
 
@@ -88,7 +111,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     emit('updated')
     emit('update:open', false)
-  } catch {
+  } catch (e) {
+    console.error(e)
     toast.add({
       title: 'Erro',
       description: 'Não foi possível atualizar o estado.',

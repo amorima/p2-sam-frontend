@@ -1,3 +1,5 @@
+import { jsPDF } from 'jspdf'
+
 export interface ReceiptDonation {
   id_doacao: number
   mecena_nif_nipc: string
@@ -12,324 +14,219 @@ export interface ReceiptDonation {
   morada?: string
 }
 
-export function printDonationReceipt(donation: ReceiptDonation) {
+const C = {
+  dark: [15, 23, 42] as [number, number, number],
+  mid: [71, 85, 105] as [number, number, number],
+  muted: [100, 116, 139] as [number, number, number],
+  light: [148, 163, 184] as [number, number, number],
+  bg: [248, 250, 252] as [number, number, number],
+  border: [226, 232, 240] as [number, number, number],
+  green: [21, 128, 61] as [number, number, number],
+  greenBg: [220, 252, 231] as [number, number, number],
+  white: [255, 255, 255] as [number, number, number]
+}
+
+export function donationDocNumber(donation: Pick<ReceiptDonation, 'id_doacao' | 'data'>) {
+  return `DOA-${new Date(donation.data).getFullYear()}-${String(donation.id_doacao).padStart(4, '0')}`
+}
+
+export function generateDonationPDFBlob(donation: ReceiptDonation): Blob {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+  const L = 20
+  const R = 190
+  const W = 170
+
+  const tc = (c: [number, number, number]) => doc.setTextColor(...c)
+  const fc = (c: [number, number, number]) => doc.setFillColor(...c)
+  const dc = (c: [number, number, number]) => doc.setDrawColor(...c)
+
   const formattedDate = new Date(donation.data).toLocaleDateString('pt-PT', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+    year: 'numeric', month: 'long', day: 'numeric'
   })
-
   const formattedValue = new Intl.NumberFormat('pt-PT', {
-    style: 'currency',
-    currency: 'EUR'
+    style: 'currency', currency: 'EUR'
   }).format(donation.valor_transacao)
-
   const printDate = new Date().toLocaleDateString('pt-PT', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+    year: 'numeric', month: 'long', day: 'numeric'
   })
+  const docNumber = donationDocNumber(donation)
+  const tipoLabel = donation.tipo_donativo === 'NUMERARIO' ? 'Monetário' : 'Espécie'
 
-  const docNumber = `DOA-${new Date(donation.data).getFullYear()}-${String(donation.id_doacao).padStart(4, '0')}`
+  // ─── HEADER ───────────────────────────────────────────────────────────────
+  let y = 25
 
-  const html = `<!DOCTYPE html>
-<html lang="pt">
-<head>
-  <meta charset="UTF-8">
-  <title>Comprovativo de Doação ${docNumber}</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 13px;
-      color: #1a1a2e;
-      background: #fff;
-      padding: 0;
-    }
-    .page {
-      max-width: 794px;
-      margin: 0 auto;
-      padding: 48px 56px;
-      min-height: 100vh;
-      position: relative;
-    }
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(30)
+  tc(C.dark)
+  doc.text('SAM', L, y)
 
-    /* Header / Logo */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 48px;
-      padding-bottom: 32px;
-      border-bottom: 3px solid #0f172a;
-    }
-    .logo-block {}
-    .logo-text {
-      font-size: 72px;
-      font-weight: 900;
-      letter-spacing: -4px;
-      color: #0f172a;
-      line-height: 1;
-    }
-    .logo-sub {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: #475569;
-      margin-top: 4px;
-    }
-    .doc-block {
-      text-align: right;
-    }
-    .doc-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #0f172a;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .doc-number {
-      font-size: 14px;
-      color: #64748b;
-      margin-top: 4px;
-      font-family: 'Courier New', monospace;
-    }
-    .doc-status {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 4px 14px;
-      background: #dcfce7;
-      color: #15803d;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(7)
+  tc(C.muted)
+  doc.text('SERVIÇO DE APOIO MUNICIPAL DE VILA DO CONDE', L, y + 6)
 
-    /* Two-column section */
-    .parties {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      margin-bottom: 40px;
-    }
-    .party-box {
-      padding: 20px;
-      background: #f8fafc;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-    }
-    .party-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #94a3b8;
-      margin-bottom: 12px;
-    }
-    .party-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 4px;
-    }
-    .party-detail {
-      font-size: 12px;
-      color: #64748b;
-      line-height: 1.6;
-    }
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(13)
+  tc(C.dark)
+  doc.text('COMPROVATIVO DE DOAÇÃO', R, y - 3, { align: 'right' })
 
-    /* Donation details table */
-    .section-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #94a3b8;
-      margin-bottom: 12px;
-    }
-    .details-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 32px;
-    }
-    .details-table thead tr {
-      background: #0f172a;
-      color: #fff;
-    }
-    .details-table th {
-      padding: 10px 16px;
-      text-align: left;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    .details-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid #e2e8f0;
-      font-size: 13px;
-    }
-    .details-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-    .details-table tbody tr:nth-child(even) td {
-      background: #f8fafc;
-    }
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(9)
+  tc(C.muted)
+  doc.text(docNumber, R, y + 3.5, { align: 'right' })
 
-    /* Total */
-    .total-block {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 40px;
-    }
-    .total-box {
-      padding: 20px 32px;
-      background: #0f172a;
-      color: #fff;
-      border-radius: 8px;
-      text-align: right;
-      min-width: 240px;
-    }
-    .total-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #94a3b8;
-      margin-bottom: 6px;
-    }
-    .total-value {
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: -1px;
-    }
+  const badgeW = 20
+  const badgeX = R - badgeW
+  const badgeY = y + 8
+  fc(C.greenBg)
+  dc(C.greenBg)
+  doc.roundedRect(badgeX, badgeY, badgeW, 6, 2, 2, 'F')
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(6.5)
+  tc(C.green)
+  doc.text('ACEITE', R - badgeW / 2, badgeY + 4, { align: 'center' })
 
-    /* Footer */
-    .footer {
-      margin-top: auto;
-      padding-top: 24px;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-    .footer-left {
-      font-size: 11px;
-      color: #94a3b8;
-      line-height: 1.6;
-    }
-    .footer-right {
-      text-align: right;
-    }
-    .signature-line {
-      width: 180px;
-      border-bottom: 1px solid #0f172a;
-      margin-bottom: 6px;
-    }
-    .signature-label {
-      font-size: 10px;
-      color: #64748b;
-    }
+  // ─── DIVIDER ──────────────────────────────────────────────────────────────
+  y = 42
+  dc(C.dark)
+  doc.setLineWidth(0.7)
+  doc.line(L, y, R, y)
 
-    @media print {
-      body { background: #fff; }
-      .page { padding: 32px 40px; }
-      @page { size: A4; margin: 0; }
-    }
-  </style>
-</head>
-<body>
-  <div class="page">
-    <!-- Header -->
-    <div class="header">
-      <div class="logo-block">
-        <div class="logo-text">SAM</div>
-        <div class="logo-sub">Serviço de Apoio Municipal de Vila do Conde</div>
-      </div>
-      <div class="doc-block">
-        <div class="doc-title">Comprovativo de Doação</div>
-        <div class="doc-number">${docNumber}</div>
-        <div class="doc-status">Aceite</div>
-      </div>
-    </div>
+  // ─── PARTIES ──────────────────────────────────────────────────────────────
+  y = 49
+  const boxH = 34
 
-    <!-- Parties -->
-    <div class="parties">
-      <div class="party-box">
-        <div class="party-label">Mecenas / Doador</div>
-        <div class="party-name">${donation.nome_entidade ?? donation.mecena_nif_nipc}</div>
-        <div class="party-detail">
-          NIF/NIPC: ${donation.mecena_nif_nipc}<br>
-          ${donation.email ? `Email: ${donation.email}<br>` : ''}
-          ${donation.iban ? `IBAN: ${donation.iban}<br>` : ''}
-          ${donation.morada ? `Morada: ${donation.morada}` : ''}
-        </div>
-      </div>
-      <div class="party-box">
-        <div class="party-label">Beneficiário</div>
-        <div class="party-name">SAM</div>
-        <div class="party-detail">
-          Serviço de Apoio Municipal de Vila do Conde<br>
-          Praça Vasco da Gama<br>
-          4480-454 Vila do Conde
-        </div>
-      </div>
-    </div>
+  fc(C.bg)
+  dc(C.border)
+  doc.setLineWidth(0.25)
+  doc.roundedRect(L, y, 82, boxH, 2, 2, 'FD')
 
-    <!-- Donation details -->
-    <div class="section-title">Detalhes da Doação</div>
-    <table class="details-table">
-      <thead>
-        <tr>
-          <th>Descrição</th>
-          <th>Data</th>
-          <th>Tipo</th>
-          <th style="text-align:right">Valor</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Donativo ao SAM</td>
-          <td>${formattedDate}</td>
-          <td>${donation.tipo_donativo === 'NUMERARIO' ? 'Monetário' : 'Espécie'}</td>
-          <td style="text-align:right;font-weight:700">${formattedValue}</td>
-        </tr>
-      </tbody>
-    </table>
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(6.5)
+  tc(C.light)
+  doc.text('MECENAS / DOADOR', L + 4, y + 7)
 
-    <!-- Total -->
-    <div class="total-block">
-      <div class="total-box">
-        <div class="total-label">Total Doado</div>
-        <div class="total-value">${formattedValue}</div>
-      </div>
-    </div>
+  const patronName = donation.nome_entidade ?? donation.mecena_nif_nipc
+  const nameLines = doc.splitTextToSize(patronName, 74) as string[]
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(10)
+  tc(C.dark)
+  doc.text(nameLines[0]!, L + 4, y + 15)
 
-    <!-- Footer -->
-    <div class="footer">
-      <div class="footer-left">
-        Documento emitido a ${printDate}<br>
-        Este comprovativo tem validade legal como recibo de donativo.<br>
-        Serviço de Apoio Municipal de Vila do Conde · Praça Vasco da Gama, 4480-454 Vila do Conde
-      </div>
-      <div class="footer-right">
-        <div class="signature-line"></div>
-        <div class="signature-label">Assinatura autorizada / SAM</div>
-      </div>
-    </div>
-  </div>
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(8)
+  tc(C.muted)
+  let detailY = y + 21
+  doc.text(`NIF/NIPC: ${donation.mecena_nif_nipc}`, L + 4, detailY)
+  if (donation.email) {
+    detailY += 5
+    doc.text(`Email: ${donation.email}`, L + 4, detailY)
+  }
+  if (donation.iban) {
+    detailY += 5
+    doc.text(`IBAN: ${donation.iban}`, L + 4, detailY)
+  }
 
-  <script>
-    window.onload = function() { window.print(); };
-  </script>
-</body>
-</html>`
+  fc(C.bg)
+  dc(C.border)
+  doc.roundedRect(108, y, 82, boxH, 2, 2, 'FD')
 
-  const win = window.open('', '_blank', 'width=900,height=700')
-  if (!win) return
-  win.document.write(html)
-  win.document.close()
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(6.5)
+  tc(C.light)
+  doc.text('BENEFICIÁRIO', 112, y + 7)
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(10)
+  tc(C.dark)
+  doc.text('SAM', 112, y + 15)
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(8)
+  tc(C.muted)
+  doc.text('Serviço de Apoio Municipal', 112, y + 21)
+  doc.text('de Vila do Conde', 112, y + 26.5)
+  doc.text('Praça Vasco da Gama, 4480-454', 112, y + 32)
+
+  // ─── TABLE ────────────────────────────────────────────────────────────────
+  y = 92
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(6.5)
+  tc(C.light)
+  doc.text('DETALHES DA DOAÇÃO', L, y)
+
+  y += 5
+
+  fc(C.dark)
+  dc(C.dark)
+  doc.rect(L, y, W, 8, 'F')
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(7)
+  tc(C.white)
+  doc.text('DESCRIÇÃO', L + 4, y + 5.3)
+  doc.text('DATA', L + 68, y + 5.3)
+  doc.text('TIPO', L + 110, y + 5.3)
+  doc.text('VALOR', R - 4, y + 5.3, { align: 'right' })
+
+  y += 8
+
+  fc(C.bg)
+  dc(C.border)
+  doc.setLineWidth(0.2)
+  doc.rect(L, y, W, 12, 'FD')
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(9)
+  tc(C.dark)
+  doc.text('Donativo ao SAM', L + 4, y + 8)
+  doc.text(formattedDate, L + 68, y + 8)
+  doc.text(tipoLabel, L + 110, y + 8)
+  doc.setFont('helvetica', 'bold')
+  doc.text(formattedValue, R - 4, y + 8, { align: 'right' })
+
+  y += 12
+
+  // ─── TOTAL ────────────────────────────────────────────────────────────────
+  y += 14
+
+  fc(C.dark)
+  dc(C.dark)
+  doc.roundedRect(R - 62, y, 62, 22, 2, 2, 'F')
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(7)
+  tc(C.light)
+  doc.text('TOTAL DOADO', R - 31, y + 7, { align: 'center' })
+
+  doc.setFontSize(17)
+  tc(C.white)
+  doc.text(formattedValue, R - 31, y + 17, { align: 'center' })
+
+  // ─── FOOTER ───────────────────────────────────────────────────────────────
+  y = 270
+
+  dc(C.border)
+  doc.setLineWidth(0.25)
+  doc.line(L, y, R, y)
+
+  y += 6
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(7.5)
+  tc(C.light)
+  doc.text(`Documento emitido a ${printDate}`, L, y)
+  doc.text('Este comprovativo tem validade legal como recibo de donativo.', L, y + 5)
+  doc.text('Serviço de Apoio Municipal de Vila do Conde · Praça Vasco da Gama, 4480-454 Vila do Conde', L, y + 10)
+
+  dc(C.dark)
+  doc.setLineWidth(0.25)
+  doc.line(R - 55, y + 10, R, y + 10)
+  doc.setFontSize(7)
+  tc(C.muted)
+  doc.text('Assinatura autorizada / SAM', R - 27.5, y + 15, { align: 'center' })
+
+  return doc.output('blob')
 }
