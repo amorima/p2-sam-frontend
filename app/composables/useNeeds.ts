@@ -1,12 +1,13 @@
 import { createSharedComposable } from '@vueuse/core'
-import {
-  type Need,
-  type NeedItem,
-  type EstadoPedido,
-  type MatchTipo,
-  type GoodsService,
-  type Business,
-  type Panel
+import type {
+  Need,
+  NeedItem,
+  EstadoPedido,
+  MatchTipo,
+  GoodsService,
+  Business,
+  Institution,
+  Panel
 } from '~/utils/mockData'
 
 interface NewItemInput {
@@ -25,7 +26,7 @@ interface CreateNeedInput {
 
 const _useNeeds = () => {
   const needs = useState<Need[]>('needs.list', () => [])
-  const institutions = useState<any[]>('needs.institutions', () => [])
+  const institutions = useState<Institution[]>('needs.institutions', () => [])
   const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [])
   const businesses = useState<Business[]>('needs.businesses', () => [])
   const panels = useState<Panel[]>('needs.panels', () => [])
@@ -35,7 +36,7 @@ const _useNeeds = () => {
     try {
       const [needsRes, institutionsRes, businessRes] = await Promise.all([
         $fetch<{ needs: Need[] }>('/api/needs'),
-        $fetch<{ data: any[] }>('/api/institutions'),
+        $fetch<{ data: Institution[] }>('/api/institutions'),
         $fetch<{ data: Business[] }>('/api/business')
       ])
 

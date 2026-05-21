@@ -17,28 +17,39 @@ function readSession(event: H3Event): StoredSession | null {
   }
 }
 
+type HttpMethod = 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE'
+  | 'get' | 'head' | 'patch' | 'post' | 'put' | 'delete' | 'connect' | 'options' | 'trace'
+
+interface FetchErrorLike {
+  response?: { status?: number }
+  statusCode?: number
+  data?: { description?: string, message?: string, error?: string }
+  message?: string
+}
+
 export async function authBackendFetch<T = unknown>(
   event: H3Event,
   url: string,
-  options: { method?: string; body?: unknown } = {}
+  options: { method?: string, body?: unknown } = {}
 ): Promise<T> {
   const config = useRuntimeConfig()
   const session = readSession(event)
 
   const doFetch = (token?: string) => $fetch<T>(url, {
-    method: options.method as any,
-    body: options.body as any,
-    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-  })
+    method: options.method as HttpMethod | undefined,
+    body: options.body as Record<string, unknown>,
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }) as Promise<T>
 
   try {
     return await doFetch(session?.accessToken)
-  } catch (err: any) {
-    const status = err?.response?.status ?? err?.statusCode
+  } catch (err: unknown) {
+    const e = err as FetchErrorLike
+    const status = e?.response?.status ?? e?.statusCode
 
     if (status === 401 && session?.refreshToken) {
       try {
-        const refreshed = await $fetch<{ accessToken: string; refreshToken: string }>(
+        const refreshed = await $fetch<{ accessToken: string, refreshToken: string }>(
           `${config.backendBase}/auth/refresh`,
           { method: 'POST', body: { refreshToken: session.refreshToken } }
         )
@@ -60,6 +71,8 @@ export async function authBackendFetch<T = unknown>(
       }
     }
 
-    throw err
+    const message = e?.data?.description ?? e?.data?.message ?? e?.data?.error ?? e?.message ?? 'Erro inesperado'
+    console.error(`[backendFetch] ${status ?? 'NET_ERR'} ${url}:`, JSON.stringify(e?.data ?? e?.message))
+    throw createError({ statusCode: status ?? 500, statusMessage: message })
   }
 }

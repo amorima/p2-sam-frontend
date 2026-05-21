@@ -5,8 +5,8 @@ interface FlatBusiness {
   nome_entidade: string
   iban: string
   email_login?: string
-  locations: any[]
-  contacts: any[]
+  locations: unknown[]
+  contacts: unknown[]
 }
 
 interface Offer {

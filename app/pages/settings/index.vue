@@ -61,7 +61,9 @@ const profile = reactive<Partial<ProfileSchema>>({
 const toast = useToast()
 
 // Sync preview when localStorage loads the stored avatar on mount
-watch(authAvatar, (url) => { profile.avatar = url })
+watch(authAvatar, (url) => {
+  profile.avatar = url
+})
 
 async function onSubmit(_event: FormSubmitEvent<ProfileSchema>) {
   toast.add({
@@ -103,7 +105,7 @@ async function onFileChange(e: Event) {
     const formData = new FormData()
     formData.append('file', file)
 
-    const uploadData = await $fetch<{ url: string; fileName: string }>(
+    const uploadData = await $fetch<{ url: string, fileName: string }>(
       `/api/upload/avatar?nome=${encodeURIComponent(file.name)}`,
       { method: 'POST', body: formData }
     )

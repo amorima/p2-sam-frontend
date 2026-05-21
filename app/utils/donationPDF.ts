@@ -15,15 +15,15 @@ export interface ReceiptDonation {
 }
 
 const C = {
-  dark:     [15, 23, 42]   as [number, number, number],
-  mid:      [71, 85, 105]  as [number, number, number],
-  muted:    [100, 116, 139] as [number, number, number],
-  light:    [148, 163, 184] as [number, number, number],
-  bg:       [248, 250, 252] as [number, number, number],
-  border:   [226, 232, 240] as [number, number, number],
-  green:    [21, 128, 61]  as [number, number, number],
-  greenBg:  [220, 252, 231] as [number, number, number],
-  white:    [255, 255, 255] as [number, number, number],
+  dark: [15, 23, 42] as [number, number, number],
+  mid: [71, 85, 105] as [number, number, number],
+  muted: [100, 116, 139] as [number, number, number],
+  light: [148, 163, 184] as [number, number, number],
+  bg: [248, 250, 252] as [number, number, number],
+  border: [226, 232, 240] as [number, number, number],
+  green: [21, 128, 61] as [number, number, number],
+  greenBg: [220, 252, 231] as [number, number, number],
+  white: [255, 255, 255] as [number, number, number]
 }
 
 export function donationDocNumber(donation: Pick<ReceiptDonation, 'id_doacao' | 'data'>) {
@@ -42,13 +42,13 @@ export function generateDonationPDFBlob(donation: ReceiptDonation): Blob {
   const dc = (c: [number, number, number]) => doc.setDrawColor(...c)
 
   const formattedDate = new Date(donation.data).toLocaleDateString('pt-PT', {
-    year: 'numeric', month: 'long', day: 'numeric',
+    year: 'numeric', month: 'long', day: 'numeric'
   })
   const formattedValue = new Intl.NumberFormat('pt-PT', {
-    style: 'currency', currency: 'EUR',
+    style: 'currency', currency: 'EUR'
   }).format(donation.valor_transacao)
   const printDate = new Date().toLocaleDateString('pt-PT', {
-    year: 'numeric', month: 'long', day: 'numeric',
+    year: 'numeric', month: 'long', day: 'numeric'
   })
   const docNumber = donationDocNumber(donation)
   const tipoLabel = donation.tipo_donativo === 'NUMERARIO' ? 'Monetário' : 'Espécie'
@@ -119,8 +119,14 @@ export function generateDonationPDFBlob(donation: ReceiptDonation): Blob {
   tc(C.muted)
   let detailY = y + 21
   doc.text(`NIF/NIPC: ${donation.mecena_nif_nipc}`, L + 4, detailY)
-  if (donation.email) { detailY += 5; doc.text(`Email: ${donation.email}`, L + 4, detailY) }
-  if (donation.iban)  { detailY += 5; doc.text(`IBAN: ${donation.iban}`, L + 4, detailY) }
+  if (donation.email) {
+    detailY += 5
+    doc.text(`Email: ${donation.email}`, L + 4, detailY)
+  }
+  if (donation.iban) {
+    detailY += 5
+    doc.text(`IBAN: ${donation.iban}`, L + 4, detailY)
+  }
 
   fc(C.bg)
   dc(C.border)

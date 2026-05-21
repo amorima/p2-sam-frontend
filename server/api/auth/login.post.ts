@@ -26,8 +26,9 @@ export default defineEventHandler(async (event) => {
       method: 'POST',
       body: { nif_nipc, password }
     })
-  } catch (err: any) {
-    const status = err?.response?.status ?? err?.statusCode
+  } catch (err: unknown) {
+    const e = err as { response?: { status?: number }, statusCode?: number }
+    const status = e?.response?.status ?? e?.statusCode
     if (status === 401) {
       throw createError({ statusCode: 401, statusMessage: 'Credenciais inválidas.' })
     }

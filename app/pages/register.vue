@@ -172,7 +172,9 @@ async function geocodeFromAddress(loc: LocationSchema): Promise<{ lat: number, l
       params: { address }
     })
     if (result.lat && result.lng) return { lat: result.lat, lng: result.lng }
-  } catch {}
+  } catch {
+    // geocoding is best-effort; fall through to default coordinates
+  }
   // Default: center of Vila do Conde
   return { lat: 41.3526, lng: -8.7396 }
 }
@@ -182,7 +184,7 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
   try {
     const coords = await geocodeFromAddress(event.data)
 
-    const payload: Record<string, any> = {
+    const payload: Record<string, unknown> = {
       role: selectedRole.value,
       entity: {
         nif_nipc: entityState.nif_nipc,
@@ -220,10 +222,11 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
       color: 'success'
     })
     router.push('/login')
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const e = err as { data?: { statusMessage?: string }, statusMessage?: string }
     toast.add({
       title: 'Erro ao registar',
-      description: err?.data?.statusMessage ?? err?.statusMessage ?? 'Não foi possível criar a conta. Verifique os dados.',
+      description: e?.data?.statusMessage ?? e?.statusMessage ?? 'Não foi possível criar a conta. Verifique os dados.',
       icon: 'i-lucide-alert-circle',
       color: 'error'
     })
@@ -310,8 +313,19 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
 
       <template #footer>
         <div class="flex items-center justify-between">
-          <UButton label="Já tenho conta" variant="link" color="neutral" to="/login" />
-          <UButton label="Continuar" icon="i-lucide-arrow-right" trailing color="primary" @click="step = 2" />
+          <UButton
+            label="Já tenho conta"
+            variant="link"
+            color="neutral"
+            to="/login"
+          />
+          <UButton
+            label="Continuar"
+            icon="i-lucide-arrow-right"
+            trailing
+            color="primary"
+            @click="step = 2"
+          />
         </div>
       </template>
     </UCard>
@@ -320,7 +334,13 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
     <UCard v-else-if="step === 2" class="shadow-lg">
       <template #header>
         <div class="flex items-center gap-3">
-          <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" size="sm" @click="step = 1" />
+          <UButton
+            icon="i-lucide-arrow-left"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            @click="step = 1"
+          />
           <div>
             <h2 class="text-lg font-semibold text-highlighted">
               Dados da entidade
@@ -340,7 +360,12 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
         @submit="onStep2Submit"
       >
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <UFormField name="nif_nipc" label="NIF / NIPC" required class="sm:col-span-2">
+          <UFormField
+            name="nif_nipc"
+            label="NIF / NIPC"
+            required
+            class="sm:col-span-2"
+          >
             <UInput
               v-model="entityState.nif_nipc"
               class="w-full font-mono"
@@ -350,7 +375,12 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
             />
           </UFormField>
 
-          <UFormField name="nome_entidade" label="Nome" required class="sm:col-span-2">
+          <UFormField
+            name="nome_entidade"
+            label="Nome"
+            required
+            class="sm:col-span-2"
+          >
             <UInput
               v-model="entityState.nome_entidade"
               class="w-full"
@@ -358,7 +388,12 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
             />
           </UFormField>
 
-          <UFormField name="email_login" label="Email" required class="sm:col-span-2">
+          <UFormField
+            name="email_login"
+            label="Email"
+            required
+            class="sm:col-span-2"
+          >
             <UInput
               v-model="entityState.email_login"
               type="email"
@@ -378,7 +413,13 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
               :ui="{ trailing: 'pe-1' }"
             >
               <template #trailing>
-                <UButton :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'" color="neutral" variant="ghost" size="sm" @click="showPassword = !showPassword" />
+                <UButton
+                  :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click="showPassword = !showPassword"
+                />
               </template>
             </UInput>
           </UFormField>
@@ -393,7 +434,13 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
               :ui="{ trailing: 'pe-1' }"
             >
               <template #trailing>
-                <UButton :icon="showPasswordConfirm ? 'i-lucide-eye-off' : 'i-lucide-eye'" color="neutral" variant="ghost" size="sm" @click="showPasswordConfirm = !showPasswordConfirm" />
+                <UButton
+                  :icon="showPasswordConfirm ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  @click="showPasswordConfirm = !showPasswordConfirm"
+                />
               </template>
             </UInput>
           </UFormField>
@@ -409,7 +456,13 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
           <UFormField label="Comprovativo de estatuto" required>
             <div class="space-y-2">
               <div class="flex items-center gap-2">
-                <input ref="fileInput" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" @change="onFileChange">
+                <input
+                  ref="fileInput"
+                  type="file"
+                  class="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  @change="onFileChange"
+                >
                 <UButton
                   :icon="isUploading ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
                   :label="isUploading ? 'A enviar...' : 'Escolher ficheiro'"
@@ -420,7 +473,12 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
                 />
                 <span v-if="uploadedFileName" class="text-sm text-muted truncate max-w-40">{{ uploadedFileName }}</span>
               </div>
-              <UBadge v-if="uploadedUrl" color="success" variant="subtle" icon="i-lucide-check-circle">
+              <UBadge
+                v-if="uploadedUrl"
+                color="success"
+                variant="subtle"
+                icon="i-lucide-check-circle"
+              >
                 Ficheiro enviado com sucesso
               </UBadge>
               <p class="text-xs text-muted">
@@ -437,7 +495,13 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
             <UFormField label="Certidão permanente" required class="sm:col-span-2">
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
-                  <input ref="fileInput" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" @change="onFileChange">
+                  <input
+                    ref="fileInput"
+                    type="file"
+                    class="hidden"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    @change="onFileChange"
+                  >
                   <UButton
                     :icon="isUploading ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
                     :label="isUploading ? 'A enviar...' : 'Escolher ficheiro'"
@@ -448,7 +512,12 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
                   />
                   <span v-if="uploadedFileName" class="text-sm text-muted truncate max-w-40">{{ uploadedFileName }}</span>
                 </div>
-                <UBadge v-if="uploadedUrl" color="success" variant="subtle" icon="i-lucide-check-circle">
+                <UBadge
+                  v-if="uploadedUrl"
+                  color="success"
+                  variant="subtle"
+                  icon="i-lucide-check-circle"
+                >
                   Ficheiro enviado com sucesso
                 </UBadge>
                 <p class="text-xs text-muted">
@@ -457,7 +526,12 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
               </div>
             </UFormField>
 
-            <UFormField name="inicio_atividade" label="Data de início de atividade" required class="sm:col-span-2">
+            <UFormField
+              name="inicio_atividade"
+              label="Data de início de atividade"
+              required
+              class="sm:col-span-2"
+            >
               <UInput v-model="entityState.inicio_atividade" type="date" class="w-full" />
             </UFormField>
           </div>
@@ -466,7 +540,14 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
 
       <template #footer>
         <div class="flex justify-end">
-          <UButton form="step2-form" type="submit" label="Continuar" icon="i-lucide-arrow-right" trailing color="primary" />
+          <UButton
+            form="step2-form"
+            type="submit"
+            label="Continuar"
+            icon="i-lucide-arrow-right"
+            trailing
+            color="primary"
+          />
         </div>
       </template>
     </UCard>
@@ -475,7 +556,13 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
     <UCard v-else class="shadow-lg">
       <template #header>
         <div class="flex items-center gap-3">
-          <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" size="sm" @click="step = 2" />
+          <UButton
+            icon="i-lucide-arrow-left"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            @click="step = 2"
+          />
           <div>
             <h2 class="text-lg font-semibold text-highlighted">
               Morada
@@ -495,12 +582,22 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
         @submit="onStep3Submit"
       >
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <UFormField name="rua" label="Rua / Avenida" required class="sm:col-span-2">
+          <UFormField
+            name="rua"
+            label="Rua / Avenida"
+            required
+            class="sm:col-span-2"
+          >
             <UInput v-model="locationState.rua" class="w-full" placeholder="Ex.: Praça Vasco da Gama" />
           </UFormField>
 
           <UFormField name="n_porta" label="Nº de porta" required>
-            <UInput v-model="locationState.n_porta" class="w-full" placeholder="Ex.: 12" maxlength="5" />
+            <UInput
+              v-model="locationState.n_porta"
+              class="w-full"
+              placeholder="Ex.: 12"
+              maxlength="5"
+            />
           </UFormField>
 
           <UFormField name="codigo_postal" label="Código postal" required>
@@ -523,7 +620,6 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
             <UInput v-model="locationState.pais" class="w-full" placeholder="Portugal" />
           </UFormField>
         </div>
-
       </UForm>
 
       <template #footer>

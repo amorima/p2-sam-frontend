@@ -79,7 +79,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         data: props.donation.data,
         valor_transacao: props.donation.valor_transacao,
         tipo_donativo: props.donation.tipo_donativo,
-        estado: 'ACEITE',
+        estado: 'ACEITE'
       }
 
       const pdfBlob = generateDonationPDFBlob(receipt)

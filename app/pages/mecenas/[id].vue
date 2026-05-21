@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 interface Donation {
   id_doacao: number
   mecena_nif_nipc: string
@@ -64,7 +63,7 @@ function downloadPDF() {
       title: 'Comprovativo não disponível',
       description: 'O comprovativo ainda não foi gerado para esta doação.',
       icon: 'i-lucide-alert-circle',
-      color: 'warning',
+      color: 'warning'
     })
     return
   }

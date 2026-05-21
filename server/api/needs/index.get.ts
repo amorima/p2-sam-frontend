@@ -1,3 +1,19 @@
+interface BackendNeedItem {
+  id_pedido: number
+  tipo_bem_servico: string
+}
+
+interface BackendNeed {
+  'id_pedido': number
+  'nif_nipc': string
+  'createdAt': string | null
+  'estado': string | null
+  'urgente': boolean | number
+  'need items'?: BackendNeedItem[]
+  'NeedItems'?: BackendNeedItem[]
+  'needItems'?: BackendNeedItem[]
+}
+
 // Known service-type keywords to infer tipo_bem when not available from backend
 const SERVICE_KEYWORDS = ['apoio', 'consulta', 'transporte', 'aulas', 'jurídico', 'psicológico', 'médic', 'explicação', 'serviço']
 
@@ -13,7 +29,7 @@ export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
 
   const [needsRes, institutionsRes] = await Promise.all([
-    $fetch<{ needs: any[] }>(`${config.backendBase}/needs`),
+    $fetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`),
     $fetch<{ data: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions`)
   ])
 
@@ -24,11 +40,11 @@ export default defineEventHandler(async () => {
   let itemCounter = 0
   const today = new Date().toISOString()
 
-  const needs = (needsRes.needs ?? []).map((need: any) => {
+  const needs = (needsRes.needs ?? []).map((need) => {
     // Sequelize names the hasMany association key using the model name "need item" → "need items"
-    const rawItems: any[] = need['need items'] ?? need.NeedItems ?? need.needItems ?? []
+    const rawItems: BackendNeedItem[] = need['need items'] ?? need.NeedItems ?? need.needItems ?? []
 
-    const items = rawItems.map((item: any) => ({
+    const items = rawItems.map(item => ({
       id_item: ++itemCounter,
       id_pedido: item.id_pedido,
       tipo_bem_servico: item.tipo_bem_servico,

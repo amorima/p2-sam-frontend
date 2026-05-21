@@ -20,7 +20,6 @@ const selectedRole = ref<UserRole>('patron')
 const showPassword = ref(false)
 const isSubmitting = ref(false)
 
-
 const schema = z.object({
   nif_nipc: z.string().min(1, 'Campo obrigatório'),
   password: z.string().min(1, 'Password obrigatória')
@@ -46,10 +45,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     }
     toast.add({ title: 'Sessão iniciada', icon: 'i-lucide-check', color: 'success' })
     router.push(redirectMap[selectedRole.value])
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const e = err as { data?: { statusMessage?: string }, statusMessage?: string }
     toast.add({
       title: 'Erro ao iniciar sessão',
-      description: err?.data?.statusMessage ?? err?.statusMessage ?? 'Verifique os seus dados.',
+      description: e?.data?.statusMessage ?? e?.statusMessage ?? 'Verifique os seus dados.',
       icon: 'i-lucide-alert-circle',
       color: 'error'
     })
@@ -105,7 +105,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       <USeparator />
 
       <!-- Credentials form -->
-      <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+      <UForm
+        :schema="schema"
+        :state="state"
+        class="space-y-4"
+        @submit="onSubmit"
+      >
         <UFormField label="NIF / NIPC" name="nif_nipc" required>
           <UInput
             v-model="state.nif_nipc"
@@ -151,7 +156,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     <template #footer>
       <p class="text-center text-sm text-muted">
         Não tem conta?
-        <UButton label="Registar-se" variant="link" color="primary" to="/register" class="px-1" />
+        <UButton
+          label="Registar-se"
+          variant="link"
+          color="primary"
+          to="/register"
+          class="px-1"
+        />
       </p>
     </template>
   </UCard>

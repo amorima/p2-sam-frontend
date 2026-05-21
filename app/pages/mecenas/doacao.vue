@@ -17,10 +17,23 @@ const { data: patronRes } = await useFetch<{
   nome_entidade: string
   email_login: string
   iban: string
-  locations: Array<{ rua: string; n_porta: string; codigo_postal: string; concelho: string; distrito: string; pais: string }>
+  locations: Array<{ rua: string, n_porta: string, codigo_postal: string, concelho: string, distrito: string, pais: string }>
 }>(`/api/patrons/${patronNif.value}`, { server: false, lazy: true })
 
-const patronData = reactive<Record<string, string>>({
+interface PatronData {
+  nif_nipc: string
+  nome_entidade: string
+  email_login: string
+  iban: string
+  rua: string
+  n_porta: string
+  codigo_postal: string
+  concelho: string
+  distrito: string
+  pais: string
+}
+
+const patronData = reactive<PatronData>({
   nif_nipc: patronNif.value,
   nome_entidade: '',
   email_login: '',

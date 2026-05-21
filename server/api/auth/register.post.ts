@@ -1,11 +1,11 @@
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
     role: string
-    entity: Record<string, any>
-    location: Record<string, any>
-    contacts?: any[]
-    institution?: Record<string, any>
-    business?: Record<string, any>
+    entity: Record<string, unknown>
+    location: Record<string, unknown>
+    contacts?: unknown[]
+    institution?: Record<string, unknown>
+    business?: Record<string, unknown>
   }>(event)
 
   const config = useRuntimeConfig()
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Tipo inválido.' })
   }
 
-  const payload: Record<string, any> = {
+  const payload: Record<string, unknown> = {
     entity: { ...body.entity, role: body.role },
     location: body.location,
     contacts: body.contacts ?? []
@@ -36,9 +36,10 @@ export default defineEventHandler(async (event) => {
 
   try {
     return await $fetch(`${config.backendBase}/${endpoint}`, { method: 'POST', body: payload })
-  } catch (err: any) {
-    const status = err?.response?.status ?? err?.statusCode
-    const message = err?.data?.description ?? err?.statusMessage ?? 'Erro ao registar.'
+  } catch (err: unknown) {
+    const e = err as { response?: { status?: number }, statusCode?: number, data?: { description?: string }, statusMessage?: string }
+    const status = e?.response?.status ?? e?.statusCode
+    const message = e?.data?.description ?? e?.statusMessage ?? 'Erro ao registar.'
     throw createError({ statusCode: status ?? 500, statusMessage: message })
   }
 })
