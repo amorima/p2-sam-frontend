@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import { type Row, getPaginationRowModel } from '@tanstack/table-core'
-import { printDonationReceipt, type ReceiptDonation } from '~/utils/donationPDF'
 
 interface Donation {
   id_doacao: number
@@ -67,19 +66,20 @@ function openStatusModal(donation: Donation) {
   statusModalOpen.value = true
 }
 
+const toast = useToast()
+
 function downloadPDF(donation: Donation) {
-  // TODO: When Minio integration is ready, fetch the file from bucket "files"
-  // using the donation ID. For now, generate the PDF locally.
-  const receipt: ReceiptDonation = {
-    id_doacao: donation.id_doacao,
-    mecena_nif_nipc: donation.mecena_nif_nipc,
-    nome_entidade: donation.nome_entidade,
-    data: donation.data,
-    valor_transacao: donation.valor_transacao,
-    tipo_donativo: donation.tipo_donativo,
-    estado: donation.estado
+  if (!donation.url_comprovativo) {
+    toast.add({
+      title: 'Comprovativo não disponível',
+      description: 'O comprovativo ainda não foi gerado para esta doação.',
+      icon: 'i-lucide-alert-circle',
+      color: 'warning',
+    })
+    return
   }
-  printDonationReceipt(receipt)
+  const fileName = donation.url_comprovativo.split('/').pop()!
+  window.open(`/api/download/files?nome=${encodeURIComponent(fileName)}`, '_blank')
 }
 
 function getRowItems(row: Row<Donation>) {

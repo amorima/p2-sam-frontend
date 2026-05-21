@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { printDonationReceipt, type ReceiptDonation } from '~/utils/donationPDF'
 
 interface Donation {
   id_doacao: number
@@ -56,18 +55,21 @@ function formatEUR(v: number) {
   return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(v)
 }
 
+const toast = useToast()
+
 function downloadPDF() {
   if (!donation.value) return
-  const receipt: ReceiptDonation = {
-    id_doacao: donation.value.id_doacao,
-    mecena_nif_nipc: donation.value.mecena_nif_nipc,
-    nome_entidade: donation.value.nome_entidade,
-    data: donation.value.data,
-    valor_transacao: donation.value.valor_transacao,
-    tipo_donativo: donation.value.tipo_donativo,
-    estado: donation.value.estado
+  if (!donation.value.url_comprovativo) {
+    toast.add({
+      title: 'Comprovativo não disponível',
+      description: 'O comprovativo ainda não foi gerado para esta doação.',
+      icon: 'i-lucide-alert-circle',
+      color: 'warning',
+    })
+    return
   }
-  printDonationReceipt(receipt)
+  const fileName = donation.value.url_comprovativo.split('/').pop()!
+  window.open(`/api/download/files?nome=${encodeURIComponent(fileName)}`, '_blank')
 }
 
 const docNumber = computed(() =>

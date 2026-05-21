@@ -13,8 +13,11 @@ if (isAdmin.value) {
 }
 
 const { data: patronRes } = await useFetch<{
-  entity: { nif_nipc: string; nome_entidade: string; email_login: string; iban: string }
-  locations: Array<{ rua: string; n_porta: string; codigo_postal: string; concelho: string }>
+  nif_nipc: string
+  nome_entidade: string
+  email_login: string
+  iban: string
+  locations: Array<{ rua: string; n_porta: string; codigo_postal: string; concelho: string; distrito: string; pais: string }>
 }>(`/api/patrons/${patronNif.value}`, { server: false, lazy: true })
 
 const patronData = reactive<Record<string, string>>({
@@ -25,11 +28,20 @@ const patronData = reactive<Record<string, string>>({
   rua: '',
   n_porta: '',
   codigo_postal: '',
-  concelho: ''
+  concelho: '',
+  distrito: '',
+  pais: ''
 })
 
 watch(patronRes, (res) => {
-  if (res) Object.assign(patronData, { ...res.entity, ...res.locations?.[0] })
+  if (res) {
+    Object.assign(patronData, {
+      nome_entidade: res.nome_entidade ?? '',
+      email_login: res.email_login ?? '',
+      iban: res.iban ?? '',
+      ...res.locations?.[0]
+    })
+  }
 }, { immediate: true })
 
 function metodoToTipo(metodo: string): string {

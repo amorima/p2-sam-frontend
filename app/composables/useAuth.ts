@@ -4,6 +4,8 @@ export interface AuthSession {
   role: UserRole
   nif: string
   name: string
+  accessToken?: string
+  refreshToken?: string
 }
 
 export function useAuth() {

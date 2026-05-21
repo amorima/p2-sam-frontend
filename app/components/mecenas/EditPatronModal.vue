@@ -31,7 +31,7 @@ const isSubmitting = ref(false)
 const schema = z.object({
   nome_entidade: z.string().min(2, 'Nome obrigatório'),
   email_login: z.string().email('Email inválido'),
-  iban: z.string().min(15, 'IBAN inválido'),
+  iban: z.string().min(15, 'IBAN inválido').optional().or(z.literal('')),
   rua: z.string().min(1, 'Rua obrigatória'),
   n_porta: z.string().optional(),
   codigo_postal: z.string().min(1, 'Código postal obrigatório'),
@@ -67,7 +67,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         entity: {
           nome_entidade: event.data.nome_entidade,
           email_login: event.data.email_login,
-          iban: event.data.iban
+          ...(event.data.iban ? { iban: event.data.iban } : {})
         },
         locations: [{
           rua: event.data.rua,
@@ -91,7 +91,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       ...props.patron,
       nome_entidade: event.data.nome_entidade,
       email_login: event.data.email_login,
-      iban: event.data.iban,
+      iban: event.data.iban ?? props.patron.iban,
       rua: event.data.rua,
       n_porta: event.data.n_porta ?? '',
       codigo_postal: event.data.codigo_postal,
@@ -152,7 +152,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           <UFormField name="email_login" label="Email" required>
             <UInput v-model="state.email_login" type="email" class="w-full" />
           </UFormField>
-          <UFormField name="iban" label="IBAN" required>
+          <UFormField name="iban" label="IBAN">
             <UInput v-model="state.iban" class="w-full font-mono" />
           </UFormField>
         </div>

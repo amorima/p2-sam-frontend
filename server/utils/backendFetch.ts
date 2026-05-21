@@ -1,0 +1,84 @@
+import type { H3Event } from 'h3'
+
+interface StoredSession {
+  role: string
+  nif: string
+  name: string
+  accessToken?: string
+  refreshToken?: string
+}
+
+function readSession(event: H3Event): StoredSession | null {
+  try {
+    const raw = getCookie(event, 'auth-session')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+function buildAuthHeaders(
+  session: StoredSession | null,
+  token: string | undefined,
+  internalApiKey: string
+): Record<string, string> {
+  if (session?.role === 'admin' && internalApiKey) {
+    return {
+      'x-internal-key': internalApiKey,
+      'x-user-nif': session.nif || '',
+      'x-user-role': 'admin'
+    }
+  }
+  if (token) {
+    return { 'Authorization': `Bearer ${token}` }
+  }
+  return {}
+}
+
+export async function authBackendFetch<T = unknown>(
+  event: H3Event,
+  url: string,
+  options: { method?: string; body?: unknown } = {}
+): Promise<T> {
+  const config = useRuntimeConfig()
+  const internalApiKey = (config.internalApiKey as string) || ''
+  const session = readSession(event)
+
+  const doFetch = (token?: string) => $fetch<T>(url, {
+    method: options.method as any,
+    body: options.body as any,
+    headers: buildAuthHeaders(session, token, internalApiKey)
+  })
+
+  try {
+    return await doFetch(session?.accessToken)
+  } catch (err: any) {
+    const status = err?.response?.status ?? err?.statusCode
+
+    if (status === 401 && session?.refreshToken) {
+      try {
+        const refreshed = await $fetch<{ accessToken: string; refreshToken: string }>(
+          `${config.backendBase}/auth/refresh`,
+          { method: 'POST', body: { refreshToken: session.refreshToken } }
+        )
+
+        const newSession: StoredSession = {
+          ...session,
+          accessToken: refreshed.accessToken,
+          refreshToken: refreshed.refreshToken
+        }
+        setCookie(event, 'auth-session', JSON.stringify(newSession), {
+          maxAge: 60 * 60 * 24 * 7,
+          sameSite: 'lax',
+          path: '/'
+        })
+
+        return await doFetch(refreshed.accessToken)
+      } catch {
+        throw createError({ statusCode: 401, statusMessage: 'Sessão expirada. Inicie sessão novamente.' })
+      }
+    }
+
+    throw err
+  }
+}
