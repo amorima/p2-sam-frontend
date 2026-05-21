@@ -1,28 +1,35 @@
 interface BackendLead {
-  id_lead: number
-  data: string | null
-  id_painel: number | null
-  panel?: { id_dispositivo: number }
-  nome_cidadao: string | null
-  contacto_cidadao: string | null
-  id_pedido: number | null
-  id_item: number | null
-  item_pedido: string | null
-  estado: string | null
-  pin_entrega: string | null
-  id_locker: number | null
-  locker?: { id_locker: number }
-  porta: number | null
-  data_entrega: string | null
-  nome_entidade: string | null
+  'id_lead': number
+  'data': string | null
+  'id_painel': number | null
+  'panel'?: { id_dispositivo: number }
+  'nome_cidadao': string | null
+  'contacto_cidadao': string | null
+  'id_pedido': number | null
+  'id_item': number | null
+  'need item'?: { id_item: number, id_pedido: number, tipo_bem_servico: string, publico: number | null }
+  'item_pedido': string | null
+  'estado': string | null
+  'pin_entrega': string | null
+  'id_locker': number | null
+  'locker'?: { id_locker: number }
+  'porta': number | null
+  'data_entrega': string | null
+  'nome_entidade': string | null
 }
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
 
-  const leads = await $fetch<BackendLead[]>(`${config.backendBase}/leads`)
+  let leads: BackendLead[] = []
+  try {
+    leads = await $fetch<BackendLead[]>(`${config.backendBase}/leads`) ?? []
+  } catch (err: unknown) {
+    console.error('[leads] Backend error:', (err as { message?: string })?.message)
+    return []
+  }
 
-  return (leads ?? []).map(lead => ({
+  return leads.map(lead => ({
     id_lead: lead.id_lead,
     data: lead.data ?? new Date().toISOString(),
     id_painel: lead.id_painel,

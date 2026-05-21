@@ -61,6 +61,16 @@ const stats = computed(() => {
   }
 })
 
+const cardUi = { container: 'gap-y-1.5', wrapper: 'items-start', leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25', title: 'font-normal text-muted text-xs uppercase' }
+
+const statCards = computed(() => [
+  { title: 'Total Leads', icon: 'i-lucide-heart-handshake', value: stats.value.total, color: 'text-highlighted' },
+  { title: 'No Locker', icon: 'i-lucide-package-check', value: stats.value.entregues, color: 'text-success' },
+  { title: 'No Prazo', icon: 'i-lucide-clock', value: stats.value.pendentes, color: 'text-warning' },
+  { title: 'A Expirar <24h', icon: 'i-lucide-timer', value: stats.value.expiraBreve, color: 'text-warning' },
+  { title: 'Vencidos', icon: 'i-lucide-clock-alert', value: stats.value.expirados, color: 'text-error' }
+])
+
 const tabItems = computed(() => [
   { label: `Todos (${stats.value.total})`, value: 'TODOS' },
   { label: `No locker (${stats.value.entregues})`, value: 'ENTREGUE' },
@@ -232,48 +242,19 @@ function downloadReport() {
         class="mb-6"
       />
 
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Total Leads
-          </p>
-          <p class="text-xl font-bold text-highlighted">
-            {{ stats.total }}
-          </p>
+      <UPageGrid class="lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-px mb-6">
+        <UPageCard
+          v-for="card in statCards"
+          :key="card.title"
+          variant="subtle"
+          :icon="card.icon"
+          :title="card.title"
+          :ui="cardUi"
+          class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+        >
+          <span :class="['text-2xl font-semibold', card.color]">{{ card.value }}</span>
         </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            No locker
-          </p>
-          <p class="text-xl font-bold text-success">
-            {{ stats.entregues }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            No prazo
-          </p>
-          <p class="text-xl font-bold text-warning">
-            {{ stats.pendentes }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            A expirar &lt;24h
-          </p>
-          <p class="text-xl font-bold text-warning">
-            {{ stats.expiraBreve }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Vencidos
-          </p>
-          <p class="text-xl font-bold text-error">
-            {{ stats.expirados }}
-          </p>
-        </UPageCard>
-      </div>
+      </UPageGrid>
 
       <div class="space-y-4">
         <div class="flex flex-wrap gap-2 items-center justify-between">

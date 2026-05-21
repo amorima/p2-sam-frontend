@@ -60,6 +60,16 @@ const stats = computed(() => {
   }
 })
 
+const cardUi = { container: 'gap-y-1.5', wrapper: 'items-start', leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25', title: 'font-normal text-muted text-xs uppercase' }
+
+const statCards = computed(() => [
+  { title: 'Total', icon: 'i-lucide-server', value: stats.value.total, color: 'text-highlighted' },
+  { title: 'Saudáveis', icon: 'i-lucide-heart-pulse', value: stats.value.saudaveis, color: 'text-success' },
+  { title: 'Com Deficiências', icon: 'i-lucide-triangle-alert', value: stats.value.deficiencias, color: 'text-warning' },
+  { title: 'Erros', icon: 'i-lucide-circle-x', value: stats.value.erros, color: 'text-error' },
+  { title: 'Desligados', icon: 'i-lucide-power-off', value: stats.value.desligados, color: 'text-muted' }
+])
+
 const columns: TableColumn<Locker>[] = [
   {
     accessorKey: 'locker_id',
@@ -155,49 +165,19 @@ const columns: TableColumn<Locker>[] = [
     </template>
 
     <template #body>
-      <!-- Stats -->
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Total
-          </p>
-          <p class="text-xl font-bold text-highlighted">
-            {{ stats.total }}
-          </p>
+      <UPageGrid class="lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-px mb-6">
+        <UPageCard
+          v-for="card in statCards"
+          :key="card.title"
+          variant="subtle"
+          :icon="card.icon"
+          :title="card.title"
+          :ui="cardUi"
+          class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+        >
+          <span :class="['text-2xl font-semibold', card.color]">{{ card.value }}</span>
         </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Saudáveis
-          </p>
-          <p class="text-xl font-bold text-success">
-            {{ stats.saudaveis }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Com Deficiências
-          </p>
-          <p class="text-xl font-bold text-warning">
-            {{ stats.deficiencias }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Erros
-          </p>
-          <p class="text-xl font-bold text-error">
-            {{ stats.erros }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Desligados
-          </p>
-          <p class="text-xl font-bold text-muted">
-            {{ stats.desligados }}
-          </p>
-        </UPageCard>
-      </div>
+      </UPageGrid>
 
       <!-- Table -->
       <div class="space-y-4">

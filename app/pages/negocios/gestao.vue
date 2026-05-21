@@ -62,6 +62,15 @@ const stats = computed(() => {
   }
 })
 
+const cardUi = { container: 'gap-y-1.5', wrapper: 'items-start', leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25', title: 'font-normal text-muted text-xs uppercase' }
+
+const statCards = computed(() => [
+  { title: 'Total', icon: 'i-lucide-store', value: stats.value.total, color: 'text-highlighted' },
+  { title: 'Ativos', icon: 'i-lucide-check-circle', value: stats.value.ativos, color: 'text-success' },
+  { title: 'Suspensos', icon: 'i-lucide-pause-circle', value: stats.value.suspensos, color: 'text-warning' },
+  { title: 'Ofertas', icon: 'i-lucide-tag', value: stats.value.ofertas, color: 'text-info' }
+])
+
 function renderSortableHeader(column: Column<Business, unknown>, label: string) {
   const isSorted = column.getIsSorted()
   return h(UButton, {
@@ -308,40 +317,19 @@ const columns: TableColumn<Business>[] = [
     </template>
 
     <template #body>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Total
-          </p>
-          <p class="text-xl font-bold text-highlighted">
-            {{ stats.total }}
-          </p>
+      <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px mb-6">
+        <UPageCard
+          v-for="card in statCards"
+          :key="card.title"
+          variant="subtle"
+          :icon="card.icon"
+          :title="card.title"
+          :ui="cardUi"
+          class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+        >
+          <span :class="['text-2xl font-semibold', card.color]">{{ card.value }}</span>
         </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Ativos
-          </p>
-          <p class="text-xl font-bold text-success">
-            {{ stats.ativos }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Suspensos
-          </p>
-          <p class="text-xl font-bold text-warning">
-            {{ stats.suspensos }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Ofertas
-          </p>
-          <p class="text-xl font-bold text-info">
-            {{ stats.ofertas }}
-          </p>
-        </UPageCard>
-      </div>
+      </UPageGrid>
 
       <div class="flex flex-wrap items-center justify-between gap-1.5">
         <UInput

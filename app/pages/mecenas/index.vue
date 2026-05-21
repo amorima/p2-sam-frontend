@@ -256,6 +256,15 @@ const stats = computed(() => {
   }
 })
 
+const cardUi = { container: 'gap-y-1.5', wrapper: 'items-start', leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25', title: 'font-normal text-muted text-xs uppercase' }
+
+const statCards = computed(() => [
+  { title: 'Total Aceite', icon: 'i-lucide-circle-dollar-sign', value: stats.value.total, color: 'text-highlighted' },
+  { title: 'Doações', icon: 'i-lucide-hand-coins', value: stats.value.count, color: 'text-highlighted' },
+  { title: 'Aceites', icon: 'i-lucide-check-circle', value: stats.value.aceites, color: 'text-success' },
+  { title: 'Pendentes', icon: 'i-lucide-clock', value: stats.value.pendentes, color: 'text-warning' }
+])
+
 const globalFilter = ref('')
 const columnVisibility = ref()
 const sorting = ref<SortingState>([])
@@ -305,41 +314,19 @@ watch(globalFilter, () => {
     </template>
 
     <template #body>
-      <!-- Stats -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Total Aceite
-          </p>
-          <p class="text-xl font-bold text-highlighted">
-            {{ stats.total }}
-          </p>
+      <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px mb-6">
+        <UPageCard
+          v-for="card in statCards"
+          :key="card.title"
+          variant="subtle"
+          :icon="card.icon"
+          :title="card.title"
+          :ui="cardUi"
+          class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+        >
+          <span :class="['text-2xl font-semibold', card.color]">{{ card.value }}</span>
         </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Doações
-          </p>
-          <p class="text-xl font-bold text-highlighted">
-            {{ stats.count }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Aceites
-          </p>
-          <p class="text-xl font-bold text-success">
-            {{ stats.aceites }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Pendentes
-          </p>
-          <p class="text-xl font-bold text-warning">
-            {{ stats.pendentes }}
-          </p>
-        </UPageCard>
-      </div>
+      </UPageGrid>
 
       <!-- Table -->
       <div class="space-y-4">

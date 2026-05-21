@@ -37,7 +37,7 @@ type PedidosTableRef = {
 }
 
 const toast = useToast()
-const { isAdmin, isBusiness, businessNif, businessName, setRole } = useAuth()
+const { isAdmin, isBusiness, businessNif } = useAuth()
 const { needs, businesses, setBusinessResponse } = useNeeds()
 
 const filterState = ref<'TODOS' | BusinessMatchEstado>('TODOS')
@@ -96,6 +96,16 @@ const stats = computed(() => {
     concluidos: list.filter(p => p.estado === 'CONCLUIDO').length
   }
 })
+
+const cardUi = { container: 'gap-y-1.5', wrapper: 'items-start', leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25', title: 'font-normal text-muted text-xs uppercase' }
+
+const statCards = computed(() => [
+  { title: 'Total', icon: 'i-lucide-briefcase', value: stats.value.total, color: 'text-highlighted' },
+  { title: 'Pendentes', icon: 'i-lucide-clock', value: stats.value.pendentes, color: 'text-warning' },
+  { title: 'Aceites', icon: 'i-lucide-thumbs-up', value: stats.value.aceites, color: 'text-info' },
+  { title: 'Concluídos', icon: 'i-lucide-check-circle', value: stats.value.concluidos, color: 'text-success' },
+  { title: 'Recusados', icon: 'i-lucide-thumbs-down', value: stats.value.recusados, color: 'text-error' }
+])
 
 const tabItems = computed(() => [
   { label: `Todos (${stats.value.total})`, value: 'TODOS' },
@@ -288,8 +298,6 @@ const columns: TableColumn<BusinessPedido>[] = [
     }
   }
 ]
-
-const firstBusiness = computed(() => businesses.value[0])
 </script>
 
 <template>
@@ -328,78 +336,19 @@ const firstBusiness = computed(() => businesses.value[0])
     </template>
 
     <template #body>
-      <UAlert
-        icon="i-lucide-flask-conical"
-        color="info"
-        variant="subtle"
-        title="Modo de demonstração"
-        :description="`Vista atual: ${isAdmin ? 'Administrador' : (isBusiness ? `Negócio (${businessName})` : 'Outro')}`"
-        class="mb-6"
-      >
-        <template #actions>
-          <UButton
-            v-if="isAdmin"
-            label="Ver como Negócio"
-            size="sm"
-            color="info"
-            variant="subtle"
-            icon="i-lucide-store"
-            @click="setRole('business', firstBusiness?.resource.nif_nipc ?? '510100200', firstBusiness?.entity.nome_entidade ?? 'Advogados Costa & Associados')"
-          />
-          <UButton
-            v-else
-            label="Ver como Admin"
-            size="sm"
-            color="info"
-            variant="subtle"
-            icon="i-lucide-shield"
-            @click="setRole('admin')"
-          />
-        </template>
-      </UAlert>
-
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Total
-          </p>
-          <p class="text-xl font-bold text-highlighted">
-            {{ stats.total }}
-          </p>
+      <UPageGrid class="lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-px mb-6">
+        <UPageCard
+          v-for="card in statCards"
+          :key="card.title"
+          variant="subtle"
+          :icon="card.icon"
+          :title="card.title"
+          :ui="cardUi"
+          class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+        >
+          <span :class="['text-2xl font-semibold', card.color]">{{ card.value }}</span>
         </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Pendentes
-          </p>
-          <p class="text-xl font-bold text-warning">
-            {{ stats.pendentes }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Aceites
-          </p>
-          <p class="text-xl font-bold text-info">
-            {{ stats.aceites }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Concluídos
-          </p>
-          <p class="text-xl font-bold text-success">
-            {{ stats.concluidos }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Recusados
-          </p>
-          <p class="text-xl font-bold text-error">
-            {{ stats.recusados }}
-          </p>
-        </UPageCard>
-      </div>
+      </UPageGrid>
 
       <div class="space-y-4">
         <UTabs

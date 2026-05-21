@@ -21,7 +21,7 @@ type NeedsTableRef = {
   tableApi?: Table<Need>
 }
 
-const { isAdmin, isInstitution, institutionNif, setRole } = useAuth()
+const { isAdmin, isInstitution, institutionNif } = useAuth()
 const { needs, institutions } = useNeeds()
 
 const statusModalOpen = ref(false)
@@ -266,6 +266,15 @@ const stats = computed(() => {
   }
 })
 
+const cardUi = { container: 'gap-y-1.5', wrapper: 'items-start', leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25', title: 'font-normal text-muted text-xs uppercase' }
+
+const statCards = computed(() => [
+  { title: 'Total Pedidos', icon: 'i-lucide-clipboard-list', value: stats.value.total, color: 'text-highlighted' },
+  { title: 'Pendentes', icon: 'i-lucide-clock', value: stats.value.pendentes, color: 'text-warning' },
+  { title: 'Aceites', icon: 'i-lucide-check-circle', value: stats.value.aceites, color: 'text-success' },
+  { title: 'Urgentes', icon: 'i-lucide-zap', value: stats.value.urgentes, color: 'text-error' }
+])
+
 const globalFilter = ref('')
 const columnVisibility = ref()
 const sorting = ref<SortingState>([])
@@ -294,8 +303,6 @@ const hideableColumns = computed<HideableColumnItem[]>(() => {
 watch(globalFilter, () => {
   pagination.value = { ...pagination.value, pageIndex: 0 }
 })
-
-const firstInstitution = computed(() => institutions.value[0])
 </script>
 
 <template>
@@ -317,70 +324,19 @@ const firstInstitution = computed(() => institutions.value[0])
     </template>
 
     <template #body>
-      <UAlert
-        icon="i-lucide-flask-conical"
-        color="info"
-        variant="subtle"
-        title="Modo de demonstração"
-        :description="`Vista atual: ${isAdmin ? 'Administrador' : 'Instituição'}`"
-        class="mb-6"
-      >
-        <template #actions>
-          <UButton
-            v-if="isAdmin"
-            label="Ver como Instituição"
-            size="sm"
-            color="info"
-            variant="subtle"
-            icon="i-lucide-building-2"
-            @click="setRole('institution', firstInstitution?.resource.nif_nipc ?? '500999888', firstInstitution?.entity.nome_entidade ?? 'Centro Social Bom Samaritano')"
-          />
-          <UButton
-            v-else
-            label="Ver como Admin"
-            size="sm"
-            color="info"
-            variant="subtle"
-            icon="i-lucide-shield"
-            @click="setRole('admin')"
-          />
-        </template>
-      </UAlert>
-
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Total Pedidos
-          </p>
-          <p class="text-xl font-bold text-highlighted">
-            {{ stats.total }}
-          </p>
+      <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px mb-6">
+        <UPageCard
+          v-for="card in statCards"
+          :key="card.title"
+          variant="subtle"
+          :icon="card.icon"
+          :title="card.title"
+          :ui="cardUi"
+          class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+        >
+          <span :class="['text-2xl font-semibold', card.color]">{{ card.value }}</span>
         </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Pendentes
-          </p>
-          <p class="text-xl font-bold text-warning">
-            {{ stats.pendentes }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Aceites
-          </p>
-          <p class="text-xl font-bold text-success">
-            {{ stats.aceites }}
-          </p>
-        </UPageCard>
-        <UPageCard variant="subtle" class="p-4">
-          <p class="text-xs text-muted uppercase tracking-wide font-medium mb-1">
-            Urgentes
-          </p>
-          <p class="text-xl font-bold text-error">
-            {{ stats.urgentes }}
-          </p>
-        </UPageCard>
-      </div>
+      </UPageGrid>
 
       <div class="space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-1.5">

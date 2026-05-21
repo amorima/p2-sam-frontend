@@ -16,7 +16,7 @@ export function useAuth() {
     sameSite: 'lax'
   })
 
-  const role = useState<UserRole>('auth.role', () => session.value?.role ?? 'admin')
+  const role = useState<UserRole | null>('auth.role', () => session.value?.role ?? null)
   const patronNif = useState<string>('auth.patronNif', () => (session.value?.role === 'patron' ? session.value.nif : ''))
   const patronName = useState<string>('auth.patronName', () => (session.value?.role === 'patron' ? session.value.name : ''))
   const institutionNif = useState<string>('auth.institutionNif', () => (session.value?.role === 'institution' ? session.value.nif : ''))
@@ -29,7 +29,7 @@ export function useAuth() {
   const isInstitution = computed(() => role.value === 'institution')
   const isBusiness = computed(() => role.value === 'business')
 
-  function setRole(newRole: UserRole, nif = '', name = '') {
+  function setRole(newRole: UserRole | null, nif = '', name = '') {
     role.value = newRole
     patronNif.value = ''
     patronName.value = ''
@@ -61,7 +61,7 @@ export function useAuth() {
 
   async function logout() {
     session.value = null
-    setRole('admin')
+    setRole(null)
     await navigateTo('/login')
   }
 
@@ -77,7 +77,6 @@ export function useAuth() {
     isPatron,
     isInstitution,
     isBusiness,
-    setRole,
     login,
     logout
   }
