@@ -524,28 +524,23 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
           </UFormField>
         </div>
 
-        <UAlert
-          icon="i-lucide-map-pin"
-          color="info"
-          variant="subtle"
-          title="Geolocalização automática"
-          description="As coordenadas GPS serão calculadas automaticamente com base na morada indicada."
-        />
       </UForm>
 
       <template #footer>
-        <div class="flex items-center justify-between">
-          <p class="text-xs text-muted">
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-end">
+            <UButton
+              form="step3-form"
+              type="submit"
+              label="Criar conta"
+              icon="i-lucide-user-plus"
+              color="primary"
+              :loading="isSubmitting"
+            />
+          </div>
+          <p class="text-xs text-muted text-center">
             Ao registar aceita os termos de utilização do SAM.
           </p>
-          <UButton
-            form="step3-form"
-            type="submit"
-            label="Criar conta"
-            icon="i-lucide-user-plus"
-            color="primary"
-            :loading="isSubmitting"
-          />
         </div>
       </template>
     </UCard>
