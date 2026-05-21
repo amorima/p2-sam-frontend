@@ -17,37 +17,18 @@ function readSession(event: H3Event): StoredSession | null {
   }
 }
 
-function buildAuthHeaders(
-  session: StoredSession | null,
-  token: string | undefined,
-  internalApiKey: string
-): Record<string, string> {
-  if (session?.role === 'admin' && internalApiKey) {
-    return {
-      'x-internal-key': internalApiKey,
-      'x-user-nif': session.nif || '',
-      'x-user-role': 'admin'
-    }
-  }
-  if (token) {
-    return { 'Authorization': `Bearer ${token}` }
-  }
-  return {}
-}
-
 export async function authBackendFetch<T = unknown>(
   event: H3Event,
   url: string,
   options: { method?: string; body?: unknown } = {}
 ): Promise<T> {
   const config = useRuntimeConfig()
-  const internalApiKey = (config.internalApiKey as string) || ''
   const session = readSession(event)
 
   const doFetch = (token?: string) => $fetch<T>(url, {
     method: options.method as any,
     body: options.body as any,
-    headers: buildAuthHeaders(session, token, internalApiKey)
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   })
 
   try {

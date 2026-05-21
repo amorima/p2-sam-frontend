@@ -1,68 +1,49 @@
 type UserRole = 'admin' | 'patron' | 'institution' | 'business'
 
+interface BackendLoginResponse {
+  accessToken: string
+  refreshToken: string
+  entity: {
+    nif_nipc: string
+    email_login: string
+    nome_entidade: string
+    role: UserRole
+    profile_pic: string | null
+  }
+}
+
 export default defineEventHandler(async (event) => {
   const { nif_nipc, password, role } = await readBody<{ nif_nipc: string, password: string, role: string }>(event)
   const config = useRuntimeConfig()
 
-  if (!nif_nipc || !role) {
-    throw createError({ statusCode: 400, statusMessage: 'NIF/NIPC e tipo são obrigatórios.' })
+  if (!nif_nipc || !password || !role) {
+    throw createError({ statusCode: 400, statusMessage: 'NIF/NIPC, palavra-passe e tipo são obrigatórios.' })
   }
 
-  if (role === 'admin') {
-    const adminNif = process.env.ADMIN_NIF ?? '000001'
-    const adminPass = process.env.ADMIN_PASSWORD ?? 'TDW'
-    if (nif_nipc === adminNif && password === adminPass) {
-      return { role: 'admin' as UserRole, nif: '', name: 'Administrador SAM' }
-    }
-    throw createError({ statusCode: 401, statusMessage: 'Credenciais de administrador inválidas.' })
-  }
-
-  const endpointMap: Record<string, string> = {
-    patron: 'patrons',
-    institution: 'institutions',
-    business: 'business'
-  }
-
-  const endpoint = endpointMap[role]
-  if (!endpoint) {
-    throw createError({ statusCode: 400, statusMessage: 'Tipo de utilizador inválido.' })
-  }
-
-  let entity: { email_login?: string; nome_entidade?: string; profile_pic?: string | null }
+  let authResult: BackendLoginResponse
   try {
-    entity = await $fetch<any>(`${config.backendBase}/${endpoint}/${nif_nipc}`)
+    authResult = await $fetch<BackendLoginResponse>(`${config.backendBase}/auth/login`, {
+      method: 'POST',
+      body: { nif_nipc, password }
+    })
   } catch (err: any) {
     const status = err?.response?.status ?? err?.statusCode
-    if (status === 404) {
-      throw createError({ statusCode: 401, statusMessage: 'NIF/NIPC não encontrado. Verifique os dados ou registe-se.' })
+    if (status === 401) {
+      throw createError({ statusCode: 401, statusMessage: 'Credenciais inválidas.' })
     }
     throw createError({ statusCode: 500, statusMessage: 'Erro ao verificar credenciais. Tente novamente.' })
   }
 
-  if (!entity.email_login) {
-    throw createError({ statusCode: 500, statusMessage: 'Dados de login não disponíveis.' })
-  }
-
-  // Verify password via backend JWT auth
-  let accessToken: string | undefined
-  let refreshToken: string | undefined
-  try {
-    const authResult = await $fetch<{ accessToken: string; refreshToken: string }>(
-      `${config.backendBase}/auth/login`,
-      { method: 'POST', body: { email_login: entity.email_login, password } }
-    )
-    accessToken = authResult.accessToken
-    refreshToken = authResult.refreshToken
-  } catch {
-    throw createError({ statusCode: 401, statusMessage: 'Credenciais inválidas.' })
+  if (authResult.entity.role !== role) {
+    throw createError({ statusCode: 401, statusMessage: 'Tipo de utilizador incorreto para estas credenciais.' })
   }
 
   return {
-    role: role as UserRole,
-    nif: nif_nipc,
-    name: entity.nome_entidade ?? nif_nipc,
-    accessToken,
-    refreshToken,
-    profile_pic: entity.profile_pic ?? null
+    role: authResult.entity.role,
+    nif: authResult.entity.nif_nipc,
+    name: authResult.entity.nome_entidade ?? nif_nipc,
+    accessToken: authResult.accessToken,
+    refreshToken: authResult.refreshToken,
+    profile_pic: authResult.entity.profile_pic ?? null
   }
 })

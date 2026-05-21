@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { type Row, getPaginationRowModel } from '@tanstack/table-core'
+import { type Column, type Row, type SortingState, type Table, getPaginationRowModel } from '@tanstack/table-core'
 
 interface Donation {
   id_doacao: number
@@ -12,6 +12,10 @@ interface Donation {
   anonimo: boolean
   url_comprovativo: string
   estado: 'ACEITE' | 'REJEITADO' | 'PENDENTE'
+}
+
+type DonationTableRef = {
+  tableApi?: Table<Donation>
 }
 
 const UBadge = resolveComponent('UBadge')
@@ -61,6 +65,33 @@ function formatModo(tipo: string) {
   return modoLabel[tipo] ?? tipo
 }
 
+function renderSortableHeader<T>(column: Column<T, unknown>, label: string) {
+  const isSorted = column.getIsSorted()
+  return h(UButton, {
+    color: 'neutral',
+    variant: 'ghost',
+    label,
+    icon: isSorted
+      ? isSorted === 'asc'
+        ? 'i-lucide-arrow-up-narrow-wide'
+        : 'i-lucide-arrow-down-wide-narrow'
+      : 'i-lucide-arrow-up-down',
+    class: '-mx-2.5',
+    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+  })
+}
+
+function getColumnLabel(columnId: string) {
+  return ({
+    id_doacao: 'N.º',
+    nome_entidade: 'Mecenas',
+    data: 'Data',
+    valor_transacao: 'Valor',
+    tipo_donativo: 'Modo',
+    estado: 'Estado'
+  }[columnId] || columnId)
+}
+
 function openStatusModal(donation: Donation) {
   selectedDonation.value = donation
   statusModalOpen.value = true
@@ -74,7 +105,7 @@ function downloadPDF(donation: Donation) {
       title: 'Comprovativo não disponível',
       description: 'O comprovativo ainda não foi gerado para esta doação.',
       icon: 'i-lucide-alert-circle',
-      color: 'warning',
+      color: 'warning'
     })
     return
   }
@@ -115,12 +146,12 @@ function getRowItems(row: Row<Donation>) {
 const adminColumns: TableColumn<Donation>[] = [
   {
     accessorKey: 'id_doacao',
-    header: 'N.º',
+    header: ({ column }) => renderSortableHeader(column, 'N.º'),
     cell: ({ row }) => h('span', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_doacao}`)
   },
   {
     accessorKey: 'nome_entidade',
-    header: 'Mecenas',
+    header: ({ column }) => renderSortableHeader(column, 'Mecenas'),
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium text-highlighted' }, row.original.nome_entidade ?? row.original.mecena_nif_nipc),
@@ -129,17 +160,17 @@ const adminColumns: TableColumn<Donation>[] = [
   },
   {
     accessorKey: 'data',
-    header: 'Data',
+    header: ({ column }) => renderSortableHeader(column, 'Data'),
     cell: ({ row }) => h('span', undefined, formatDate(row.original.data))
   },
   {
     accessorKey: 'valor_transacao',
-    header: 'Valor',
+    header: ({ column }) => renderSortableHeader(column, 'Valor'),
     cell: ({ row }) => h('span', { class: 'font-semibold tabular-nums' }, formatEUR(row.original.valor_transacao))
   },
   {
     accessorKey: 'tipo_donativo',
-    header: 'Modo',
+    header: ({ column }) => renderSortableHeader(column, 'Modo'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' },
         () => formatModo(row.original.tipo_donativo)
@@ -147,7 +178,7 @@ const adminColumns: TableColumn<Donation>[] = [
   },
   {
     accessorKey: 'estado',
-    header: 'Estado',
+    header: ({ column }) => renderSortableHeader(column, 'Estado'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: badgeColor(row.original.estado), size: 'sm' },
         () => row.original.estado
@@ -155,6 +186,7 @@ const adminColumns: TableColumn<Donation>[] = [
   },
   {
     id: 'actions',
+    enableHiding: false,
     cell: ({ row }) =>
       h('div', { class: 'text-right' },
         h(UDropdownMenu, { content: { align: 'end' }, items: getRowItems(row) },
@@ -167,22 +199,22 @@ const adminColumns: TableColumn<Donation>[] = [
 const patronColumns: TableColumn<Donation>[] = [
   {
     accessorKey: 'id_doacao',
-    header: 'N.º',
+    header: ({ column }) => renderSortableHeader(column, 'N.º'),
     cell: ({ row }) => h('span', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_doacao}`)
   },
   {
     accessorKey: 'data',
-    header: 'Data',
+    header: ({ column }) => renderSortableHeader(column, 'Data'),
     cell: ({ row }) => h('span', undefined, formatDate(row.original.data))
   },
   {
     accessorKey: 'valor_transacao',
-    header: 'Valor',
+    header: ({ column }) => renderSortableHeader(column, 'Valor'),
     cell: ({ row }) => h('span', { class: 'font-semibold tabular-nums' }, formatEUR(row.original.valor_transacao))
   },
   {
     accessorKey: 'tipo_donativo',
-    header: 'Modo',
+    header: ({ column }) => renderSortableHeader(column, 'Modo'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' },
         () => formatModo(row.original.tipo_donativo)
@@ -190,7 +222,7 @@ const patronColumns: TableColumn<Donation>[] = [
   },
   {
     accessorKey: 'estado',
-    header: 'Estado',
+    header: ({ column }) => renderSortableHeader(column, 'Estado'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: badgeColor(row.original.estado), size: 'sm' },
         () => row.original.estado
@@ -198,6 +230,7 @@ const patronColumns: TableColumn<Donation>[] = [
   },
   {
     id: 'actions',
+    enableHiding: false,
     cell: ({ row }) =>
       h('div', { class: 'text-right' },
         h(UDropdownMenu, { content: { align: 'end' }, items: getRowItems(row) },
@@ -223,17 +256,30 @@ const stats = computed(() => {
   }
 })
 
-interface TableInstance {
-  tableApi?: {
-    getFilteredRowModel: () => { rows: unknown[] }
-  }
-}
-
 const globalFilter = ref('')
-const pagination = ref({ pageIndex: 0, pageSize: 20 })
+const columnVisibility = ref()
+const sorting = ref<SortingState>([])
+const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
-const tableRef = useTemplateRef<TableInstance>('tableRef')
-const filteredCount = computed<number>(() => tableRef.value?.tableApi?.getFilteredRowModel().rows.length ?? donations.value.length)
+const tableRef = useTemplateRef<DonationTableRef>('tableRef')
+
+const hideableColumns = computed(() => {
+  return (tableRef.value?.tableApi?.getAllColumns() ?? [])
+    .filter((column: Column<Donation, unknown>) => column.getCanHide())
+    .map((column: Column<Donation, unknown>) => ({
+      label: getColumnLabel(column.id),
+      type: 'checkbox' as const,
+      checked: column.getIsVisible(),
+      onUpdateChecked(checked: boolean) {
+        tableRef.value?.tableApi
+          ?.getColumn(column.id)
+          ?.toggleVisibility(!!checked)
+      },
+      onSelect(e?: Event) {
+        e?.preventDefault()
+      }
+    }))
+})
 
 watch(globalFilter, () => {
   pagination.value = { ...pagination.value, pageIndex: 0 }
@@ -297,35 +343,64 @@ watch(globalFilter, () => {
 
       <!-- Table -->
       <div class="space-y-4">
-        <UInput
-          v-model="globalFilter"
-          icon="i-lucide-search"
-          :placeholder="isAdmin ? 'Pesquisar por mecenas, valor...' : 'Pesquisar doações...'"
-          class="max-w-sm"
-        />
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <UInput
+            v-model="globalFilter"
+            class="max-w-sm"
+            icon="i-lucide-search"
+            :placeholder="isAdmin ? 'Pesquisar por mecenas, valor...' : 'Pesquisar doações...'"
+          />
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <UDropdownMenu :items="hideableColumns" :content="{ align: 'end' }">
+              <UButton
+                label="Colunas"
+                color="neutral"
+                variant="outline"
+                trailing-icon="i-lucide-settings-2"
+              />
+            </UDropdownMenu>
+          </div>
+        </div>
 
         <UTable
           ref="tableRef"
           v-model:global-filter="globalFilter"
+          v-model:column-visibility="columnVisibility"
+          v-model:sorting="sorting"
           v-model:pagination="pagination"
           :data="donations"
           :columns="columns"
           :pagination-options="paginationOptions"
           :loading="status === 'pending'"
+          class="shrink-0"
           :ui="{
             base: 'table-fixed border-separate border-spacing-0',
             thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
             tbody: '[&>tr]:last:[&>td]:border-b-0',
             th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-            td: 'border-b border-default'
+            td: 'border-b border-default',
+            separator: 'h-0'
           }"
         />
 
-        <TablePagination
+        <div
           v-if="donations.length > 0"
-          v-model="pagination"
-          :total="filteredCount"
-        />
+          class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
+        >
+          <div class="text-sm text-muted">
+            {{ tableRef?.tableApi?.getFilteredRowModel().rows.length || 0 }} registo(s)
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <UPagination
+              :default-page="(tableRef?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+              :items-per-page="tableRef?.tableApi?.getState().pagination.pageSize"
+              :total="tableRef?.tableApi?.getFilteredRowModel().rows.length"
+              @update:page="(p: number) => tableRef?.tableApi?.setPageIndex(p - 1)"
+            />
+          </div>
+        </div>
 
         <div
           v-if="status !== 'pending' && donations.length === 0"

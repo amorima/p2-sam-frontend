@@ -20,8 +20,6 @@ const selectedRole = ref<UserRole>('patron')
 const showPassword = ref(false)
 const isSubmitting = ref(false)
 
-const adminNifPlaceholder = computed(() => selectedRole.value === 'admin' ? '000000000 (ID admin)' : 'Ex.: 510123456')
-const nifLabel = computed(() => selectedRole.value === 'admin' ? 'ID de Administrador' : 'NIF / NIPC')
 
 const schema = z.object({
   nif_nipc: z.string().min(1, 'Campo obrigatório'),
@@ -108,10 +106,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
       <!-- Credentials form -->
       <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-        <UFormField :label="nifLabel" name="nif_nipc" required>
+        <UFormField label="NIF / NIPC" name="nif_nipc" required>
           <UInput
             v-model="state.nif_nipc"
-            :placeholder="adminNifPlaceholder"
+            placeholder="Ex.: 510123456"
             class="w-full font-mono"
             autocomplete="username"
           />
