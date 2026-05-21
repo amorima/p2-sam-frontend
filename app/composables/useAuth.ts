@@ -1,23 +1,25 @@
 export type UserRole = 'admin' | 'patron' | 'institution' | 'business'
 
-export interface AuthState {
+export interface AuthSession {
   role: UserRole
-  patronNif: string
-  patronName: string
-  institutionNif: string
-  institutionName: string
-  businessNif: string
-  businessName: string
+  nif: string
+  name: string
 }
 
 export function useAuth() {
-  const role = useState<UserRole>('auth.role', () => 'admin')
-  const patronNif = useState<string>('auth.patronNif', () => '')
-  const patronName = useState<string>('auth.patronName', () => '')
-  const institutionNif = useState<string>('auth.institutionNif', () => '')
-  const institutionName = useState<string>('auth.institutionName', () => '')
-  const businessNif = useState<string>('auth.businessNif', () => '')
-  const businessName = useState<string>('auth.businessName', () => '')
+  const session = useCookie<AuthSession | null>('auth-session', {
+    default: () => null,
+    maxAge: 60 * 60 * 24 * 7,
+    sameSite: 'lax'
+  })
+
+  const role = useState<UserRole>('auth.role', () => session.value?.role ?? 'admin')
+  const patronNif = useState<string>('auth.patronNif', () => (session.value?.role === 'patron' ? session.value.nif : ''))
+  const patronName = useState<string>('auth.patronName', () => (session.value?.role === 'patron' ? session.value.name : ''))
+  const institutionNif = useState<string>('auth.institutionNif', () => (session.value?.role === 'institution' ? session.value.nif : ''))
+  const institutionName = useState<string>('auth.institutionName', () => (session.value?.role === 'institution' ? session.value.name : ''))
+  const businessNif = useState<string>('auth.businessNif', () => (session.value?.role === 'business' ? session.value.nif : ''))
+  const businessName = useState<string>('auth.businessName', () => (session.value?.role === 'business' ? session.value.name : ''))
 
   const isAdmin = computed(() => role.value === 'admin')
   const isPatron = computed(() => role.value === 'patron')
@@ -44,6 +46,33 @@ export function useAuth() {
     }
   }
 
+  async function login(nif_nipc: string, password: string, loginRole: UserRole) {
+    const result = await $fetch<AuthSession>('/api/auth/login', {
+      method: 'POST',
+      body: { nif_nipc, password, role: loginRole }
+    })
+    session.value = result
+    setRole(result.role, result.nif, result.name)
+
+    // Sync display name in profile
+    const profile = useState<{ name: string, avatar: string }>('user-profile')
+    if (profile.value && result.name) {
+      profile.value.name = result.name
+    }
+
+    return result
+  }
+
+  async function logout() {
+    session.value = null
+    setRole('admin')
+    const profile = useState<{ name: string, avatar: string }>('user-profile')
+    if (profile.value) {
+      profile.value.name = 'António Amorim'
+    }
+    await navigateTo('/login')
+  }
+
   return {
     role,
     patronNif,
@@ -56,6 +85,8 @@ export function useAuth() {
     isPatron,
     isInstitution,
     isBusiness,
-    setRole
+    setRole,
+    login,
+    logout
   }
 }

@@ -8,6 +8,7 @@ const props = defineProps<{
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
 const userProfile = useUserProfile()
+const { logout } = useAuth()
 const isCollapsed = computed(() => !!props.collapsed)
 
 const displayName = computed(
@@ -185,7 +186,8 @@ const items = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: 'Terminar sessão',
-      icon: 'i-lucide-log-out'
+      icon: 'i-lucide-log-out',
+      onSelect: () => logout()
     }
   ]
 ])
