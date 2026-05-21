@@ -6,6 +6,7 @@ export interface AuthSession {
   name: string
   accessToken?: string
   refreshToken?: string
+  profile_pic?: string | null
 }
 
 export function useAuth() {
@@ -59,7 +60,6 @@ export function useAuth() {
   }
 
   async function logout() {
-    useUserProfile().clearAvatar()
     session.value = null
     setRole('admin')
     await navigateTo('/login')

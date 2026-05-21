@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Tipo de utilizador inválido.' })
   }
 
-  let entity: { email_login?: string; nome_entidade?: string }
+  let entity: { email_login?: string; nome_entidade?: string; profile_pic?: string | null }
   try {
     entity = await $fetch<any>(`${config.backendBase}/${endpoint}/${nif_nipc}`)
   } catch (err: any) {
@@ -62,6 +62,7 @@ export default defineEventHandler(async (event) => {
     nif: nif_nipc,
     name: entity.nome_entidade ?? nif_nipc,
     accessToken,
-    refreshToken
+    refreshToken,
+    profile_pic: entity.profile_pic ?? null
   }
 })

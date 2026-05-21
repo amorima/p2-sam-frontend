@@ -16,7 +16,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: response.status, statusMessage: 'Ficheiro não encontrado' })
   }
 
-  setResponseHeader(event, 'Content-Type', 'application/pdf')
+  const contentType = response.headers.get('content-type') ?? 'application/octet-stream'
+  setResponseHeader(event, 'Content-Type', contentType)
   setResponseHeader(event, 'Content-Disposition', `inline; filename="${nome}"`)
 
   return sendStream(event, response.body as ReadableStream)

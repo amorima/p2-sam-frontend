@@ -103,13 +103,13 @@ async function onFileChange(e: Event) {
     const formData = new FormData()
     formData.append('file', file)
 
-    const uploadData = await $fetch<{ url: string }>(
+    const uploadData = await $fetch<{ url: string; fileName: string }>(
       `/api/upload/avatar?nome=${encodeURIComponent(file.name)}`,
       { method: 'POST', body: formData }
     )
 
-    profile.avatar = uploadData.url
-    updateAvatar(uploadData.url)
+    // updateAvatar stores the fileName in DB + localStorage and updates the sidebar
+    updateAvatar(uploadData.fileName)
 
     toast.add({
       title: 'Sucesso',
