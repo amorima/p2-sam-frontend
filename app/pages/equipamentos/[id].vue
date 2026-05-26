@@ -156,7 +156,7 @@ const columns: TableColumn<TelemetryPing>[] = [
 <template>
   <UDashboardPanel :id="`equipamento-${lockerId}`">
     <template #header>
-      <UDashboardNavbar :title="`Locker #${lockerId} — Telemetria`">
+      <UDashboardNavbar :title="`Equipamento #${lockerId} — Telemetria`">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>

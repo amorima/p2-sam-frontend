@@ -49,10 +49,10 @@ export function useAuth() {
     }
   }
 
-  async function login(nif_nipc: string, password: string, loginRole: UserRole) {
+  async function login(nif_nipc: string, password: string) {
     const result = await $fetch<AuthSession>('/api/auth/login', {
       method: 'POST',
-      body: { nif_nipc, password, role: loginRole }
+      body: { nif_nipc, password }
     })
     session.value = result
     setRole(result.role, result.nif, result.name)

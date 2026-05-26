@@ -11,16 +11,23 @@ const _useLeads = () => {
   const leads = useState<Lead[]>('leads.list', () => [])
   const smartLockers = useState<SmartLocker[]>('leads.smartLockers', () => [])
 
-  // Fetch leads from API on mount (smart lockers kept as mock — no backend endpoint)
-  useAsyncData('leads-initial-data', async () => {
+  const fetchLeads = async () => {
     try {
       const data = await $fetch<Lead[]>('/api/leads')
       leads.value = data ?? []
     } catch (e) {
       console.error('[useLeads] Failed to load leads:', e)
     }
-    return null
-  })
+  }
+
+  // Initial load (client-only — no SSR needed for admin dashboard)
+  useAsyncData('leads-initial-data', fetchLeads, { server: false })
+
+  // Poll every 30 seconds so new leads from the panel appear automatically
+  if (import.meta.client) {
+    const interval = setInterval(fetchLeads, 30000)
+    onScopeDispose(() => clearInterval(interval))
+  }
 
   function effectiveEstado(lead: Lead): 'PENDENTE' | 'ENTREGUE' | 'EXPIRADO' {
     if (lead.estado === 'ENTREGUE') return 'ENTREGUE'

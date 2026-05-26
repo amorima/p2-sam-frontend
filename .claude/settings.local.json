@@ -28,7 +28,17 @@
       "PowerShell(\\(Get-Content \"C:\\\\SAM\\\\p2-SAM-data-generator\\\\output\\\\doacao.json\" | ConvertFrom-Json\\) | Select-Object -ExpandProperty tipo_donativo | Sort-Object -Unique)",
       "PowerShell(\\(Get-Content \"C:\\\\SAM\\\\p2-SAM-data-generator\\\\output\\\\doacao.json\" | ConvertFrom-Json\\) | Select-Object -First 1)",
       "Bash(grep -v \"^$\")",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(Select-String \"\\\\.env\")",
+      "Bash(Remove-Item *)",
+      "Bash(dir C:SAM *)",
+      "PowerShell(Get-ChildItem C:\\\\SAM | Select-Object Name, @{n='Type';e={if\\($_.PSIsContainer\\){'Dir'}else{'File'}}})",
+      "Bash(curl -s -o /dev/null -w \"leads: %{http_code}\\\\n\" https://apisam.netdw.tech/leads)",
+      "Bash(curl -s -o /dev/null -w \"telemetry list: %{http_code}\\\\n\" https://apisam.netdw.tech/telemetry)",
+      "Bash(curl -s https://apisam.netdw.tech/leads)",
+      "Bash(curl -s https://apisam.netdw.tech/telemetry)",
+      "Bash(curl -s https://apisam.netdw.tech/needs)",
+      "Bash(curl *)"
     ]
   }
 }

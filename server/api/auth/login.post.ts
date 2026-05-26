@@ -13,11 +13,11 @@ interface BackendLoginResponse {
 }
 
 export default defineEventHandler(async (event) => {
-  const { nif_nipc, password, role } = await readBody<{ nif_nipc: string, password: string, role: string }>(event)
+  const { nif_nipc, password } = await readBody<{ nif_nipc: string, password: string }>(event)
   const config = useRuntimeConfig()
 
-  if (!nif_nipc || !password || !role) {
-    throw createError({ statusCode: 400, statusMessage: 'NIF/NIPC, palavra-passe e tipo são obrigatórios.' })
+  if (!nif_nipc || !password) {
+    throw createError({ statusCode: 400, statusMessage: 'NIF/NIPC e palavra-passe são obrigatórios.' })
   }
 
   let authResult: BackendLoginResponse
@@ -33,10 +33,6 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 401, statusMessage: 'Credenciais inválidas.' })
     }
     throw createError({ statusCode: 500, statusMessage: 'Erro ao verificar credenciais. Tente novamente.' })
-  }
-
-  if (authResult.entity.role !== role) {
-    throw createError({ statusCode: 401, statusMessage: 'Tipo de utilizador incorreto para estas credenciais.' })
   }
 
   return {
