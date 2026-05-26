@@ -10,7 +10,9 @@ export default defineNuxtPlugin(() => {
     isRedirecting = true
 
     session.value = null
-    try { localStorage.removeItem('auth-session') } catch { /* ignore */ }
+    try {
+      localStorage.removeItem('auth-session')
+    } catch { /* ignore */ }
 
     const current = window.location.pathname
     if (current === '/login' || current === '/register') {
@@ -19,7 +21,7 @@ export default defineNuxtPlugin(() => {
     }
 
     const target = `/login?redirect=${encodeURIComponent(current + window.location.search)}`
-    navigateTo(target, { replace: true }).finally(() => {
+    Promise.resolve(navigateTo(target, { replace: true })).finally(() => {
       isRedirecting = false
     })
   }

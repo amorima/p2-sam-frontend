@@ -55,6 +55,11 @@ export interface DeviceInfo {
   visibility: string | null
 }
 
+export interface PanelStatus {
+  ecra_tatil: string // 'ok' | 'sem_touch'
+  impressora: string // 'ok' | 'offline' | 'erro'
+}
+
 export interface DeviceTelemetrySample {
   bateria_estado: number
   cpu_temperatura: number
@@ -62,7 +67,7 @@ export interface DeviceTelemetrySample {
   aviso: string | null
   evento: string
   versao: string
-  status: { sensor_porta: string, numpad: string }
+  status: PanelStatus
   device: DeviceInfo
 }
 
@@ -89,7 +94,9 @@ export function useDeviceTelemetry() {
   const tempBaseline = 42 + Math.random() * 4
   const tempOffset = ref(0)
   let tempJitterTimer: ReturnType<typeof setInterval> | null = null
+  let printerProbeTimer: ReturnType<typeof setInterval> | null = null
   const bootTimestamp = import.meta.client ? performance.now() : 0
+  const printerOnline = ref<boolean | null>(null)
 
   const setupBattery = async () => {
     if (!import.meta.client) return
@@ -98,6 +105,39 @@ export function useDeviceTelemetry() {
     try {
       battery.value = await nav.getBattery()
     } catch { /* not supported */ }
+  }
+
+  const probePrinter = async () => {
+    if (!import.meta.client) return
+    try {
+      const r = await fetch('http://127.0.0.1:9191/health', {
+        signal: AbortSignal.timeout(1500)
+      })
+      printerOnline.value = r.ok
+    } catch {
+      printerOnline.value = false
+    }
+  }
+
+  const startPrinterProbe = () => {
+    if (!import.meta.client || printerProbeTimer) return
+    probePrinter()
+    printerProbeTimer = setInterval(probePrinter, 10000)
+  }
+
+  const stopPrinterProbe = () => {
+    if (printerProbeTimer) {
+      clearInterval(printerProbeTimer)
+      printerProbeTimer = null
+    }
+  }
+
+  const detectTouch = (): boolean => {
+    if (!import.meta.client) return false
+    const nav = navigator as Navigator & { msMaxTouchPoints?: number }
+    return (nav.maxTouchPoints ?? 0) > 0
+      || (nav.msMaxTouchPoints ?? 0) > 0
+      || (typeof window !== 'undefined' && 'ontouchstart' in window)
   }
 
   const startTempSim = () => {
@@ -125,7 +165,7 @@ export function useDeviceTelemetry() {
         connection_downlink_mbps: null, connection_rtt_ms: null, save_data: null,
         battery_charging: null, battery_level_pct: null,
         jsheap_used_mb: null, jsheap_total_mb: null,
-        uptime_seconds: 0, visibility: null,
+        uptime_seconds: 0, visibility: null
       }
     }
 
@@ -156,7 +196,7 @@ export function useDeviceTelemetry() {
       jsheap_used_mb: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null,
       jsheap_total_mb: mem ? Math.round(mem.totalJSHeapSize / 1048576) : null,
       uptime_seconds: Math.round((performance.now() - bootTimestamp) / 1000),
-      visibility: document.visibilityState || null,
+      visibility: document.visibilityState || null
     }
   }
 
@@ -178,11 +218,19 @@ export function useDeviceTelemetry() {
       dnb_sinal = signalFromConnection(nav.connection ?? nav.mozConnection ?? nav.webkitConnection)
     }
 
+    const ecra_tatil = detectTouch() ? 'ok' : 'sem_touch'
+    const impressora = printerOnline.value === null
+      ? 'desconhecido'
+      : printerOnline.value
+        ? 'ok'
+        : 'offline'
+
     let aviso: string | null = null
     if (bateria_estado < 20) aviso = 'bateria baixa'
     else if (cpu_temperatura > 80) aviso = 'temperatura elevada'
     else if (dnb_sinal === 0) aviso = 'sem sinal'
     else if (device.online === false) aviso = 'offline'
+    else if (impressora === 'offline') aviso = 'impressora offline'
 
     return {
       bateria_estado,
@@ -191,18 +239,20 @@ export function useDeviceTelemetry() {
       aviso,
       evento: aviso ? 'warn' : 'ping',
       versao: APP_VERSION,
-      status: { sensor_porta: 'fechado', numpad: 'ok' },
-      device,
+      status: { ecra_tatil, impressora },
+      device
     }
   }
 
   const init = async () => {
     await setupBattery()
     startTempSim()
+    startPrinterProbe()
   }
 
   const dispose = () => {
     stopTempSim()
+    stopPrinterProbe()
   }
 
   return { init, dispose, sample }

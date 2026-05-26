@@ -158,7 +158,12 @@ function copyToClipboard(value: string, label: string) {
       <div v-else-if="error || !user" class="flex flex-col items-center justify-center py-16 text-muted gap-3">
         <UIcon name="i-lucide-circle-alert" class="text-error text-3xl" />
         <p>Não foi possível carregar este utilizador.</p>
-        <UButton color="neutral" variant="subtle" to="/customers" label="Voltar à lista" />
+        <UButton
+          color="neutral"
+          variant="subtle"
+          to="/customers"
+          label="Voltar à lista"
+        />
       </div>
 
       <div v-else class="grid gap-6 lg:grid-cols-3">

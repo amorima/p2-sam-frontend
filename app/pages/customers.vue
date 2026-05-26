@@ -117,9 +117,13 @@ async function deleteCustomer(user: User) {
   }
 }
 
-type BlockTarget = { users: User[], defaultReason: string | null, subject: string | null }
+interface BlockTarget {
+  users: User[]
+  defaultReason: string | null
+  subject: string | null
+}
 const blockModalOpen = ref(false)
-const blockTarget = ref<BlockTarget | null>(null)
+const blockTarget = shallowRef<BlockTarget | null>(null)
 
 function openBlockModal(users: User[]) {
   if (!users.length) return
@@ -172,7 +176,8 @@ async function onBlockConfirm(reason: string) {
   const target = blockTarget.value
   blockTarget.value = null
   if (!target) return
-  await applyBlock(target.users, true, reason)
+  const users: User[] = target.users
+  await applyBlock(users, true, reason)
 }
 
 async function setUserBlocked(user: User, blocked: boolean) {
@@ -199,7 +204,7 @@ async function bulkDelete() {
       })
     })
   )
-  const failed = results.filter((r) => r.status === 'rejected').length
+  const failed = results.filter(r => r.status === 'rejected').length
   if (failed) {
     toast.add({ title: `${failed} eliminações falharam`, color: 'error' })
   } else {

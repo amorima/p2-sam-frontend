@@ -167,14 +167,6 @@ function formatDate(d: string) {
       </div>
 
       <div v-else class="space-y-6">
-        <UAlert
-          icon="i-lucide-info"
-          color="info"
-          variant="subtle"
-          title="Como funciona a aprovação"
-          description="Para cada item do pedido, escolha como será suprido: emissão de voucher (PDF para gastar fundos), negócio parceiro, ou alocação a um painel para os cidadãos doarem (só para bens)."
-        />
-
         <UPageCard
           v-for="need in pendingNeeds"
           :key="need.id_pedido"
