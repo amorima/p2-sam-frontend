@@ -8,11 +8,19 @@ const props = defineProps<{
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
 const userProfile = useUserProfile()
-const { logout } = useAuth()
+const { logout, role } = useAuth()
+const session = useCookie<import('~/composables/useAuth').AuthSession | null>('auth-session')
 const isCollapsed = computed(() => !!props.collapsed)
 
 const displayName = computed(() => userProfile.name.value)
 const displayAvatar = computed(() => userProfile.avatar.value)
+
+const profileHref = computed(() => {
+  const r = role.value
+  const nif = session.value?.nif
+  if (!nif || !r || r === 'admin') return null
+  return `/utilizadores/${r}/${encodeURIComponent(nif)}`
+})
 
 const colors = [
   'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald',
@@ -47,7 +55,9 @@ const items = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: 'Perfil',
-      icon: 'i-lucide-user'
+      icon: 'i-lucide-user',
+      to: profileHref.value ?? undefined,
+      disabled: !profileHref.value
     },
     {
       label: 'Definições',

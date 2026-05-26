@@ -177,6 +177,7 @@ const sendTelemetry = async () => {
         evento: s.evento,
         versao: s.versao,
         status: s.status,
+        device: s.device,
         timestamp: new Date().toISOString()
       }
     })

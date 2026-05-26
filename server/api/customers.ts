@@ -1,208 +1,100 @@
 import type { User } from '~/types'
 
-const customers: User[] = [
-  {
-    id: 1,
-    name: 'Alex Smith',
-    email: 'alex.smith@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=1'
-    },
-    status: 'subscribed',
-    actorType: 'Mecenas'
-  },
-  {
-    id: 2,
-    name: 'Jordan Brown',
-    email: 'jordan.brown@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=2'
-    },
-    status: 'unsubscribed',
-    actorType: 'Negócio'
-  },
-  {
-    id: 3,
-    name: 'Taylor Green',
-    email: 'taylor.green@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=3'
-    },
-    status: 'bounced',
-    actorType: 'Instituição'
-  },
-  {
-    id: 4,
-    name: 'Morgan White',
-    email: 'morgan.white@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=4'
-    },
-    status: 'subscribed',
-    actorType: 'Cidadão'
-  },
-  {
-    id: 5,
-    name: 'Casey Gray',
-    email: 'casey.gray@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=5'
-    },
-    status: 'subscribed',
-    actorType: 'Mecenas'
-  },
-  {
-    id: 6,
-    name: 'Jamie Johnson',
-    email: 'jamie.johnson@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=6'
-    },
-    status: 'subscribed',
-    actorType: 'Negócio'
-  },
-  {
-    id: 7,
-    name: 'Riley Davis',
-    email: 'riley.davis@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=7'
-    },
-    status: 'subscribed',
-    actorType: 'Instituição'
-  },
-  {
-    id: 8,
-    name: 'Kelly Wilson',
-    email: 'kelly.wilson@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=8'
-    },
-    status: 'subscribed',
-    actorType: 'Cidadão'
-  },
-  {
-    id: 9,
-    name: 'Drew Moore',
-    email: 'drew.moore@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=9'
-    },
-    status: 'bounced',
-    actorType: 'Mecenas'
-  },
-  {
-    id: 10,
-    name: 'Jordan Taylor',
-    email: 'jordan.taylor@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=10'
-    },
-    status: 'subscribed',
-    actorType: 'Negócio'
-  },
-  {
-    id: 11,
-    name: 'Morgan Anderson',
-    email: 'morgan.anderson@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=11'
-    },
-    status: 'subscribed',
-    actorType: 'Instituição'
-  },
-  {
-    id: 12,
-    name: 'Casey Thomas',
-    email: 'casey.thomas@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=12'
-    },
-    status: 'unsubscribed',
-    actorType: 'Cidadão'
-  },
-  {
-    id: 13,
-    name: 'Jamie Jackson',
-    email: 'jamie.jackson@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=13'
-    },
-    status: 'unsubscribed',
-    actorType: 'Mecenas'
-  },
-  {
-    id: 14,
-    name: 'Riley White',
-    email: 'riley.white@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=14'
-    },
-    status: 'unsubscribed',
-    actorType: 'Negócio'
-  },
-  {
-    id: 15,
-    name: 'Kelly Harris',
-    email: 'kelly.harris@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=15'
-    },
-    status: 'subscribed',
-    actorType: 'Instituição'
-  },
-  {
-    id: 16,
-    name: 'Drew Martin',
-    email: 'drew.martin@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=16'
-    },
-    status: 'subscribed',
-    actorType: 'Cidadão'
-  },
-  {
-    id: 17,
-    name: 'Alex Thompson',
-    email: 'alex.thompson@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=17'
-    },
-    status: 'unsubscribed',
-    actorType: 'Mecenas'
-  },
-  {
-    id: 18,
-    name: 'Jordan Garcia',
-    email: 'jordan.garcia@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=18'
-    },
-    status: 'subscribed',
-    actorType: 'Negócio'
-  },
-  {
-    id: 19,
-    name: 'Taylor Rodriguez',
-    email: 'taylor.rodriguez@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=19'
-    },
-    status: 'bounced',
-    actorType: 'Instituição'
-  },
-  {
-    id: 20,
-    name: 'Morgan Lopez',
-    email: 'morgan.lopez@example.com',
-    avatar: {
-      src: 'https://i.pravatar.cc/128?u=20'
-    },
-    status: 'subscribed',
-    actorType: 'Cidadão'
-  }
-]
+interface BackendEntity {
+  nif_nipc: string
+  nome_entidade?: string
+  email_login?: string
+  iban?: string | null
+  profile_pic?: string | null
+  blocked?: boolean | number
+  reason?: string | null
+}
 
-export default eventHandler(async () => {
-  return customers
+interface BackendCitizen {
+  nome: string
+  contacto: string
+  rgpd?: number
+  blocked?: number
+  reason?: string | null
+}
+
+const PRAVATAR_BASE = 'https://i.pravatar.cc/128?u='
+
+function avatarUrl(profile_pic: string | null | undefined, seed: string): string {
+  if (profile_pic) return `/api/download/avatar?nome=${encodeURIComponent(profile_pic)}`
+  return `${PRAVATAR_BASE}${encodeURIComponent(seed)}`
+}
+
+function entityToUser(
+  e: BackendEntity,
+  kind: 'patron' | 'business' | 'institution',
+  actorType: 'Mecenas' | 'Negócio' | 'Instituição'
+): User {
+  const blocked = Boolean(e.blocked)
+  return {
+    id: e.nif_nipc,
+    name: e.nome_entidade ?? e.nif_nipc,
+    email: e.email_login ?? '',
+    avatar: { src: avatarUrl(e.profile_pic, e.nif_nipc) },
+    status: blocked ? 'unsubscribed' : 'subscribed',
+    actorType,
+    kind,
+    blocked,
+    reason: e.reason ?? null,
+    iban: e.iban ?? null,
+    profile_pic: e.profile_pic ?? null
+  }
+}
+
+function citizenToUser(c: BackendCitizen): User {
+  const blocked = Boolean(c.blocked)
+  return {
+    id: c.contacto,
+    name: c.nome,
+    email: c.contacto,
+    avatar: { src: avatarUrl(null, c.contacto) },
+    status: blocked ? 'unsubscribed' : 'subscribed',
+    actorType: 'Cidadão',
+    kind: 'citizen',
+    blocked,
+    reason: c.reason ?? null
+  }
+}
+
+export default defineEventHandler(async (): Promise<User[]> => {
+  const config = useRuntimeConfig()
+  const base = config.backendBase
+
+  const safeFetch = async <T>(path: string): Promise<T | null> => {
+    try {
+      return await $fetch<T>(`${base}${path}`)
+    } catch (err: unknown) {
+      const e = err as { response?: { status?: number }, message?: string }
+      console.warn(`[customers] ${path} failed:`, e?.response?.status, e?.message)
+      return null
+    }
+  }
+
+  // Citizens can be a bare array (older backend) or { data: [...] } (new backend);
+  // entities are always { data: [...] }.
+  const [patrons, businesses, institutions, citizensRes] = await Promise.all([
+    safeFetch<{ data?: BackendEntity[] } | BackendEntity[]>('/patrons'),
+    safeFetch<{ data?: BackendEntity[] } | BackendEntity[]>('/business'),
+    safeFetch<{ data?: BackendEntity[] } | BackendEntity[]>('/institutions'),
+    safeFetch<{ data?: BackendCitizen[] } | BackendCitizen[]>('/citizens')
+  ])
+
+  const toArray = <T>(v: { data?: T[] } | T[] | null): T[] => {
+    if (!v) return []
+    return Array.isArray(v) ? v : (v.data ?? [])
+  }
+
+  const users: User[] = []
+  for (const p of toArray<BackendEntity>(patrons)) users.push(entityToUser(p, 'patron', 'Mecenas'))
+  for (const b of toArray<BackendEntity>(businesses)) users.push(entityToUser(b, 'business', 'Negócio'))
+  for (const i of toArray<BackendEntity>(institutions)) users.push(entityToUser(i, 'institution', 'Instituição'))
+  for (const c of toArray<BackendCitizen>(citizensRes)) users.push(citizenToUser(c))
+
+  console.log(`[customers] returning ${users.length} users (patrons=${toArray<BackendEntity>(patrons).length}, business=${toArray<BackendEntity>(businesses).length}, institutions=${toArray<BackendEntity>(institutions).length}, citizens=${toArray<BackendCitizen>(citizensRes).length})`)
+  return users
 })

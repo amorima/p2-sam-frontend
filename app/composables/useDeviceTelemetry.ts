@@ -21,6 +21,38 @@ interface NavigatorWithConnection extends Navigator {
   connection?: NetworkInformation
   mozConnection?: NetworkInformation
   webkitConnection?: NetworkInformation
+  deviceMemory?: number
+}
+
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize: number
+    totalJSHeapSize: number
+    jsHeapSizeLimit: number
+  }
+}
+
+export interface DeviceInfo {
+  platform: string | null
+  user_agent: string | null
+  language: string | null
+  timezone: string | null
+  hardware_concurrency: number | null
+  device_memory_gb: number | null
+  screen_resolution: string | null
+  viewport: string | null
+  pixel_ratio: number | null
+  online: boolean | null
+  connection_type: string | null
+  connection_downlink_mbps: number | null
+  connection_rtt_ms: number | null
+  save_data: boolean | null
+  battery_charging: boolean | null
+  battery_level_pct: number | null
+  jsheap_used_mb: number | null
+  jsheap_total_mb: number | null
+  uptime_seconds: number
+  visibility: string | null
 }
 
 export interface DeviceTelemetrySample {
@@ -31,6 +63,7 @@ export interface DeviceTelemetrySample {
   evento: string
   versao: string
   status: { sensor_porta: string, numpad: string }
+  device: DeviceInfo
 }
 
 const APP_VERSION = '1.0.0'
@@ -52,9 +85,11 @@ function signalFromConnection(c?: NetworkInformation): number {
 
 export function useDeviceTelemetry() {
   const battery = ref<BatteryManager | null>(null)
+  // CPU temp não é acessível via APIs de browser — mantemos uma estimativa.
   const tempBaseline = 42 + Math.random() * 4
   const tempOffset = ref(0)
   let tempJitterTimer: ReturnType<typeof setInterval> | null = null
+  const bootTimestamp = import.meta.client ? performance.now() : 0
 
   const setupBattery = async () => {
     if (!import.meta.client) return
@@ -80,7 +115,54 @@ export function useDeviceTelemetry() {
     }
   }
 
+  const collectDevice = (): DeviceInfo => {
+    if (!import.meta.client) {
+      return {
+        platform: null, user_agent: null, language: null, timezone: null,
+        hardware_concurrency: null, device_memory_gb: null,
+        screen_resolution: null, viewport: null, pixel_ratio: null,
+        online: null, connection_type: null,
+        connection_downlink_mbps: null, connection_rtt_ms: null, save_data: null,
+        battery_charging: null, battery_level_pct: null,
+        jsheap_used_mb: null, jsheap_total_mb: null,
+        uptime_seconds: 0, visibility: null,
+      }
+    }
+
+    const nav = navigator as NavigatorWithConnection
+    const conn = nav.connection ?? nav.mozConnection ?? nav.webkitConnection
+    const perf = performance as PerformanceWithMemory
+    const mem = perf.memory
+
+    return {
+      platform: navigator.platform || null,
+      user_agent: navigator.userAgent || null,
+      language: navigator.language || null,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+      hardware_concurrency: navigator.hardwareConcurrency ?? null,
+      device_memory_gb: nav.deviceMemory ?? null,
+      screen_resolution: `${window.screen.width}x${window.screen.height}`,
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      pixel_ratio: window.devicePixelRatio ?? null,
+      online: navigator.onLine,
+      connection_type: conn?.effectiveType ?? conn?.type ?? null,
+      connection_downlink_mbps: conn?.downlink ?? null,
+      connection_rtt_ms: conn?.rtt ?? null,
+      save_data: conn?.saveData ?? null,
+      battery_charging: battery.value?.charging ?? null,
+      battery_level_pct: battery.value
+        ? Math.round(clamp(battery.value.level * 100, 0, 100))
+        : null,
+      jsheap_used_mb: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null,
+      jsheap_total_mb: mem ? Math.round(mem.totalJSHeapSize / 1048576) : null,
+      uptime_seconds: Math.round((performance.now() - bootTimestamp) / 1000),
+      visibility: document.visibilityState || null,
+    }
+  }
+
   const sample = (): DeviceTelemetrySample => {
+    const device = collectDevice()
+
     let bateria_estado = 100
     if (battery.value) {
       bateria_estado = Math.round(clamp(battery.value.level * 100, 0, 100))
@@ -100,6 +182,7 @@ export function useDeviceTelemetry() {
     if (bateria_estado < 20) aviso = 'bateria baixa'
     else if (cpu_temperatura > 80) aviso = 'temperatura elevada'
     else if (dnb_sinal === 0) aviso = 'sem sinal'
+    else if (device.online === false) aviso = 'offline'
 
     return {
       bateria_estado,
@@ -108,7 +191,8 @@ export function useDeviceTelemetry() {
       aviso,
       evento: aviso ? 'warn' : 'ping',
       versao: APP_VERSION,
-      status: { sensor_porta: 'fechado', numpad: 'ok' }
+      status: { sensor_porta: 'fechado', numpad: 'ok' },
+      device,
     }
   }
 

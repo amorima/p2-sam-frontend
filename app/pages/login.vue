@@ -8,6 +8,7 @@ definePageMeta({ layout: 'auth' })
 const { login } = useAuth()
 const toast = useToast()
 const router = useRouter()
+const route = useRoute()
 
 const showPassword = ref(false)
 const isSubmitting = ref(false)
@@ -31,7 +32,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       business: '/negocios'
     }
     toast.add({ title: 'Sessão iniciada', icon: 'i-lucide-check', color: 'success' })
-    router.push(redirectMap[result.role])
+    const redirectParam = route.query.redirect
+    const target = typeof redirectParam === 'string' && redirectParam.startsWith('/')
+      ? redirectParam
+      : redirectMap[result.role]
+    router.push(target)
   } catch (err: unknown) {
     const e = err as { data?: { statusMessage?: string }, statusMessage?: string }
     toast.add({
