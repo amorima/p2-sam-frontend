@@ -158,8 +158,11 @@ const detectLocation = () => {
 }
 
 // ── Telemetry ─────────────────────────────────────────────────────────────────
+const { init: initDeviceTelemetry, dispose: disposeDeviceTelemetry, sample: sampleTelemetry } = useDeviceTelemetry()
+
 const sendTelemetry = async () => {
   try {
+    const s = sampleTelemetry()
     await $fetch('/api/painel/telemetry', {
       method: 'POST',
       body: {
@@ -167,12 +170,14 @@ const sendTelemetry = async () => {
         tipo: 'painel',
         geo_latitude: panelLat.value ?? 0,
         geo_longitude: panelLng.value ?? 0,
-        bateria_estado: 100,
-        cpu_temperatura: 42 + Math.floor(Math.random() * 8),
-        dnb_sinal: 4,
-        aviso: null,
-        evento: 'ping',
-        versao: '1.0.0'
+        bateria_estado: s.bateria_estado,
+        cpu_temperatura: s.cpu_temperatura,
+        dnb_sinal: s.dnb_sinal,
+        aviso: s.aviso,
+        evento: s.evento,
+        versao: s.versao,
+        status: s.status,
+        timestamp: new Date().toISOString()
       }
     })
   } catch { /* best-effort */ }
@@ -304,17 +309,19 @@ const clearTimers = () => {
   if (telemetryInterval) clearInterval(telemetryInterval)
 }
 
-onMounted(() => {
+onMounted(async () => {
   detectLocation()
   fetchWeather()
   updateClock()
   clockInterval = setInterval(updateClock, 1000)
+  await initDeviceTelemetry()
   sendTelemetry()
   telemetryInterval = setInterval(sendTelemetry, 5000)
 })
 
 onBeforeUnmount(() => {
   clearTimers()
+  disposeDeviceTelemetry()
 })
 </script>
 
