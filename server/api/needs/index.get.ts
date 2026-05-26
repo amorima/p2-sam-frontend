@@ -1,4 +1,5 @@
 interface BackendNeedItem {
+  id_item?: number
   id_pedido: number
   tipo_bem_servico: string
 }
@@ -45,7 +46,7 @@ export default defineEventHandler(async () => {
     const rawItems: BackendNeedItem[] = need['need items'] ?? need.NeedItems ?? need.needItems ?? []
 
     const items = rawItems.map(item => ({
-      id_item: ++itemCounter,
+      id_item: item.id_item ?? ++itemCounter,
       id_pedido: item.id_pedido,
       tipo_bem_servico: item.tipo_bem_servico,
       tipo_bem: inferTipoBem(item.tipo_bem_servico),

@@ -79,11 +79,13 @@ const columns: TableColumn<Locker>[] = [
   {
     accessorKey: 'tipo',
     header: 'Equipamento',
-    cell: ({ row }) =>
-      h('div', undefined, [
-        h('p', { class: 'font-medium text-highlighted' }, `Locker #${row.original.locker_id}`),
+    cell: ({ row }) => {
+      const label = row.original.tipo === 'painel' ? 'Painel' : 'Locker'
+      return h('div', undefined, [
+        h('p', { class: 'font-medium text-highlighted' }, `${label} #${row.original.locker_id}`),
         h('p', { class: 'text-xs text-muted capitalize' }, row.original.tipo ?? '—')
       ])
+    }
   },
   {
     accessorKey: 'bateria_estado',

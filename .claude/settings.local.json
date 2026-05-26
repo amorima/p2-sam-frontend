@@ -28,7 +28,9 @@
       "PowerShell(\\(Get-Content \"C:\\\\SAM\\\\p2-SAM-data-generator\\\\output\\\\doacao.json\" | ConvertFrom-Json\\) | Select-Object -ExpandProperty tipo_donativo | Sort-Object -Unique)",
       "PowerShell(\\(Get-Content \"C:\\\\SAM\\\\p2-SAM-data-generator\\\\output\\\\doacao.json\" | ConvertFrom-Json\\) | Select-Object -First 1)",
       "Bash(grep -v \"^$\")",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(Select-String \"\\\\.env\")",
+      "Bash(Remove-Item *)"
     ]
   }
 }

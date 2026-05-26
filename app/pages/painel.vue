@@ -7,18 +7,32 @@ definePageMeta({
   layout: false
 })
 
+// ID do cacifo de testes no backend (locker_id usado em locker_telemetry)
+const PANEL_LOCKER_ID = 1
+
+const panelLat = ref<number | null>(null)
+const panelLng = ref<number | null>(null)
+
+const panelCoords = computed(() => {
+  if (panelLat.value == null || panelLng.value == null) return 'A detetar localização…'
+  const latStr = `${Math.abs(panelLat.value).toFixed(4)}°${panelLat.value >= 0 ? 'N' : 'S'}`
+  const lngStr = `${Math.abs(panelLng.value).toFixed(4)}°${panelLng.value >= 0 ? 'E' : 'W'}`
+  return `${latStr} · ${lngStr}`
+})
+
+interface NeedGood {
+  id_item: number
+  id_pedido: number
+  tipo_bem_servico: string
+  nome_entidade: string
+}
+
 interface WeatherData {
   temp: number
   description: string
   humidity: number
   windSpeed: number
   icon: string
-}
-
-interface Good {
-  id: string
-  name: string
-  emoji: string
 }
 
 const screen = ref<'panel' | 'donate'>('panel')
@@ -36,51 +50,22 @@ const weatherData = ref<WeatherData>({
 const thanksOpen = ref(false)
 const currentTime = ref('')
 const currentDate = ref('')
+const isSubmitting = ref(false)
+const submitError = ref('')
 
 let modalTimerId: ReturnType<typeof setTimeout> | null = null
 let resetTimerId: ReturnType<typeof setTimeout> | null = null
 let clockInterval: ReturnType<typeof setInterval> | null = null
+let telemetryInterval: ReturnType<typeof setInterval> | null = null
 
-const goods: Good[] = [
-  { id: 'food', name: 'Alimentos', emoji: '🍽️' },
-  { id: 'rice', name: 'Arroz', emoji: '🍚' },
-  { id: 'bread', name: 'Pão', emoji: '🍞' },
-  { id: 'milk', name: 'Leite', emoji: '🥛' },
-  { id: 'eggs', name: 'Ovos', emoji: '🥚' },
-  { id: 'pasta', name: 'Massa', emoji: '🍝' },
-  { id: 'beans', name: 'Feijão', emoji: '🫘' },
-  { id: 'oil', name: 'Óleo', emoji: '🫒' },
-  { id: 'clothes', name: 'Roupas', emoji: '👕' },
-  { id: 'shirts', name: 'Camisas', emoji: '👔' },
-  { id: 'pants', name: 'Calças', emoji: '👖' },
-  { id: 'shoes', name: 'Sapatos', emoji: '👟' },
-  { id: 'jackets', name: 'Jaquetas', emoji: '🧥' },
-  { id: 'socks', name: 'Meias', emoji: '🧦' },
-  { id: 'underwear', name: 'Roupa Interior', emoji: '🩲' },
-  { id: 'hats', name: 'Chapéus', emoji: '🧢' },
-  { id: 'hygiene', name: 'Higiene', emoji: '🧼' },
-  { id: 'soap', name: 'Sabonete', emoji: '🧴' },
-  { id: 'toothbrush', name: 'Escova Dentes', emoji: '🪥' },
-  { id: 'toothpaste', name: 'Pasta Dentes', emoji: '😁' },
-  { id: 'shampoo', name: 'Champô', emoji: '💆' },
-  { id: 'deodorant', name: 'Desodorizante', emoji: '💨' },
-  { id: 'tissues', name: 'Lenços', emoji: '🧻' },
-  { id: 'school', name: 'Escolar', emoji: '📚' },
-  { id: 'notebooks', name: 'Cadernos', emoji: '📓' },
-  { id: 'pens', name: 'Canetas', emoji: '🖊️' },
-  { id: 'pencils', name: 'Lápis', emoji: '✏️' },
-  { id: 'backpack', name: 'Mochila', emoji: '🎒' },
-  { id: 'books', name: 'Livros', emoji: '📖' },
-  { id: 'markers', name: 'Marcadores', emoji: '🖍️' },
-  { id: 'blankets', name: 'Cobertores', emoji: '🛏️' },
-  { id: 'pillows', name: 'Almofadas', emoji: '🛌' },
-  { id: 'sheets', name: 'Lençóis', emoji: '🧺' },
-  { id: 'mattress', name: 'Colchão', emoji: '🛏️' },
-  { id: 'towels', name: 'Toalhas', emoji: '🛁' },
-  { id: 'medical', name: 'Medicamentos', emoji: '💊' },
-  { id: 'bandages', name: 'Pensos', emoji: '🩹' },
-  { id: 'vitamins', name: 'Vitaminas', emoji: '💉' }
-]
+// ── Goods from backend ────────────────────────────────────────────────────────
+const { data: goodsData, refresh: refreshGoods } = useFetch<{ goods: NeedGood[] }>('/api/painel/goods', {
+  server: false,
+  query: { lat: panelLat, lng: panelLng },
+  watch: false
+})
+const goods = computed<NeedGood[]>(() => goodsData.value?.goods ?? [])
+const selectedGood = computed(() => goods.value.find(g => String(g.id_item) === selectedGoodId.value) ?? null)
 
 const emailIsValid = computed(() =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorEmail.value.trim())
@@ -91,6 +76,7 @@ const isDonateEnabled = computed(() => {
     selectedGoodId.value.length > 0
     && donorName.value.trim().length > 0
     && emailIsValid.value
+    && !isSubmitting.value
   )
 })
 
@@ -157,6 +143,41 @@ const fetchWeather = async () => {
   }
 }
 
+// ── Geolocalização ────────────────────────────────────────────────────────────
+const detectLocation = () => {
+  if (!navigator.geolocation) return
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      panelLat.value = pos.coords.latitude
+      panelLng.value = pos.coords.longitude
+      await refreshGoods()
+    },
+    () => { /* permissão negada — bens não serão filtrados por raio */ },
+    { enableHighAccuracy: true, timeout: 10000 }
+  )
+}
+
+// ── Telemetry ─────────────────────────────────────────────────────────────────
+const sendTelemetry = async () => {
+  try {
+    await $fetch('/api/painel/telemetry', {
+      method: 'POST',
+      body: {
+        locker_id: PANEL_LOCKER_ID,
+        tipo: 'painel',
+        geo_latitude: panelLat.value ?? 0,
+        geo_longitude: panelLng.value ?? 0,
+        bateria_estado: 100,
+        cpu_temperatura: 42 + Math.floor(Math.random() * 8),
+        dnb_sinal: 4,
+        aviso: null,
+        evento: 'ping',
+        versao: '1.0.0'
+      }
+    })
+  } catch { /* best-effort */ }
+}
+
 const generatePin = (): string => Math.floor(100000 + Math.random() * 900000).toString()
 
 const goToDonate = () => {
@@ -185,8 +206,7 @@ const { print: agentPrint } = usePrintAgent()
 const printReceipt = async () => {
   if (!isPrintEnabled()) return
 
-  const selectedGood = goods.find(g => g.id === selectedGoodId.value)
-  const goodName = selectedGood?.name || selectedGoodId.value
+  const goodName = selectedGood.value?.tipo_bem_servico ?? selectedGoodId.value
 
   const now = new Date()
   const date = now.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -218,22 +238,56 @@ const printReceipt = async () => {
   }
 }
 
-const submitDonation = () => {
-  if (!isDonateEnabled.value) return
-  pin.value = generatePin()
-  printState.value = 'idle'
-  printError.value = ''
-  thanksOpen.value = true
-  if (modalTimerId) clearTimeout(modalTimerId)
-  if (resetTimerId) clearTimeout(resetTimerId)
-  modalTimerId = setTimeout(() => {
-    thanksOpen.value = false
-  }, 8000)
-  resetTimerId = setTimeout(() => {
-    resetDonation()
-    screen.value = 'panel'
-  }, 30000)
-  printReceipt()
+const submitDonation = async () => {
+  if (!isDonateEnabled.value || !selectedGood.value) return
+  isSubmitting.value = true
+  submitError.value = ''
+
+  const generatedPin = generatePin()
+
+  try {
+    await $fetch('/api/leads', {
+      method: 'POST',
+      body: {
+        nome_cidadao: donorName.value,
+        contacto_cidadao: donorEmail.value,
+        rgpd: 1,
+        id_pedido: selectedGood.value.id_pedido,
+        id_item: selectedGood.value.id_item,
+        item_pedido: selectedGood.value.tipo_bem_servico,
+        pin_entrega: generatedPin
+      }
+    })
+
+    pin.value = generatedPin
+    isSubmitting.value = false
+    printState.value = 'idle'
+    printError.value = ''
+    thanksOpen.value = true
+    if (modalTimerId) clearTimeout(modalTimerId)
+    if (resetTimerId) clearTimeout(resetTimerId)
+    modalTimerId = setTimeout(() => {
+      thanksOpen.value = false
+    }, 8000)
+    resetTimerId = setTimeout(() => {
+      resetDonation()
+      screen.value = 'panel'
+    }, 30000)
+    printReceipt()
+    refreshGoods()
+  } catch (err: unknown) {
+    console.error('[painel] lead creation failed:', err)
+    isSubmitting.value = false
+    const e = err as { data?: { description?: string; errors?: Array<Record<string, string>> } }
+    const conflict = e?.data?.errors?.[0]
+    if (conflict && 'id_item' in conflict) {
+      submitError.value = 'Este bem já não está disponível. A lista foi atualizada.'
+      selectedGoodId.value = ''
+      await refreshGoods()
+    } else {
+      submitError.value = 'Ocorreu um erro. Tente novamente.'
+    }
+  }
 }
 
 const resetDonation = () => {
@@ -247,12 +301,16 @@ const clearTimers = () => {
   if (modalTimerId) clearTimeout(modalTimerId)
   if (resetTimerId) clearTimeout(resetTimerId)
   if (clockInterval) clearInterval(clockInterval)
+  if (telemetryInterval) clearInterval(telemetryInterval)
 }
 
 onMounted(() => {
+  detectLocation()
   fetchWeather()
   updateClock()
   clockInterval = setInterval(updateClock, 1000)
+  sendTelemetry()
+  telemetryInterval = setInterval(sendTelemetry, 5000)
 })
 
 onBeforeUnmount(() => {
@@ -373,7 +431,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="info-badge">
                   <UIcon name="i-fa6-solid-globe" aria-hidden="true" />
-                  <span>41.3304°N · 8.7447°W</span>
+                  <span>{{ panelCoords }}</span>
                 </div>
               </div>
             </div>
@@ -592,14 +650,23 @@ onBeforeUnmount(() => {
               Selecione o bem a doar
             </div>
             <div class="donate-goods-grid">
+              <div v-if="!goodsData" class="goods-status">
+                <UIcon name="i-lucide-loader-circle" class="animate-spin" />
+                <span>A carregar bens disponíveis…</span>
+              </div>
+              <div v-else-if="goods.length === 0" class="goods-status">
+                <UIcon name="i-lucide-package-open" />
+                <span>Nenhum bem disponível na área de cobertura.</span>
+              </div>
               <button
                 v-for="good in goods"
-                :key="good.id"
+                :key="good.id_item"
                 class="good-chip"
-                :class="{ active: selectedGoodId === good.id }"
-                @click="toggleGood(good.id)"
+                :class="{ active: selectedGoodId === String(good.id_item) }"
+                @click="toggleGood(String(good.id_item))"
               >
-                <span class="good-name">{{ good.name }}</span>
+                <span class="good-name">{{ good.tipo_bem_servico }}</span>
+                <span class="good-institution">{{ good.nome_entidade }}</span>
               </button>
             </div>
           </div>
@@ -627,6 +694,11 @@ onBeforeUnmount(() => {
                 size="xl"
               />
             </UFormField>
+
+            <div v-if="submitError" class="submit-error">
+              <UIcon name="i-fa6-solid-circle-exclamation" aria-hidden="true" />
+              {{ submitError }}
+            </div>
 
             <button
               class="donate-submit-btn"
@@ -1224,6 +1296,20 @@ onBeforeUnmount(() => {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
 }
 
+.submit-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
 .donate-submit-btn {
   width: 100%;
   min-height: 56px;
@@ -1378,6 +1464,29 @@ onBeforeUnmount(() => {
   color: #fca5a5;
   max-width: 320px;
   text-align: left;
+}
+
+/* ── GOODS STATUS (loading / empty) ── */
+.goods-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+}
+
+.goods-status :deep(svg) { font-size: 20px; flex-shrink: 0; }
+
+.good-institution {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.38);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── SCROLLBAR ── */
