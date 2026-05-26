@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import { useLeads } from '~/composables/useLeads'
-import { LEAD_PIN_VALIDITY_HOURS, type Lead, type LeadEstado } from '~/utils/mockData'
+import type { Lead, LeadEstado } from '~/utils/mockData'
 import { printPickupReport, type PickupReportLead } from '~/utils/pickupReportPDF'
 
 const UBadge = resolveComponent('UBadge')
@@ -233,15 +233,6 @@ function downloadReport() {
     </template>
 
     <template #body>
-      <UAlert
-        icon="i-lucide-info"
-        color="info"
-        variant="subtle"
-        title="Como funciona"
-        :description="`Cada lead gera um PIN de 6 dígitos com validade de ${LEAD_PIN_VALIDITY_HOURS}h (7 dias). Se o cidadão não depositar o bem no locker até expirar, o pedido volta aos painéis.`"
-        class="mb-6"
-      />
-
       <UPageGrid class="lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-px mb-6">
         <UPageCard
           v-for="card in statCards"

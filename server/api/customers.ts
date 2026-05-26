@@ -67,7 +67,8 @@ export default defineEventHandler(async (): Promise<User[]> => {
 
   const safeFetch = async <T>(path: string): Promise<T | null> => {
     try {
-      return await $fetch<T>(`${base}${path}`)
+      const res = await $fetch(`${base}${path}`)
+      return res as T
     } catch (err: unknown) {
       const e = err as { response?: { status?: number }, message?: string }
       console.warn(`[customers] ${path} failed:`, e?.response?.status, e?.message)

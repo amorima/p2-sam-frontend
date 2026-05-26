@@ -14,12 +14,12 @@ interface BackendNeedItem {
 }
 
 interface BackendNeed {
-  id_pedido: number
-  nif_nipc: string
-  estado?: string | null
+  'id_pedido': number
+  'nif_nipc': string
+  'estado'?: string | null
   'need items'?: BackendNeedItem[]
-  NeedItems?: BackendNeedItem[]
-  needItems?: BackendNeedItem[]
+  'NeedItems'?: BackendNeedItem[]
+  'needItems'?: BackendNeedItem[]
 }
 
 interface BackendLead {
@@ -63,7 +63,6 @@ export default defineEventHandler(async (event) => {
   // Exclude items that have an active lead (PENDENTE, ENTREGUE, or CONCLUIDO).
   // EXPIRADO leads free the item back onto the panel.
   const excludedByItemId = new Set<number>()
-  const excludedByKey = new Set<string>()
   for (const lead of leadsRes as BackendLead[]) {
     if (lead.estado === 'PENDENTE' || lead.estado === 'ENTREGUE' || lead.estado === 'CONCLUIDO') {
       if (lead.id_item != null) excludedByItemId.add(lead.id_item)

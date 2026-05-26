@@ -203,14 +203,18 @@ const isPrintEnabled = (): boolean => {
   return val === null ? true : val === 'true'
 }
 
-type PrintState = 'idle' | 'printing' | 'ok' | 'error'
-const printState = ref<PrintState>('idle')
-const printError = ref('')
-
-const { print: agentPrint } = usePrintAgent()
+const { print: agentPrint, isAvailable: printerAvailable, checkAvailability: refreshPrinter } = usePrintAgent()
 
 const printReceipt = async () => {
   if (!isPrintEnabled()) return
+
+  // Validação: só imprime se o print-agent estiver ativo (fonte de verdade
+  // sobre a disponibilidade da impressora). Se estiver offline, ignora-se.
+  await refreshPrinter()
+  if (!printerAvailable.value) {
+    console.warn('[painel] print-agent offline — talão não impresso')
+    return
+  }
 
   const goodName = selectedGood.value?.tipo_bem_servico ?? selectedGoodId.value
 
@@ -218,9 +222,6 @@ const printReceipt = async () => {
   const date = now.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
   const time = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', hour12: false })
   const printerName = localStorage.getItem('sam_print_receipt_printer') || undefined
-
-  printState.value = 'printing'
-  printError.value = ''
 
   try {
     const result = await $fetch<{ bytes: number[] }>('/api/print/bytes', {
@@ -235,12 +236,8 @@ const printReceipt = async () => {
       }
     })
     await agentPrint(result.bytes, printerName)
-    printState.value = 'ok'
   } catch (err: unknown) {
-    const fetchErr = err as { data?: { message?: string }, message?: string }
-    const msg = fetchErr?.data?.message || fetchErr?.message || String(err)
-    printState.value = 'error'
-    printError.value = msg
+    console.error('[painel] print failed:', err)
   }
 }
 
@@ -267,8 +264,6 @@ const submitDonation = async () => {
 
     pin.value = generatedPin
     isSubmitting.value = false
-    printState.value = 'idle'
-    printError.value = ''
     thanksOpen.value = true
     if (modalTimerId) clearTimeout(modalTimerId)
     if (resetTimerId) clearTimeout(resetTimerId)
@@ -284,7 +279,7 @@ const submitDonation = async () => {
   } catch (err: unknown) {
     console.error('[painel] lead creation failed:', err)
     isSubmitting.value = false
-    const e = err as { data?: { description?: string; errors?: Array<Record<string, string>> } }
+    const e = err as { data?: { description?: string, errors?: Array<Record<string, string>> } }
     const conflict = e?.data?.errors?.[0]
     if (conflict && 'id_item' in conflict) {
       submitError.value = 'Este bem já não está disponível. A lista foi atualizada.'
@@ -753,16 +748,6 @@ onBeforeUnmount(() => {
             <p class="thanks-note">
               Obrigado por ajudar a comunidade de Vila do Conde!
             </p>
-            <div v-if="isPrintEnabled()" class="thanks-print-status" :class="printState">
-              <UIcon
-                :name="printState === 'printing' ? 'i-lucide-loader-circle' : printState === 'ok' ? 'i-lucide-printer' : printState === 'error' ? 'i-lucide-printer' : 'i-lucide-printer'"
-                :class="{ 'animate-spin': printState === 'printing' }"
-              />
-              <span v-if="printState === 'idle'">A enviar para impressora…</span>
-              <span v-else-if="printState === 'printing'">A imprimir talão…</span>
-              <span v-else-if="printState === 'ok'">Talão impresso</span>
-              <span v-else>Erro de impressão: {{ printError }}</span>
-            </div>
           </div>
         </div>
       </Transition>
@@ -1438,40 +1423,6 @@ onBeforeUnmount(() => {
   color: rgba(255,255,255,0.4);
   font-style: italic;
   margin: 0;
-}
-
-.thanks-print-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.5);
-}
-
-.thanks-print-status.printing {
-  background: rgba(96,165,250,0.1);
-  border-color: rgba(96,165,250,0.3);
-  color: #93c5fd;
-}
-
-.thanks-print-status.ok {
-  background: rgba(52,211,153,0.1);
-  border-color: rgba(52,211,153,0.3);
-  color: #6ee7b7;
-}
-
-.thanks-print-status.error {
-  background: rgba(239,68,68,0.1);
-  border-color: rgba(239,68,68,0.3);
-  color: #fca5a5;
-  max-width: 320px;
-  text-align: left;
 }
 
 /* ── GOODS STATUS (loading / empty) ── */
