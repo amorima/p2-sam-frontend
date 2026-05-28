@@ -31,29 +31,21 @@ export const useUserProfile = () => {
     }
   }
 
-  // updateAvatar receives the fileName returned by the upload endpoint
+  // updateAvatar receives the fileName returned by whichever upload endpoint was used.
+  // DB persistence is handled server-side by `PATCH /api/auth/avatar` for entity users;
+  // for admins (no entity row) the avatar lives in localStorage only.
   function updateAvatar(fileName: string) {
     avatar.value = toProxyUrl(fileName)
 
     const session = authCookie.value
     if (!import.meta.client || !session) return
 
-    // Cache in localStorage
     if (session.nif) {
       localStorage.setItem(`sam_avatar_${session.nif}`, fileName)
     }
 
-    // Persist in DB (not needed for admin who has no entity row)
     if (session.role !== 'admin') {
-      $fetch('/api/auth/profile-pic', {
-        method: 'PATCH',
-        body: { profile_pic: fileName }
-      }).then(() => {
-        // Keep cookie in sync so next load doesn't need localStorage fallback
-        if (authCookie.value) {
-          authCookie.value = { ...authCookie.value, profile_pic: fileName }
-        }
-      }).catch(console.error)
+      authCookie.value = { ...session, profile_pic: fileName }
     }
   }
 
