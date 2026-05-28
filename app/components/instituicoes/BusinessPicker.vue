@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Business, BusinessOffer } from '~/utils/mockData'
+import type { Business, BusinessOffer } from '~/utils/domain'
 
 interface PartnerOption {
   business: Business

@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
     contacts?: unknown[]
     institution?: Record<string, unknown>
     business?: Record<string, unknown>
+    offers?: unknown[]
   }>(event)
 
   const config = useRuntimeConfig()
@@ -32,6 +33,9 @@ export default defineEventHandler(async (event) => {
   }
   if (body.role === 'business' && body.business) {
     payload.business = body.business
+    if (Array.isArray(body.offers) && body.offers.length) {
+      payload.offers = body.offers
+    }
   }
 
   try {

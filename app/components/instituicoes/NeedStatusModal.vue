@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import type { Need } from '~/utils/mockData'
+import type { Need } from '~/utils/domain'
 import { useNeeds } from '~/composables/useNeeds'
 
 const props = defineProps<{

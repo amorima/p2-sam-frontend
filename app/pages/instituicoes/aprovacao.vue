@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useNeeds } from '~/composables/useNeeds'
-import type { MatchTipo, Need } from '~/utils/mockData'
+import type { MatchTipo, Need } from '~/utils/domain'
 import { printVoucher } from '~/utils/voucherPDF'
 
 const toast = useToast()

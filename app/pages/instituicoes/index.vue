@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { type Column, type Row, type SortingState, type Table, getPaginationRowModel } from '@tanstack/table-core'
 import { printVoucher } from '~/utils/voucherPDF'
-import type { Need, NeedItem } from '~/utils/mockData'
+import type { Need, NeedItem } from '~/utils/domain'
 import { useNeeds } from '~/composables/useNeeds'
 
 const UBadge = resolveComponent('UBadge')

@@ -3,7 +3,7 @@ import {
   LEAD_PIN_VALIDITY_HOURS,
   type Lead,
   type SmartLocker
-} from '~/utils/mockData'
+} from '~/utils/domain'
 
 const HOUR = 3_600_000
 

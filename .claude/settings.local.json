@@ -38,7 +38,14 @@
       "Bash(curl -s https://apisam.netdw.tech/leads)",
       "Bash(curl -s https://apisam.netdw.tech/telemetry)",
       "Bash(curl -s https://apisam.netdw.tech/needs)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(echo \"Exit: $?\")",
+      "PowerShell(Get-Process *)",
+      "PowerShell(try { Invoke-WebRequest -Uri \"http://localhost:3001/\" -Method GET -UseBasicParsing -TimeoutSec 5 -MaximumRedirection 0 -ErrorAction Stop | Select-Object StatusCode } catch { $_.Exception.Response.StatusCode.value__ })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:3001/\" -Method GET -UseBasicParsing -TimeoutSec 5 -MaximumRedirection 0 -ErrorAction Stop; $r.StatusCode; $r.Headers.Location } catch { Write-Output \"ERR $\\($_.Exception.Message\\)\"; if \\($_.Exception.Response\\) { $_.Exception.Response.StatusCode.value__; $_.Exception.Response.Headers.Location } })",
+      "PowerShell($ProgressPreference='SilentlyContinue'; curl.exe -s -o \"C:/SAM/p2-sam-frontend/api-business.json\" -w \"STATUS=%{http_code}\" http://localhost:3001/api/business; Write-Output \"\"; Get-Content \"C:/SAM/p2-sam-frontend/api-business.json\" -TotalCount 1)",
+      "PowerShell($ProgressPreference='SilentlyContinue'; curl.exe -s -o \"C:/SAM/p2-sam-frontend/api-needs.json\" -w \"STATUS=%{http_code}\" http://localhost:3001/api/needs; Write-Output \"\"; Get-Content \"C:/SAM/p2-sam-frontend/api-needs.json\" -TotalCount 1)",
+      "Bash(git *)"
     ]
   }
 }

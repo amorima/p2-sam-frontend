@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useNeeds } from '~/composables/useNeeds'
-import type { TipoBem } from '~/utils/mockData'
+import type { TipoBem } from '~/utils/domain'
 
 interface ItemEntry {
   tipo_bem_servico: string

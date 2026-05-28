@@ -1,0 +1,2781 @@
+{
+  "needs": [
+    {
+      "id_pedido": 1,
+      "nif_nipc": "505860126",
+      "nome_entidade": "Associação Renascer de Vila Real de Santo Ant",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 12,
+          "id_pedido": 1,
+          "tipo_bem_servico": "Detergente para a roupa",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 39,
+          "id_pedido": 1,
+          "tipo_bem_servico": "Livros escolares",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 2,
+      "nif_nipc": "929978942",
+      "nome_entidade": "IPSS Caridade de Santa Cruz",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 15,
+          "id_pedido": 2,
+          "tipo_bem_servico": "Sapatos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 3,
+      "nif_nipc": "919651739",
+      "nome_entidade": "União Solidária de Mêda",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 102,
+          "id_pedido": 3,
+          "tipo_bem_servico": "Cadernos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 4,
+      "nif_nipc": "957266646",
+      "nome_entidade": "Associação Luz de Cartaxo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "REJEITADO",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 71,
+          "id_pedido": 4,
+          "tipo_bem_servico": "Lanternas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 5,
+      "nif_nipc": "989594804",
+      "nome_entidade": "Casa do Povo de Silves",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "REJEITADO",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 33,
+          "id_pedido": 5,
+          "tipo_bem_servico": "Fraldas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 142,
+          "id_pedido": 5,
+          "tipo_bem_servico": "Ibuprofeno",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 6,
+      "nif_nipc": "972406304",
+      "nome_entidade": "Misericórdia do Vale de Costa da Caparica",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 76,
+          "id_pedido": 6,
+          "tipo_bem_servico": "Farinha",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 21,
+          "id_pedido": 6,
+          "tipo_bem_servico": "Fraldas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 7,
+      "nif_nipc": "590017314",
+      "nome_entidade": "Lar São Francisco de Ponte de Sor",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 44,
+          "id_pedido": 7,
+          "tipo_bem_servico": "Bilhete de metro",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 20,
+          "id_pedido": 7,
+          "tipo_bem_servico": "Ibuprofeno",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 69,
+          "id_pedido": 7,
+          "tipo_bem_servico": "Pilhas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 8,
+      "nif_nipc": "935400709",
+      "nome_entidade": "Federação Progresso de Tavira",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 9,
+      "nif_nipc": "974994503",
+      "nome_entidade": "Casa do Povo de Agualva-Cacém",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "REJEITADO",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 138,
+          "id_pedido": 9,
+          "tipo_bem_servico": "Cadernos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 86,
+          "id_pedido": 9,
+          "tipo_bem_servico": "Casaco de inverno",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 10,
+      "nif_nipc": "999445959",
+      "nome_entidade": "Centro Comunitário Serra de Santana",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 11,
+      "nif_nipc": "976962414",
+      "nome_entidade": "Federação Progresso de Ermesinde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 93,
+          "id_pedido": 11,
+          "tipo_bem_servico": "Papel higiénico",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 54,
+          "id_pedido": 11,
+          "tipo_bem_servico": "Passe mensal",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 90,
+          "id_pedido": 11,
+          "tipo_bem_servico": "Sapatos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 12,
+      "nif_nipc": "935400709",
+      "nome_entidade": "Federação Progresso de Tavira",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 13,
+      "nif_nipc": "976962414",
+      "nome_entidade": "Federação Progresso de Ermesinde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 114,
+          "id_pedido": 13,
+          "tipo_bem_servico": "Régua e compasso",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 50,
+          "id_pedido": 13,
+          "tipo_bem_servico": "Velas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 14,
+      "nif_nipc": "963257096",
+      "nome_entidade": "Fundação Terra Nova de Paredes",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "REJEITADO",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 32,
+          "id_pedido": 14,
+          "tipo_bem_servico": "Feijão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 15,
+      "nif_nipc": "500466841",
+      "nome_entidade": "ONG Futuro de Câmara de Lobos",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 16,
+      "nif_nipc": "595061013",
+      "nome_entidade": "Cooperativa Horizonte de Portimão",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 30,
+          "id_pedido": 16,
+          "tipo_bem_servico": "Lixívia",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 28,
+          "id_pedido": 16,
+          "tipo_bem_servico": "Paracetamol",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 17,
+      "nif_nipc": "999445959",
+      "nome_entidade": "Centro Comunitário Serra de Santana",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 3,
+          "id_pedido": 17,
+          "tipo_bem_servico": "Pasta de dentes",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 18,
+      "nif_nipc": "966491750",
+      "nome_entidade": "Centro Comunitário Serra de Amarante",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 63,
+          "id_pedido": 18,
+          "tipo_bem_servico": "Pensos higiénicos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 19,
+      "nif_nipc": "957266646",
+      "nome_entidade": "Associação Luz de Cartaxo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 101,
+          "id_pedido": 19,
+          "tipo_bem_servico": "Álcool etílico",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 23,
+          "id_pedido": 19,
+          "tipo_bem_servico": "Massa",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 20,
+      "nif_nipc": "989594804",
+      "nome_entidade": "Casa do Povo de Silves",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 21,
+      "nif_nipc": "538548328",
+      "nome_entidade": "Cooperativa Fraternidade de Lagos",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 22,
+      "nif_nipc": "541948584",
+      "nome_entidade": "Associação Renascer de Mirandela",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 5,
+          "id_pedido": 22,
+          "tipo_bem_servico": "Pensos rápidos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 83,
+          "id_pedido": 22,
+          "tipo_bem_servico": "Sal",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 23,
+      "nif_nipc": "538335145",
+      "nome_entidade": "Associação Rede Viva de Silves",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 82,
+          "id_pedido": 23,
+          "tipo_bem_servico": "Esfregão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 116,
+          "id_pedido": 23,
+          "tipo_bem_servico": "Paracetamol",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 147,
+          "id_pedido": 23,
+          "tipo_bem_servico": "Velas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 24,
+      "nif_nipc": "957266646",
+      "nome_entidade": "Associação Luz de Cartaxo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 26,
+          "id_pedido": 24,
+          "tipo_bem_servico": "Bilhete de metro",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 99,
+          "id_pedido": 24,
+          "tipo_bem_servico": "Camisolas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 25,
+      "nif_nipc": "500466841",
+      "nome_entidade": "ONG Futuro de Câmara de Lobos",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 59,
+          "id_pedido": 25,
+          "tipo_bem_servico": "Arroz",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 145,
+          "id_pedido": 25,
+          "tipo_bem_servico": "Material de escritório",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 26,
+      "nif_nipc": "916780228",
+      "nome_entidade": "Federação Progresso de Vila do Conde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 146,
+          "id_pedido": 26,
+          "tipo_bem_servico": "Cobertor",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 27,
+      "nif_nipc": "538663770",
+      "nome_entidade": "União do Bem de Freamunde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 46,
+          "id_pedido": 27,
+          "tipo_bem_servico": "Fraldas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 124,
+          "id_pedido": 27,
+          "tipo_bem_servico": "Roupa interior",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 28,
+      "nif_nipc": "917809499",
+      "nome_entidade": "Misericórdia do Vale de Estarreja",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 108,
+          "id_pedido": 28,
+          "tipo_bem_servico": "Brinquedos para crianças",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 29,
+      "nif_nipc": "500466841",
+      "nome_entidade": "ONG Futuro de Câmara de Lobos",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 80,
+          "id_pedido": 29,
+          "tipo_bem_servico": "Azeite",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 45,
+          "id_pedido": 29,
+          "tipo_bem_servico": "Brinquedos para crianças",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 123,
+          "id_pedido": 29,
+          "tipo_bem_servico": "Cadernos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 150,
+          "id_pedido": 29,
+          "tipo_bem_servico": "Cobertor",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 30,
+      "nif_nipc": "976962414",
+      "nome_entidade": "Federação Progresso de Ermesinde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 134,
+          "id_pedido": 30,
+          "tipo_bem_servico": "Calças de ganga",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 43,
+          "id_pedido": 30,
+          "tipo_bem_servico": "Farinha",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 121,
+          "id_pedido": 30,
+          "tipo_bem_servico": "Livros escolares",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 95,
+          "id_pedido": 30,
+          "tipo_bem_servico": "Mochila escolar",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 127,
+          "id_pedido": 30,
+          "tipo_bem_servico": "Pensos higiénicos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 31,
+      "nif_nipc": "583071899",
+      "nome_entidade": "Centro de Apoio Social de Paços de Ferreira",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 24,
+          "id_pedido": 31,
+          "tipo_bem_servico": "Arroz",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 32,
+      "nif_nipc": "530715597",
+      "nome_entidade": "IPSS Caridade de Alcobaça",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 110,
+          "id_pedido": 32,
+          "tipo_bem_servico": "Açúcar",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 33,
+      "nif_nipc": "566577794",
+      "nome_entidade": "Cooperativa Fraternidade de Paços de Ferreira",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 9,
+          "id_pedido": 33,
+          "tipo_bem_servico": "Botas de chuva",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 126,
+          "id_pedido": 33,
+          "tipo_bem_servico": "Casaco de inverno",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 34,
+      "nif_nipc": "583071899",
+      "nome_entidade": "Centro de Apoio Social de Paços de Ferreira",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 35,
+          "id_pedido": 34,
+          "tipo_bem_servico": "Medidor de tensão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 40,
+          "id_pedido": 34,
+          "tipo_bem_servico": "Pilhas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 35,
+      "nif_nipc": "981523503",
+      "nome_entidade": "Cooperativa Horizonte de Espinho",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 137,
+          "id_pedido": 35,
+          "tipo_bem_servico": "Medidor de tensão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 36,
+      "nif_nipc": "989594804",
+      "nome_entidade": "Casa do Povo de Silves",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 81,
+          "id_pedido": 36,
+          "tipo_bem_servico": "Cadernos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 139,
+          "id_pedido": 36,
+          "tipo_bem_servico": "Fraldas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 29,
+          "id_pedido": 36,
+          "tipo_bem_servico": "Lanternas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 17,
+          "id_pedido": 36,
+          "tipo_bem_servico": "Lixívia",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 37,
+      "nif_nipc": "963763479",
+      "nome_entidade": "Fundação Terra Nova de Valongo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 120,
+          "id_pedido": 37,
+          "tipo_bem_servico": "Camisolas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 113,
+          "id_pedido": 37,
+          "tipo_bem_servico": "Farinha",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 38,
+      "nif_nipc": "976962414",
+      "nome_entidade": "Federação Progresso de Ermesinde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 111,
+          "id_pedido": 38,
+          "tipo_bem_servico": "Roupa interior",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 39,
+      "nif_nipc": "941427064",
+      "nome_entidade": "Centro Social Raízes de Póvoa de Varzim",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 13,
+          "id_pedido": 39,
+          "tipo_bem_servico": "Bilhete de autocarro",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 60,
+          "id_pedido": 39,
+          "tipo_bem_servico": "Calças de ganga",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 125,
+          "id_pedido": 39,
+          "tipo_bem_servico": "Lençóis",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 7,
+          "id_pedido": 39,
+          "tipo_bem_servico": "Sapatos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 40,
+      "nif_nipc": "590193870",
+      "nome_entidade": "Centro Comunitário Serra de Santa Comba Dão",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 122,
+          "id_pedido": 40,
+          "tipo_bem_servico": "Arroz",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 19,
+          "id_pedido": 40,
+          "tipo_bem_servico": "Feijão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 41,
+          "id_pedido": 40,
+          "tipo_bem_servico": "Pilhas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 41,
+      "nif_nipc": "538548328",
+      "nome_entidade": "Cooperativa Fraternidade de Lagos",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 98,
+          "id_pedido": 41,
+          "tipo_bem_servico": "Material de escritório",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 66,
+          "id_pedido": 41,
+          "tipo_bem_servico": "Pensos rápidos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 42,
+      "nif_nipc": "541948584",
+      "nome_entidade": "Associação Renascer de Mirandela",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 43,
+      "nif_nipc": "991219356",
+      "nome_entidade": "Fundação Caminho de Oliveira do Bairro",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 44,
+      "nif_nipc": "912337435",
+      "nome_entidade": "União do Bem de Rio Tinto",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 52,
+          "id_pedido": 44,
+          "tipo_bem_servico": "Sabonete",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 45,
+      "nif_nipc": "541948584",
+      "nome_entidade": "Associação Renascer de Mirandela",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 103,
+          "id_pedido": 45,
+          "tipo_bem_servico": "Botas de chuva",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 53,
+          "id_pedido": 45,
+          "tipo_bem_servico": "Calças de ganga",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 56,
+          "id_pedido": 45,
+          "tipo_bem_servico": "Termómetro",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 46,
+      "nif_nipc": "926863810",
+      "nome_entidade": "Centro de Apoio Social de Horta",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 119,
+          "id_pedido": 46,
+          "tipo_bem_servico": "Feijão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 57,
+          "id_pedido": 46,
+          "tipo_bem_servico": "Mochila escolar",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 47,
+      "nif_nipc": "539411045",
+      "nome_entidade": "Lar dos Avós de Costa da Caparica",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 10,
+          "id_pedido": 47,
+          "tipo_bem_servico": "Brinquedos para crianças",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 70,
+          "id_pedido": 47,
+          "tipo_bem_servico": "Detergente para a roupa",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 143,
+          "id_pedido": 47,
+          "tipo_bem_servico": "Pasta de dentes",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 48,
+      "nif_nipc": "541951658",
+      "nome_entidade": "Centro Social Raízes de Moura",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 22,
+          "id_pedido": 48,
+          "tipo_bem_servico": "Álcool etílico",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 128,
+          "id_pedido": 48,
+          "tipo_bem_servico": "Almofada",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 115,
+          "id_pedido": 48,
+          "tipo_bem_servico": "Borracha",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 84,
+          "id_pedido": 48,
+          "tipo_bem_servico": "Botas de chuva",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 100,
+          "id_pedido": 48,
+          "tipo_bem_servico": "Ibuprofeno",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 49,
+      "nif_nipc": "538663770",
+      "nome_entidade": "União do Bem de Freamunde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 50,
+      "nif_nipc": "917809499",
+      "nome_entidade": "Misericórdia do Vale de Estarreja",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 51,
+      "nif_nipc": "999445959",
+      "nome_entidade": "Centro Comunitário Serra de Santana",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 67,
+          "id_pedido": 51,
+          "tipo_bem_servico": "Álcool etílico",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 64,
+          "id_pedido": 51,
+          "tipo_bem_servico": "Bilhete de metro",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 109,
+          "id_pedido": 51,
+          "tipo_bem_servico": "Material de escritório",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 52,
+      "nif_nipc": "539411045",
+      "nome_entidade": "Lar dos Avós de Costa da Caparica",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 53,
+      "nif_nipc": "525489320",
+      "nome_entidade": "Lar dos Avós de Felgueiras",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 94,
+          "id_pedido": 53,
+          "tipo_bem_servico": "Casaco de inverno",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 130,
+          "id_pedido": 53,
+          "tipo_bem_servico": "Medidor de tensão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 73,
+          "id_pedido": 53,
+          "tipo_bem_servico": "Pensos rápidos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 54,
+      "nif_nipc": "595061013",
+      "nome_entidade": "Cooperativa Horizonte de Portimão",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 141,
+          "id_pedido": 54,
+          "tipo_bem_servico": "Conservas de peixe",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 49,
+          "id_pedido": 54,
+          "tipo_bem_servico": "Lanternas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 55,
+      "nif_nipc": "538663770",
+      "nome_entidade": "União do Bem de Freamunde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 104,
+          "id_pedido": 55,
+          "tipo_bem_servico": "Calças de ganga",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 27,
+          "id_pedido": 55,
+          "tipo_bem_servico": "Feijão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 6,
+          "id_pedido": 55,
+          "tipo_bem_servico": "Régua e compasso",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 56,
+      "nif_nipc": "945313534",
+      "nome_entidade": "Lar dos Avós de Valbom",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 136,
+          "id_pedido": 56,
+          "tipo_bem_servico": "Medidor de tensão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 57,
+      "nif_nipc": "929978942",
+      "nome_entidade": "IPSS Caridade de Santa Cruz",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 25,
+          "id_pedido": 57,
+          "tipo_bem_servico": "Camisolas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 148,
+          "id_pedido": 57,
+          "tipo_bem_servico": "Conservas de peixe",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 4,
+          "id_pedido": 57,
+          "tipo_bem_servico": "Detergente para a roupa",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 117,
+          "id_pedido": 57,
+          "tipo_bem_servico": "Lixívia",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 62,
+          "id_pedido": 57,
+          "tipo_bem_servico": "Pensos higiénicos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 58,
+      "nif_nipc": "516732567",
+      "nome_entidade": "Lar São Francisco de Viana do Castelo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 59,
+      "nif_nipc": "517146912",
+      "nome_entidade": "Misericórdia do Vale de Fafe",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 34,
+          "id_pedido": 59,
+          "tipo_bem_servico": "Detergente para a roupa",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 60,
+      "nif_nipc": "539411045",
+      "nome_entidade": "Lar dos Avós de Costa da Caparica",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 106,
+          "id_pedido": 60,
+          "tipo_bem_servico": "Botas de chuva",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 61,
+      "nif_nipc": "991219356",
+      "nome_entidade": "Fundação Caminho de Oliveira do Bairro",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 131,
+          "id_pedido": 61,
+          "tipo_bem_servico": "Casaco de inverno",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 31,
+          "id_pedido": 61,
+          "tipo_bem_servico": "Lanternas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 62,
+      "nif_nipc": "991219356",
+      "nome_entidade": "Fundação Caminho de Oliveira do Bairro",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 63,
+      "nif_nipc": "976962414",
+      "nome_entidade": "Federação Progresso de Ermesinde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 2,
+          "id_pedido": 63,
+          "tipo_bem_servico": "Paracetamol",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 64,
+      "nif_nipc": "968379727",
+      "nome_entidade": "Associação Luz de Sines",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "REJEITADO",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 55,
+          "id_pedido": 64,
+          "tipo_bem_servico": "Fraldas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 65,
+      "nif_nipc": "957266646",
+      "nome_entidade": "Associação Luz de Cartaxo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 91,
+          "id_pedido": 65,
+          "tipo_bem_servico": "Esfregão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 66,
+      "nif_nipc": "941427064",
+      "nome_entidade": "Centro Social Raízes de Póvoa de Varzim",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 67,
+      "nif_nipc": "926863810",
+      "nome_entidade": "Centro de Apoio Social de Horta",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 96,
+          "id_pedido": 67,
+          "tipo_bem_servico": "Sopa em pó",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 68,
+      "nif_nipc": "945313534",
+      "nome_entidade": "Lar dos Avós de Valbom",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 79,
+          "id_pedido": 68,
+          "tipo_bem_servico": "Passe mensal",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 69,
+      "nif_nipc": "530715597",
+      "nome_entidade": "IPSS Caridade de Alcobaça",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 42,
+          "id_pedido": 69,
+          "tipo_bem_servico": "Esfregão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 140,
+          "id_pedido": 69,
+          "tipo_bem_servico": "Termómetro",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 70,
+      "nif_nipc": "538548328",
+      "nome_entidade": "Cooperativa Fraternidade de Lagos",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 71,
+      "nif_nipc": "566577794",
+      "nome_entidade": "Cooperativa Fraternidade de Paços de Ferreira",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "REJEITADO",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 88,
+          "id_pedido": 71,
+          "tipo_bem_servico": "Almofada",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 68,
+          "id_pedido": 71,
+          "tipo_bem_servico": "Leite",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 72,
+      "nif_nipc": "987691143",
+      "nome_entidade": "Associação Rede Viva de Moura",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 78,
+          "id_pedido": 72,
+          "tipo_bem_servico": "Álcool etílico",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 74,
+          "id_pedido": 72,
+          "tipo_bem_servico": "Lanternas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 149,
+          "id_pedido": 72,
+          "tipo_bem_servico": "Velas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 73,
+      "nif_nipc": "517146912",
+      "nome_entidade": "Misericórdia do Vale de Fafe",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "REJEITADO",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 74,
+      "nif_nipc": "941427064",
+      "nome_entidade": "Centro Social Raízes de Póvoa de Varzim",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 48,
+          "id_pedido": 74,
+          "tipo_bem_servico": "Gel de banho",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 65,
+          "id_pedido": 74,
+          "tipo_bem_servico": "Vitaminas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 75,
+      "nif_nipc": "919651739",
+      "nome_entidade": "União Solidária de Mêda",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 61,
+          "id_pedido": 75,
+          "tipo_bem_servico": "Fraldas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 76,
+      "nif_nipc": "538663770",
+      "nome_entidade": "União do Bem de Freamunde",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 8,
+          "id_pedido": 76,
+          "tipo_bem_servico": "Farinha",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 36,
+          "id_pedido": 76,
+          "tipo_bem_servico": "Paracetamol",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 77,
+      "nif_nipc": "568986333",
+      "nome_entidade": "Fundação Esperança de Mealhada",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 72,
+          "id_pedido": 77,
+          "tipo_bem_servico": "Azeite",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 14,
+          "id_pedido": 77,
+          "tipo_bem_servico": "Brinquedos para crianças",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 78,
+      "nif_nipc": "987691143",
+      "nome_entidade": "Associação Rede Viva de Moura",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 85,
+          "id_pedido": 78,
+          "tipo_bem_servico": "Almofada",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 92,
+          "id_pedido": 78,
+          "tipo_bem_servico": "Borracha",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 79,
+      "nif_nipc": "541951658",
+      "nome_entidade": "Centro Social Raízes de Moura",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 11,
+          "id_pedido": 79,
+          "tipo_bem_servico": "Lanternas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 75,
+          "id_pedido": 79,
+          "tipo_bem_servico": "Papel higiénico",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 80,
+      "nif_nipc": "945313534",
+      "nome_entidade": "Lar dos Avós de Valbom",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 105,
+          "id_pedido": 80,
+          "tipo_bem_servico": "Pilhas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 81,
+      "nif_nipc": "944329270",
+      "nome_entidade": "Centro de Apoio Social de Vila Nova de Santo ",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 132,
+          "id_pedido": 81,
+          "tipo_bem_servico": "Medidor de tensão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 129,
+          "id_pedido": 81,
+          "tipo_bem_servico": "Papel higiénico",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 133,
+          "id_pedido": 81,
+          "tipo_bem_servico": "Pasta de dentes",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 82,
+      "nif_nipc": "520743586",
+      "nome_entidade": "Fundação Caminho de Sines",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 1,
+          "id_pedido": 82,
+          "tipo_bem_servico": "Azeite",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 83,
+      "nif_nipc": "957266646",
+      "nome_entidade": "Associação Luz de Cartaxo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "REJEITADO",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 84,
+      "nif_nipc": "583071899",
+      "nome_entidade": "Centro de Apoio Social de Paços de Ferreira",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 85,
+      "nif_nipc": "590017314",
+      "nome_entidade": "Lar São Francisco de Ponte de Sor",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 86,
+      "nif_nipc": "932974675",
+      "nome_entidade": "União Solidária de Serpa",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 37,
+          "id_pedido": 86,
+          "tipo_bem_servico": "Mochila escolar",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 87,
+      "nif_nipc": "926863810",
+      "nome_entidade": "Centro de Apoio Social de Horta",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 38,
+          "id_pedido": 87,
+          "tipo_bem_servico": "Farinha",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 77,
+          "id_pedido": 87,
+          "tipo_bem_servico": "Meias",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 16,
+          "id_pedido": 87,
+          "tipo_bem_servico": "Pensos rápidos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 88,
+      "nif_nipc": "957266646",
+      "nome_entidade": "Associação Luz de Cartaxo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 89,
+      "nif_nipc": "963763479",
+      "nome_entidade": "Fundação Terra Nova de Valongo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 135,
+          "id_pedido": 89,
+          "tipo_bem_servico": "Esfregão",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 87,
+          "id_pedido": 89,
+          "tipo_bem_servico": "Pilhas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 90,
+      "nif_nipc": "957266646",
+      "nome_entidade": "Associação Luz de Cartaxo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 97,
+          "id_pedido": 90,
+          "tipo_bem_servico": "Vitaminas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 91,
+      "nif_nipc": "963763479",
+      "nome_entidade": "Fundação Terra Nova de Valongo",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 58,
+          "id_pedido": 91,
+          "tipo_bem_servico": "Lápis e canetas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 107,
+          "id_pedido": 91,
+          "tipo_bem_servico": "Sopa em pó",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 92,
+      "nif_nipc": "917809499",
+      "nome_entidade": "Misericórdia do Vale de Estarreja",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 51,
+          "id_pedido": 92,
+          "tipo_bem_servico": "Lanternas",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 93,
+      "nif_nipc": "541948584",
+      "nome_entidade": "Associação Renascer de Mirandela",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 94,
+      "nif_nipc": "917809499",
+      "nome_entidade": "Misericórdia do Vale de Estarreja",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 118,
+          "id_pedido": 94,
+          "tipo_bem_servico": "Passe mensal",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 95,
+      "nif_nipc": "912337435",
+      "nome_entidade": "União do Bem de Rio Tinto",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 47,
+          "id_pedido": 95,
+          "tipo_bem_servico": "Sopa em pó",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 96,
+      "nif_nipc": "999445959",
+      "nome_entidade": "Centro Comunitário Serra de Santana",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 97,
+      "nif_nipc": "538335145",
+      "nome_entidade": "Associação Rede Viva de Silves",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 18,
+          "id_pedido": 97,
+          "tipo_bem_servico": "Termómetro",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 98,
+      "nif_nipc": "929978942",
+      "nome_entidade": "IPSS Caridade de Santa Cruz",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": []
+    },
+    {
+      "id_pedido": 99,
+      "nif_nipc": "541951658",
+      "nome_entidade": "Centro Social Raízes de Moura",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "PENDENTE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 112,
+          "id_pedido": 99,
+          "tipo_bem_servico": "Álcool etílico",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        },
+        {
+          "id_item": 144,
+          "id_pedido": 99,
+          "tipo_bem_servico": "Cadernos",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    },
+    {
+      "id_pedido": 100,
+      "nif_nipc": "912236855",
+      "nome_entidade": "Fundação Esperança de Vila Real",
+      "data": "2026-05-27T23:30:22.494Z",
+      "estado": "ACEITE",
+      "urgente": false,
+      "items": [
+        {
+          "id_item": 89,
+          "id_pedido": 100,
+          "tipo_bem_servico": "Açúcar",
+          "tipo_bem": "BEM",
+          "status": "available",
+          "match_tipo": null,
+          "match_ref": null,
+          "match_business_nif": null,
+          "match_business_estado": null,
+          "match_business_motivo": null
+        }
+      ]
+    }
+  ]
+}

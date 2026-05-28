@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GoodsService, TipoBem } from '~/utils/mockData'
+import type { GoodsService, TipoBem } from '~/utils/domain'
 
 interface ItemEntry {
   tipo_bem_servico: string

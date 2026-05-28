@@ -1,3 +1,19 @@
+interface Location {
+  codigo_postal: string
+  concelho: string
+  distrito: string
+  freguesia: string
+  pais: string
+  rua: string
+  n_porta: string
+}
+
+interface Contact {
+  contacto: string
+  nome_contacto: string
+  descricao: string
+}
+
 interface FlatBusiness {
   nif_nipc: string
   geo_latitude: number
@@ -5,8 +21,12 @@ interface FlatBusiness {
   nome_entidade: string
   iban: string
   email_login?: string
-  locations: unknown[]
-  contacts: unknown[]
+  blocked?: boolean | number
+  reason?: string | null
+  url_certidao_permanente?: string
+  inicio_atividade?: string
+  locations?: Location[]
+  contacts?: Contact[]
 }
 
 interface Offer {
@@ -24,7 +44,6 @@ export default defineEventHandler(async () => {
   const businessRes = await $fetch<{ data: FlatBusiness[] }>(`${config.backendBase}/business`)
   const businesses = businessRes.data ?? []
 
-  // Fetch offers for all businesses in parallel
   const offersResults = await Promise.allSettled(
     businesses.map(b =>
       $fetch<{ offers: Offer[] }>(`${config.backendBase}/business/${b.nif_nipc}/offers`)
@@ -37,17 +56,23 @@ export default defineEventHandler(async () => {
       ? ((result as PromiseFulfilledResult<{ offers: Offer[] }>).value?.offers ?? [])
       : []
 
+    const isBlocked = Boolean(flat.blocked)
+
     return {
       resource: {
         nif_nipc: flat.nif_nipc,
-        geo_latitude: flat.geo_latitude ?? 0,
-        geo_longitude: flat.geo_longitude ?? 0
+        geo_latitude: Number(flat.geo_latitude) || 0,
+        geo_longitude: Number(flat.geo_longitude) || 0,
+        url_certidao_permanente: flat.url_certidao_permanente ?? '',
+        inicio_atividade: flat.inicio_atividade ?? ''
       },
       entity: {
         nif_nipc: flat.nif_nipc,
         nome_entidade: flat.nome_entidade ?? '',
         email_login: flat.email_login ?? '',
-        iban: flat.iban ?? ''
+        iban: flat.iban ?? '',
+        blocked: isBlocked,
+        reason: flat.reason ?? null
       },
       locations: flat.locations ?? [],
       contacts: flat.contacts ?? [],
@@ -59,7 +84,7 @@ export default defineEventHandler(async () => {
         valor_total: Number(o.valor_total),
         desconto: Number(o.desconto)
       })),
-      status: 'ATIVO' as const
+      status: (isBlocked ? 'SUSPENSO' : 'ATIVO') as 'ATIVO' | 'SUSPENSO'
     }
   })
 

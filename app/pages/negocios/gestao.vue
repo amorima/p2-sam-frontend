@@ -3,7 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Column, Row, SortingState, Table } from '@tanstack/table-core'
 import { useNeeds } from '~/composables/useNeeds'
-import type { Business, BusinessStatus } from '~/utils/mockData'
+import type { Business, BusinessStatus } from '~/utils/domain'
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
@@ -37,7 +37,8 @@ const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
 const tableRef = useTemplateRef<BusinessesTableRef>('tableRef')
 
 function businessStatus(b: Business): BusinessStatus {
-  return b.status ?? 'ATIVO'
+  if (b.status) return b.status
+  return b.entity.blocked ? 'SUSPENSO' : 'ATIVO'
 }
 
 function pedidosCount(nif: string) {
@@ -120,29 +121,39 @@ function openEdit(b: Business) {
   editOpen.value = true
 }
 
-function saveEdit() {
+const editSaving = ref(false)
+
+async function saveEdit() {
   if (!editTarget.value) return
   if (!editName.value.trim() || !editEmail.value.trim() || !editIban.value.trim()) {
     toast.add({ title: 'Campos obrigatórios', description: 'Preencha nome, email e IBAN.', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
-  updateBusiness(editTarget.value.resource.nif_nipc, b => ({
-    ...b,
-    entity: {
-      ...b.entity,
-      nome_entidade: editName.value.trim(),
-      email_login: editEmail.value.trim(),
-      iban: editIban.value.trim()
-    },
-    resource: {
-      ...b.resource,
-      geo_latitude: editLat.value,
-      geo_longitude: editLng.value
-    }
-  }))
-  toast.add({ title: 'Negócio atualizado', icon: 'i-lucide-check', color: 'success' })
-  editOpen.value = false
-  editTarget.value = null
+  editSaving.value = true
+  try {
+    await updateBusiness(editTarget.value.resource.nif_nipc, b => ({
+      ...b,
+      entity: {
+        ...b.entity,
+        nome_entidade: editName.value.trim(),
+        email_login: editEmail.value.trim(),
+        iban: editIban.value.trim()
+      },
+      resource: {
+        ...b.resource,
+        geo_latitude: editLat.value,
+        geo_longitude: editLng.value
+      }
+    }))
+    toast.add({ title: 'Negócio atualizado', icon: 'i-lucide-check', color: 'success' })
+    editOpen.value = false
+    editTarget.value = null
+  } catch (e) {
+    const msg = (e as { statusMessage?: string })?.statusMessage ?? 'Não foi possível guardar as alterações.'
+    toast.add({ title: 'Erro ao guardar', description: msg, icon: 'i-lucide-x', color: 'error' })
+  } finally {
+    editSaving.value = false
+  }
 }
 
 // Suspend / remove modals
@@ -154,24 +165,40 @@ function openRemove(b: Business) {
   removeOpen.value = true
 }
 
-function confirmRemove() {
+const removeBusy = ref(false)
+
+async function confirmRemove() {
   if (!removeTarget.value) return
   const nome = removeTarget.value.entity.nome_entidade
-  removeBusiness(removeTarget.value.resource.nif_nipc)
-  toast.add({ title: 'Negócio removido', description: `${nome} foi removido.`, icon: 'i-lucide-trash', color: 'error' })
-  removeOpen.value = false
-  removeTarget.value = null
+  const nif = removeTarget.value.resource.nif_nipc
+  removeBusy.value = true
+  try {
+    await removeBusiness(nif)
+    toast.add({ title: 'Negócio removido', description: `${nome} foi removido.`, icon: 'i-lucide-trash', color: 'error' })
+    removeOpen.value = false
+    removeTarget.value = null
+  } catch (e) {
+    const msg = (e as { statusMessage?: string })?.statusMessage ?? 'Não foi possível remover o negócio.'
+    toast.add({ title: 'Erro ao remover', description: msg, icon: 'i-lucide-x', color: 'error' })
+  } finally {
+    removeBusy.value = false
+  }
 }
 
-function toggleSuspend(b: Business) {
+async function toggleSuspend(b: Business) {
   const next: BusinessStatus = businessStatus(b) === 'ATIVO' ? 'SUSPENSO' : 'ATIVO'
-  setBusinessStatus(b.resource.nif_nipc, next)
-  toast.add({
-    title: next === 'SUSPENSO' ? 'Negócio suspenso' : 'Negócio reativado',
-    description: `${b.entity.nome_entidade} — ${next === 'SUSPENSO' ? 'não receberá novos pedidos.' : 'voltou a receber pedidos.'}`,
-    icon: next === 'SUSPENSO' ? 'i-lucide-pause' : 'i-lucide-play',
-    color: next === 'SUSPENSO' ? 'warning' : 'success'
-  })
+  try {
+    await setBusinessStatus(b.resource.nif_nipc, next, next === 'SUSPENSO' ? 'Suspenso pelo administrador' : undefined)
+    toast.add({
+      title: next === 'SUSPENSO' ? 'Negócio suspenso' : 'Negócio reativado',
+      description: `${b.entity.nome_entidade} — ${next === 'SUSPENSO' ? 'não receberá novos pedidos.' : 'voltou a receber pedidos.'}`,
+      icon: next === 'SUSPENSO' ? 'i-lucide-pause' : 'i-lucide-play',
+      color: next === 'SUSPENSO' ? 'warning' : 'success'
+    })
+  } catch (e) {
+    const msg = (e as { statusMessage?: string })?.statusMessage ?? 'Não foi possível alterar o estado.'
+    toast.add({ title: 'Erro', description: msg, icon: 'i-lucide-x', color: 'error' })
+  }
 }
 
 function getRowItems(row: Row<Business>) {
@@ -179,6 +206,11 @@ function getRowItems(row: Row<Business>) {
   const suspended = businessStatus(b) === 'SUSPENSO'
   return [
     { type: 'label', label: 'Ações' },
+    {
+      label: 'Ver detalhe e ofertas',
+      icon: 'i-lucide-eye',
+      to: `/negocios/meu?nif=${b.resource.nif_nipc}`
+    },
     {
       label: 'Copiar NIF/NIPC',
       icon: 'i-lucide-copy',
@@ -433,24 +465,6 @@ const columns: TableColumn<Business>[] = [
             <UFormField label="IBAN" required>
               <UInput v-model="editIban" class="w-full font-mono" />
             </UFormField>
-            <div class="grid grid-cols-2 gap-3">
-              <UFormField label="Latitude">
-                <UInput
-                  v-model.number="editLat"
-                  type="number"
-                  step="0.0001"
-                  class="w-full"
-                />
-              </UFormField>
-              <UFormField label="Longitude">
-                <UInput
-                  v-model.number="editLng"
-                  type="number"
-                  step="0.0001"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
             <div class="flex justify-end gap-2 pt-2">
               <UButton
                 label="Cancelar"
@@ -462,6 +476,7 @@ const columns: TableColumn<Business>[] = [
                 label="Guardar"
                 icon="i-lucide-check"
                 color="primary"
+                :loading="editSaving"
                 @click="saveEdit"
               />
             </div>
@@ -495,6 +510,7 @@ const columns: TableColumn<Business>[] = [
                 label="Remover"
                 icon="i-lucide-trash"
                 color="error"
+                :loading="removeBusy"
                 @click="confirmRemove"
               />
             </div>

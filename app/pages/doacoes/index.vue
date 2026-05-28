@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import { useLeads } from '~/composables/useLeads'
-import type { Lead, LeadEstado } from '~/utils/mockData'
+import type { Lead, LeadEstado } from '~/utils/domain'
 import { printPickupReport, type PickupReportLead } from '~/utils/pickupReportPDF'
 
 const UBadge = resolveComponent('UBadge')

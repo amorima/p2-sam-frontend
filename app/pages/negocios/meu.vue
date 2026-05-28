@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { useNeeds } from '~/composables/useNeeds'
-import type { BusinessOffer } from '~/utils/mockData'
+import type { BusinessOffer } from '~/utils/domain'
 
 const toast = useToast()
+const route = useRoute()
 const { isBusiness, businessNif, isAdmin } = useAuth()
-const { businesses, goodsServices, updateBusiness } = useNeeds()
+const { businesses, goodsServices, updateBusiness, addBusinessOffer, removeBusinessOffer } = useNeeds()
 
-if (isAdmin.value) {
-  await navigateTo('/negocios/registo')
-}
+const targetNif = computed(() => {
+  const queryNif = typeof route.query.nif === 'string' ? route.query.nif : undefined
+  if (isAdmin.value) return queryNif ?? businesses.value[0]?.resource.nif_nipc ?? null
+  return businessNif.value || null
+})
 
 const myBusiness = computed(() => {
-  if (!businessNif.value) return businesses.value[0] ?? null
-  return businesses.value.find(b => b.resource.nif_nipc === businessNif.value) ?? null
+  if (!targetNif.value) return null
+  return businesses.value.find(b => b.resource.nif_nipc === targetNif.value) ?? null
 })
 
 const editMode = ref(false)
@@ -29,23 +32,33 @@ watch(myBusiness, (b) => {
   }
 }, { immediate: true })
 
-function saveProfile() {
+const savingProfile = ref(false)
+
+async function saveProfile() {
   if (!myBusiness.value) return
   if (!editName.value.trim() || !editEmail.value.trim() || !editIban.value.trim()) {
     toast.add({ title: 'Campos obrigatórios', description: 'Preencha nome, email e IBAN.', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
-  updateBusiness(myBusiness.value.resource.nif_nipc, b => ({
-    ...b,
-    entity: {
-      ...b.entity,
-      nome_entidade: editName.value.trim(),
-      email_login: editEmail.value.trim(),
-      iban: editIban.value.trim()
-    }
-  }))
-  toast.add({ title: 'Perfil atualizado', icon: 'i-lucide-check', color: 'success' })
-  editMode.value = false
+  savingProfile.value = true
+  try {
+    await updateBusiness(myBusiness.value.resource.nif_nipc, b => ({
+      ...b,
+      entity: {
+        ...b.entity,
+        nome_entidade: editName.value.trim(),
+        email_login: editEmail.value.trim(),
+        iban: editIban.value.trim()
+      }
+    }))
+    toast.add({ title: 'Perfil atualizado', icon: 'i-lucide-check', color: 'success' })
+    editMode.value = false
+  } catch (e) {
+    const msg = (e as { statusMessage?: string })?.statusMessage ?? 'Não foi possível guardar o perfil.'
+    toast.add({ title: 'Erro ao guardar', description: msg, icon: 'i-lucide-x', color: 'error' })
+  } finally {
+    savingProfile.value = false
+  }
 }
 
 function cancelEdit() {
@@ -69,15 +82,12 @@ const categoryOptions = computed(() =>
   goodsServices.value.map(g => ({ label: `${g.tipo_bem_servico} (${g.tipo_bem === 'BEM' ? 'Bem' : 'Serviço'})`, value: g.tipo_bem_servico }))
 )
 
-function nextOfferId() {
-  const all = businesses.value.flatMap(b => b.offers.map(o => o.id_oferta))
-  return Math.max(900, ...all) + 1
-}
+const savingOffer = ref(false)
 
-function addOffer() {
+async function addOffer() {
   if (!myBusiness.value) return
   const cat = newCategory.value.trim()
-  if (!cat || !newDescription.value.trim() || !newValor.value || newValor.value <= 0) {
+  if (!cat || !newDescription.value.trim() || newValor.value === undefined || newValor.value === null || newValor.value <= 0) {
     toast.add({ title: 'Campos obrigatórios', description: 'Preencha categoria, descrição e valor.', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
@@ -85,33 +95,39 @@ function addOffer() {
     toast.add({ title: 'Categoria já existe', description: 'Esta categoria já está registada no seu negócio.', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
-  const newOffer: BusinessOffer = {
-    id_oferta: nextOfferId(),
-    negocio_nif_nipc: myBusiness.value.resource.nif_nipc,
-    tipo_bem_servico: cat,
-    descricao: newDescription.value.trim(),
-    valor_total: newValor.value,
-    desconto: newDesconto.value
+  savingOffer.value = true
+  try {
+    const tipo_bem = goodsServices.value.find(g => g.tipo_bem_servico === cat)?.tipo_bem ?? 'BEM'
+    await addBusinessOffer(myBusiness.value.resource.nif_nipc, {
+      tipo_bem_servico: cat,
+      descricao: newDescription.value.trim(),
+      valor_total: newValor.value,
+      desconto: newDesconto.value,
+      tipo_bem
+    })
+    toast.add({ title: 'Categoria adicionada', description: `${cat} adicionada ao seu negócio.`, icon: 'i-lucide-check', color: 'success' })
+    showAddOffer.value = false
+    newCategory.value = ''
+    newDescription.value = ''
+    newValor.value = undefined
+    newDesconto.value = 100
+  } catch (e) {
+    const msg = (e as { statusMessage?: string })?.statusMessage ?? 'Não foi possível adicionar a categoria.'
+    toast.add({ title: 'Erro', description: msg, icon: 'i-lucide-x', color: 'error' })
+  } finally {
+    savingOffer.value = false
   }
-  updateBusiness(myBusiness.value.resource.nif_nipc, b => ({
-    ...b,
-    offers: [...b.offers, newOffer]
-  }))
-  toast.add({ title: 'Categoria adicionada', description: `${cat} adicionada ao seu negócio.`, icon: 'i-lucide-check', color: 'success' })
-  showAddOffer.value = false
-  newCategory.value = ''
-  newDescription.value = ''
-  newValor.value = undefined
-  newDesconto.value = 100
 }
 
-function removeOffer(offerId: number) {
+async function removeOffer(offerId: number) {
   if (!myBusiness.value) return
-  updateBusiness(myBusiness.value.resource.nif_nipc, b => ({
-    ...b,
-    offers: b.offers.filter(o => o.id_oferta !== offerId)
-  }))
-  toast.add({ title: 'Categoria removida', icon: 'i-lucide-check', color: 'success' })
+  try {
+    await removeBusinessOffer(myBusiness.value.resource.nif_nipc, offerId)
+    toast.add({ title: 'Categoria removida', icon: 'i-lucide-check', color: 'success' })
+  } catch (e) {
+    const msg = (e as { statusMessage?: string })?.statusMessage ?? 'Não foi possível remover a categoria.'
+    toast.add({ title: 'Erro', description: msg, icon: 'i-lucide-x', color: 'error' })
+  }
 }
 
 function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'warning' | 'info' } {
@@ -124,14 +140,14 @@ function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'wa
 <template>
   <UDashboardPanel id="meu-negocio">
     <template #header>
-      <UDashboardNavbar title="O Meu Negócio">
+      <UDashboardNavbar :title="isAdmin && myBusiness ? `Detalhe — ${myBusiness.entity.nome_entidade}` : 'O Meu Negócio'">
         <template #leading>
           <UDashboardSidebarCollapse />
           <UButton
             icon="i-lucide-arrow-left"
             color="neutral"
             variant="ghost"
-            to="/negocios"
+            :to="isAdmin ? '/negocios/gestao' : '/negocios'"
             class="hidden lg:flex"
           />
         </template>
@@ -155,6 +171,7 @@ function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'wa
               label="Guardar"
               icon="i-lucide-check"
               color="primary"
+              :loading="savingProfile"
               @click="saveProfile"
             />
           </template>
@@ -309,6 +326,7 @@ function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'wa
                 icon="i-lucide-check"
                 color="primary"
                 size="sm"
+                :loading="savingOffer"
                 @click="addOffer"
               />
             </div>
@@ -347,7 +365,7 @@ function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'wa
                 {{ descontoLabel(offer).text }}
               </UBadge>
               <UButton
-                v-if="isBusiness"
+                v-if="isBusiness || isAdmin"
                 icon="i-lucide-trash-2"
                 color="error"
                 variant="ghost"

@@ -1,0 +1,2694 @@
+{
+  "data": [
+    {
+      "resource": {
+        "nif_nipc": "104200942",
+        "geo_latitude": 39.6001,
+        "geo_longitude": -8.3011,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/104200942.pdf",
+        "inicio_atividade": "1999-03-06T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "104200942",
+        "nome_entidade": "FlexWork 09",
+        "email_login": "flexwork09@sapo.pt",
+        "iban": "PT083730528577044524245",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2300-998",
+          "concelho": "Tomar",
+          "distrito": "Santarém",
+          "freguesia": "Serra",
+          "pais": "Portugal",
+          "rua": "R. de Augusto Gomes",
+          "n_porta": "22"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "964341349",
+          "nome_contacto": "FlexWork 09",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 35,
+          "negocio_nif_nipc": "104200942",
+          "tipo_bem_servico": "Passe mensal",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2845.6,
+          "desconto": 40.5
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "127641148",
+        "geo_latitude": 37.0882,
+        "geo_longitude": -8.2503,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/127641148.pdf",
+        "inicio_atividade": "2018-03-09T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "127641148",
+        "nome_entidade": "FlexWork 53",
+        "email_login": "flexwork53@clix.pt",
+        "iban": "PT245490483228086457974",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "8200-286",
+          "concelho": "Albufeira",
+          "distrito": "Faro",
+          "freguesia": "Albufeira",
+          "pais": "Portugal",
+          "rua": "Travessa das Japoneiras",
+          "n_porta": "62"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "anamoreira@example.com",
+          "nome_contacto": "FlexWork 53",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 15,
+          "negocio_nif_nipc": "127641148",
+          "tipo_bem_servico": "Material de escritório",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4971.2,
+          "desconto": 40.8
+        },
+        {
+          "id_oferta": 37,
+          "negocio_nif_nipc": "127641148",
+          "tipo_bem_servico": "Sapatos",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4262.06,
+          "desconto": 9.8
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "130419085",
+        "geo_latitude": 41.3562,
+        "geo_longitude": -8.1793,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/130419085.pdf",
+        "inicio_atividade": "2010-05-31T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "130419085",
+        "nome_entidade": "NovaMed 99",
+        "email_login": "novamed99@sapo.pt",
+        "iban": "PT377497971734313373124",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4610-452",
+          "concelho": "Felgueiras",
+          "distrito": "Porto",
+          "freguesia": "Moure",
+          "pais": "Portugal",
+          "rua": "Rua de Cunha",
+          "n_porta": "02"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "932691799",
+          "nome_contacto": "NovaMed 99",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 23,
+          "negocio_nif_nipc": "130419085",
+          "tipo_bem_servico": "Arroz",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2358.07,
+          "desconto": 4.05
+        },
+        {
+          "id_oferta": 34,
+          "negocio_nif_nipc": "130419085",
+          "tipo_bem_servico": "Sal",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2060.32,
+          "desconto": 46.58
+        },
+        {
+          "id_oferta": 74,
+          "negocio_nif_nipc": "130419085",
+          "tipo_bem_servico": "Leite",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 290.29,
+          "desconto": 38.82
+        },
+        {
+          "id_oferta": 76,
+          "negocio_nif_nipc": "130419085",
+          "tipo_bem_servico": "Limpeza de habitação",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4936.49,
+          "desconto": 47.7
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "143720924",
+        "geo_latitude": 41.3501,
+        "geo_longitude": -8.5356,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/143720924.pdf",
+        "inicio_atividade": "2012-12-24T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "143720924",
+        "nome_entidade": "UrbanBuild 58",
+        "email_login": "urbanbuild58@gmail.com",
+        "iban": "PT500847441617691173165",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4760-824",
+          "concelho": "Vila Nova de Famalicão",
+          "distrito": "Braga",
+          "freguesia": "Lousado",
+          "pais": "Portugal",
+          "rua": "Rua de Carvalho",
+          "n_porta": "74"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "yi-88598128",
+          "nome_contacto": "UrbanBuild 58",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "143922896",
+        "geo_latitude": 38.6501,
+        "geo_longitude": -28.1302,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/143922896.pdf",
+        "inicio_atividade": "2015-09-29T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "143922896",
+        "nome_entidade": "LogiFlow 92",
+        "email_login": "logiflow92@sapo.pt",
+        "iban": "PT344802875188611450983",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "9880-351",
+          "concelho": "Santa Cruz da Graciosa",
+          "distrito": "Azores",
+          "freguesia": "Santa Cruz da Graciosa",
+          "pais": "Portugal",
+          "rua": "Avenida de Cardoso",
+          "n_porta": "27"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "234985131",
+          "nome_contacto": "LogiFlow 92",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 61,
+          "negocio_nif_nipc": "143922896",
+          "tipo_bem_servico": "Medidor de tensão",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 53.92,
+          "desconto": 32.71
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "149139993",
+        "geo_latitude": 41.2272,
+        "geo_longitude": -8.6996,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/149139993.pdf",
+        "inicio_atividade": "2017-02-13T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "149139993",
+        "nome_entidade": "MediCare 63",
+        "email_login": "medicare63@hotmail.com",
+        "iban": "PT518108800950403345785",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4455-411",
+          "concelho": "Matosinhos",
+          "distrito": "Porto",
+          "freguesia": "Perafita",
+          "pais": "Portugal",
+          "rua": "Rua de Araújo",
+          "n_porta": "33"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "961331177",
+          "nome_contacto": "MediCare 63",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 6,
+          "negocio_nif_nipc": "149139993",
+          "tipo_bem_servico": "Transporte de idosos",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1707.22,
+          "desconto": 28.87
+        },
+        {
+          "id_oferta": 11,
+          "negocio_nif_nipc": "149139993",
+          "tipo_bem_servico": "Fraldas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1142.66,
+          "desconto": 44.52
+        },
+        {
+          "id_oferta": 42,
+          "negocio_nif_nipc": "149139993",
+          "tipo_bem_servico": "Passe mensal",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3077.76,
+          "desconto": 34.33
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "156092715",
+        "geo_latitude": 39.8166,
+        "geo_longitude": -8.0491,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/156092715.pdf",
+        "inicio_atividade": "2001-03-24T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "156092715",
+        "nome_entidade": "TechLuso 77",
+        "email_login": "techluso77@clix.pt",
+        "iban": "PT809215503313273783312",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "6100-682",
+          "concelho": "Sertã",
+          "distrito": "Castelo Branco",
+          "freguesia": "Pombas",
+          "pais": "Portugal",
+          "rua": "Alameda de Moradais Populares do Carriçal",
+          "n_porta": "83"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "965749675",
+          "nome_contacto": "TechLuso 77",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 5,
+          "negocio_nif_nipc": "156092715",
+          "tipo_bem_servico": "Lápis e canetas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 400.04,
+          "desconto": 43.79
+        },
+        {
+          "id_oferta": 41,
+          "negocio_nif_nipc": "156092715",
+          "tipo_bem_servico": "Sal",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 649.01,
+          "desconto": 39.62
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "158506754",
+        "geo_latitude": 41.3016,
+        "geo_longitude": -8.5498,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/158506754.pdf",
+        "inicio_atividade": "2023-08-19T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "158506754",
+        "nome_entidade": "AgroConde 46",
+        "email_login": "agroconde46@gmail.com",
+        "iban": "PT283717890283463055144",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4785-100",
+          "concelho": "Trofa",
+          "distrito": "Porto",
+          "freguesia": "São Martinho Bougado",
+          "pais": "Portugal",
+          "rua": "Av de Neves",
+          "n_porta": "39"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "919673081",
+          "nome_contacto": "AgroConde 46",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 10,
+          "negocio_nif_nipc": "158506754",
+          "tipo_bem_servico": "Acompanhamento de idosos",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 235.34,
+          "desconto": 44.19
+        },
+        {
+          "id_oferta": 50,
+          "negocio_nif_nipc": "158506754",
+          "tipo_bem_servico": "Vitaminas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2875.29,
+          "desconto": 48.67
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "166172485",
+        "geo_latitude": 38.4253,
+        "geo_longitude": -7.5349,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/166172485.pdf",
+        "inicio_atividade": "1998-03-13T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "166172485",
+        "nome_entidade": "TurboLean 48",
+        "email_login": "turbolean48@gmail.com",
+        "iban": "PT829512726843714029195",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "7200-343",
+          "concelho": "Reguengos de Monsaraz",
+          "distrito": "Évora",
+          "freguesia": "Reguengos de Monsaraz",
+          "pais": "Portugal",
+          "rua": "Travessa Alexandre Borges",
+          "n_porta": "27"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "240576878",
+          "nome_contacto": "TurboLean 48",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 26,
+          "negocio_nif_nipc": "166172485",
+          "tipo_bem_servico": "Massa",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4507.77,
+          "desconto": 7.5
+        },
+        {
+          "id_oferta": 80,
+          "negocio_nif_nipc": "166172485",
+          "tipo_bem_servico": "Lápis e canetas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2156.72,
+          "desconto": 38.92
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "173386485",
+        "geo_latitude": 40.4956,
+        "geo_longitude": -7.5935,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/173386485.pdf",
+        "inicio_atividade": "2019-05-05T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "173386485",
+        "nome_entidade": "NovaMed 32",
+        "email_login": "novamed32@sapo.pt",
+        "iban": "PT079777958554349394752",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "6290-357",
+          "concelho": "Gouveia",
+          "distrito": "Guarda",
+          "freguesia": "Gouveia",
+          "pais": "Portugal",
+          "rua": "Rua Maia",
+          "n_porta": "43"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "929845230",
+          "nome_contacto": "NovaMed 32",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "187113464",
+        "geo_latitude": 39.4667,
+        "geo_longitude": -8.2,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/187113464.pdf",
+        "inicio_atividade": "2024-10-24T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "187113464",
+        "nome_entidade": "EcoVerde 35",
+        "email_login": "ecoverde35@clix.pt",
+        "iban": "PT347885941295258043119",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2200-312",
+          "concelho": "Abrantes",
+          "distrito": "Santarém",
+          "freguesia": "Abrantes",
+          "pais": "Portugal",
+          "rua": "R. Joaquim Cruz",
+          "n_porta": "35"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "angelarocha@example.org",
+          "nome_contacto": "EcoVerde 35",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 21,
+          "negocio_nif_nipc": "187113464",
+          "tipo_bem_servico": "Material de escritório",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 871.09,
+          "desconto": 28.29
+        },
+        {
+          "id_oferta": 30,
+          "negocio_nif_nipc": "187113464",
+          "tipo_bem_servico": "Apoio ao arrendamento",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2234.48,
+          "desconto": 17.32
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "187799977",
+        "geo_latitude": 39.6001,
+        "geo_longitude": -8.3011,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/187799977.pdf",
+        "inicio_atividade": "1998-11-13T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "187799977",
+        "nome_entidade": "LogiFlow 46",
+        "email_login": "logiflow46@clix.pt",
+        "iban": "PT640417520040330672890",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2300-998",
+          "concelho": "Tomar",
+          "distrito": "Santarém",
+          "freguesia": "Serra",
+          "pais": "Portugal",
+          "rua": "R. de Augusto Gomes",
+          "n_porta": "22"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "216777368",
+          "nome_contacto": "LogiFlow 46",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 16,
+          "negocio_nif_nipc": "187799977",
+          "tipo_bem_servico": "Mochila escolar",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2948.88,
+          "desconto": 32.26
+        },
+        {
+          "id_oferta": 32,
+          "negocio_nif_nipc": "187799977",
+          "tipo_bem_servico": "Botas de chuva",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2660.43,
+          "desconto": 45.96
+        },
+        {
+          "id_oferta": 33,
+          "negocio_nif_nipc": "187799977",
+          "tipo_bem_servico": "Cobertor",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4146.83,
+          "desconto": 30.04
+        },
+        {
+          "id_oferta": 48,
+          "negocio_nif_nipc": "187799977",
+          "tipo_bem_servico": "Explicações escolares",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1510.09,
+          "desconto": 16.17
+        },
+        {
+          "id_oferta": 92,
+          "negocio_nif_nipc": "187799977",
+          "tipo_bem_servico": "Banco de horas voluntário",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2833.44,
+          "desconto": 49.36
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "189206312",
+        "geo_latitude": 41.3834,
+        "geo_longitude": -8.7636,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/189206312.pdf",
+        "inicio_atividade": "2003-11-16T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "189206312",
+        "nome_entidade": "DataBridge 02",
+        "email_login": "databridge02@sapo.pt",
+        "iban": "PT923370262766396666107",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4495-178",
+          "concelho": "Póvoa de Varzim",
+          "distrito": "Porto",
+          "freguesia": "Póvoa de Varzim",
+          "pais": "Portugal",
+          "rua": "Av de Gomes",
+          "n_porta": "70"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "200490200",
+          "nome_contacto": "DataBridge 02",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 82,
+          "negocio_nif_nipc": "189206312",
+          "tipo_bem_servico": "Fisioterapia",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 905.2,
+          "desconto": 49.84
+        },
+        {
+          "id_oferta": 90,
+          "negocio_nif_nipc": "189206312",
+          "tipo_bem_servico": "Paracetamol",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1160.12,
+          "desconto": 7.3
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "218927097",
+        "geo_latitude": 41.1821,
+        "geo_longitude": -8.6891,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/218927097.pdf",
+        "inicio_atividade": "2015-07-31T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "218927097",
+        "nome_entidade": "EcoVerde 31",
+        "email_login": "ecoverde31@sapo.pt",
+        "iban": "PT848317819286378021385",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4450-198",
+          "concelho": "Matosinhos",
+          "distrito": "Porto",
+          "freguesia": "Matosinhos",
+          "pais": "Portugal",
+          "rua": "Praça de Rocha",
+          "n_porta": "52"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "borgesclara@example.net",
+          "nome_contacto": "EcoVerde 31",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 2,
+          "negocio_nif_nipc": "218927097",
+          "tipo_bem_servico": "Ibuprofeno",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1144.94,
+          "desconto": 35.44
+        },
+        {
+          "id_oferta": 65,
+          "negocio_nif_nipc": "218927097",
+          "tipo_bem_servico": "Lápis e canetas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4577.39,
+          "desconto": 47.38
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "226628026",
+        "geo_latitude": 37.0882,
+        "geo_longitude": -8.2503,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/226628026.pdf",
+        "inicio_atividade": "2001-11-28T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "226628026",
+        "nome_entidade": "DataBridge 62",
+        "email_login": "databridge62@sapo.pt",
+        "iban": "PT500208822658649600983",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "8200-286",
+          "concelho": "Albufeira",
+          "distrito": "Faro",
+          "freguesia": "Albufeira",
+          "pais": "Portugal",
+          "rua": "Travessa das Japoneiras",
+          "n_porta": "62"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "968974937",
+          "nome_contacto": "DataBridge 62",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 38,
+          "negocio_nif_nipc": "226628026",
+          "tipo_bem_servico": "Gel de banho",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2995.68,
+          "desconto": 15.93
+        },
+        {
+          "id_oferta": 44,
+          "negocio_nif_nipc": "226628026",
+          "tipo_bem_servico": "Brinquedos para crianças",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 519.94,
+          "desconto": 42.68
+        },
+        {
+          "id_oferta": 68,
+          "negocio_nif_nipc": "226628026",
+          "tipo_bem_servico": "Almofada",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3075.99,
+          "desconto": 16.68
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "227494399",
+        "geo_latitude": 40.841,
+        "geo_longitude": -8.4756,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/227494399.pdf",
+        "inicio_atividade": "2013-08-25T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "227494399",
+        "nome_entidade": "NanoTech 92",
+        "email_login": "nanotech92@hotmail.com",
+        "iban": "PT170946912244631280122",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "3720-234",
+          "concelho": "Oliveira de Azeméis",
+          "distrito": "Aveiro",
+          "freguesia": "Oliveira de Azeméis",
+          "pais": "Portugal",
+          "rua": "Praça de Moradias Populares do Eng.º Machado ",
+          "n_porta": "60"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "256774384",
+          "nome_contacto": "NanoTech 92",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 45,
+          "negocio_nif_nipc": "227494399",
+          "tipo_bem_servico": "Cobertor",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3552.81,
+          "desconto": 3.95
+        },
+        {
+          "id_oferta": 55,
+          "negocio_nif_nipc": "227494399",
+          "tipo_bem_servico": "Transporte para consultas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4323.14,
+          "desconto": 43.58
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "237065099",
+        "geo_latitude": 40.9838,
+        "geo_longitude": -7.6177,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/237065099.pdf",
+        "inicio_atividade": "2004-05-09T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "237065099",
+        "nome_entidade": "SafeGuard 51",
+        "email_login": "safeguard51@hotmail.com",
+        "iban": "PT726800689694028468300",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "3620-315",
+          "concelho": "Moimenta da Beira",
+          "distrito": "Viseu",
+          "freguesia": "Alto do Facho",
+          "pais": "Portugal",
+          "rua": "Alameda Maia",
+          "n_porta": "60"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "wmartins@example.net",
+          "nome_contacto": "SafeGuard 51",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 87,
+          "negocio_nif_nipc": "237065099",
+          "tipo_bem_servico": "Reparações domésticas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3735.2,
+          "desconto": 25.57
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "251740260",
+        "geo_latitude": 39.3558,
+        "geo_longitude": -9.3811,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/251740260.pdf",
+        "inicio_atividade": "2016-01-18T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "251740260",
+        "nome_entidade": "AquaClean 63",
+        "email_login": "aquaclean63@gmail.com",
+        "iban": "PT365038733849455682463",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2520-560",
+          "concelho": "Peniche",
+          "distrito": "Leiria",
+          "freguesia": "Peniche",
+          "pais": "Portugal",
+          "rua": "Travessa de Henriques",
+          "n_porta": "85"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "IR-97192964",
+          "nome_contacto": "AquaClean 63",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 53,
+          "negocio_nif_nipc": "251740260",
+          "tipo_bem_servico": "Brinquedos para crianças",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3914.8,
+          "desconto": 18.69
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "268000659",
+        "geo_latitude": 37.7167,
+        "geo_longitude": -25.4333,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/268000659.pdf",
+        "inicio_atividade": "2024-12-15T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "268000659",
+        "nome_entidade": "UrbanBuild 87",
+        "email_login": "urbanbuild87@hotmail.com",
+        "iban": "PT506357593099006581963",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "9680-120",
+          "concelho": "Vila Franca do Campo",
+          "distrito": "Azores",
+          "freguesia": "Vila Franca do Campo",
+          "pais": "Portugal",
+          "rua": "Praça Guerreiro",
+          "n_porta": "28"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "242677214",
+          "nome_contacto": "UrbanBuild 87",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 36,
+          "negocio_nif_nipc": "268000659",
+          "tipo_bem_servico": "Acompanhamento de idosos",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 706.26,
+          "desconto": 27.44
+        },
+        {
+          "id_oferta": 40,
+          "negocio_nif_nipc": "268000659",
+          "tipo_bem_servico": "Lanternas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2339.21,
+          "desconto": 30.79
+        },
+        {
+          "id_oferta": 56,
+          "negocio_nif_nipc": "268000659",
+          "tipo_bem_servico": "Champô",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2345.17,
+          "desconto": 17.75
+        },
+        {
+          "id_oferta": 67,
+          "negocio_nif_nipc": "268000659",
+          "tipo_bem_servico": "Esfregão",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2736.54,
+          "desconto": 24.92
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "268529921",
+        "geo_latitude": 41.5231,
+        "geo_longitude": -8.7513,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/268529921.pdf",
+        "inicio_atividade": "1998-05-16T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "268529921",
+        "nome_entidade": "AquaClean 61",
+        "email_login": "aquaclean61@clix.pt",
+        "iban": "PT166644918352762097669",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4740-633",
+          "concelho": "Esposende",
+          "distrito": "Braga",
+          "freguesia": "Chouso",
+          "pais": "Portugal",
+          "rua": "Av Juliana Mendes",
+          "n_porta": "86"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "bp-66432891",
+          "nome_contacto": "AquaClean 61",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "273161601",
+        "geo_latitude": 39.5144,
+        "geo_longitude": -9.1311,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/273161601.pdf",
+        "inicio_atividade": "1999-05-05T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "273161601",
+        "nome_entidade": "MediCare 92",
+        "email_login": "medicare92@gmail.com",
+        "iban": "PT837196676620359507470",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2460-680",
+          "concelho": "Alcobaça",
+          "distrito": "Leiria",
+          "freguesia": "São Martinho do Porto",
+          "pais": "Portugal",
+          "rua": "Alameda Vicente",
+          "n_porta": "54"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "231957381",
+          "nome_contacto": "MediCare 92",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 17,
+          "negocio_nif_nipc": "273161601",
+          "tipo_bem_servico": "Apoio ao arrendamento",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 635.21,
+          "desconto": 1.64
+        },
+        {
+          "id_oferta": 69,
+          "negocio_nif_nipc": "273161601",
+          "tipo_bem_servico": "Pinturas e obras",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 516.76,
+          "desconto": 30.27
+        },
+        {
+          "id_oferta": 96,
+          "negocio_nif_nipc": "273161601",
+          "tipo_bem_servico": "Botas de chuva",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4413.35,
+          "desconto": 17.57
+        },
+        {
+          "id_oferta": 97,
+          "negocio_nif_nipc": "273161601",
+          "tipo_bem_servico": "Fisioterapia",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3300.91,
+          "desconto": 8.54
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "501096545",
+        "geo_latitude": 39.7128,
+        "geo_longitude": -8.5274,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/501096545.pdf",
+        "inicio_atividade": "2009-09-18T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "501096545",
+        "nome_entidade": "InovaMais 33",
+        "email_login": "inovamais33@gmail.com",
+        "iban": "PT968376149222499329992",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2435-038",
+          "concelho": "Ourém",
+          "distrito": "Santarém",
+          "freguesia": "Castelo",
+          "pais": "Portugal",
+          "rua": "Travessa de Nascimento",
+          "n_porta": "41"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "zO-16235976",
+          "nome_contacto": "InovaMais 33",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 75,
+          "negocio_nif_nipc": "501096545",
+          "tipo_bem_servico": "Formação profissional",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3138.05,
+          "desconto": 19.14
+        },
+        {
+          "id_oferta": 89,
+          "negocio_nif_nipc": "501096545",
+          "tipo_bem_servico": "Lixívia",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3901.56,
+          "desconto": 33.24
+        },
+        {
+          "id_oferta": 95,
+          "negocio_nif_nipc": "501096545",
+          "tipo_bem_servico": "Apoio jurídico",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3761.24,
+          "desconto": 15.4
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "505687095",
+        "geo_latitude": 41.3127,
+        "geo_longitude": -8.6111,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/505687095.pdf",
+        "inicio_atividade": "2007-10-27T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "505687095",
+        "nome_entidade": "NovaMed 94",
+        "email_login": "novamed94@hotmail.com",
+        "iban": "PT367233245126375085921",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4745-122",
+          "concelho": "Trofa",
+          "distrito": "Porto",
+          "freguesia": "Alvarelhos",
+          "pais": "Portugal",
+          "rua": "Alameda Guilherme Machado",
+          "n_porta": "64"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "moraisafonso@example.com",
+          "nome_contacto": "NovaMed 94",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 14,
+          "negocio_nif_nipc": "505687095",
+          "tipo_bem_servico": "Calças de ganga",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4112.5,
+          "desconto": 44.89
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "512568346",
+        "geo_latitude": 41.2,
+        "geo_longitude": -8.6333,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/512568346.pdf",
+        "inicio_atividade": "2007-08-13T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "512568346",
+        "nome_entidade": "SolTec 51",
+        "email_login": "soltec51@hotmail.com",
+        "iban": "PT980349098437100542189",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4460-736",
+          "concelho": "Matosinhos",
+          "distrito": "Porto",
+          "freguesia": "Custóias",
+          "pais": "Portugal",
+          "rua": "Largo Bernardo Tavares",
+          "n_porta": "45"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "gmorais@example.com",
+          "nome_contacto": "SolTec 51",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 39,
+          "negocio_nif_nipc": "512568346",
+          "tipo_bem_servico": "Apoio psicológico",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1080.24,
+          "desconto": 5.59
+        },
+        {
+          "id_oferta": 49,
+          "negocio_nif_nipc": "512568346",
+          "tipo_bem_servico": "Gel de banho",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1250.6,
+          "desconto": 18.6
+        },
+        {
+          "id_oferta": 52,
+          "negocio_nif_nipc": "512568346",
+          "tipo_bem_servico": "Paracetamol",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 473.09,
+          "desconto": 47.38
+        },
+        {
+          "id_oferta": 70,
+          "negocio_nif_nipc": "512568346",
+          "tipo_bem_servico": "Consulta de enfermagem",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4245.35,
+          "desconto": 20.71
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "513195977",
+        "geo_latitude": 40.9577,
+        "geo_longitude": -8.6275,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/513195977.pdf",
+        "inicio_atividade": "2011-12-29T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "513195977",
+        "nome_entidade": "BioLab 83",
+        "email_login": "biolab83@hotmail.com",
+        "iban": "PT605551035132002730379",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "3885-448",
+          "concelho": "Ovar",
+          "distrito": "Aveiro",
+          "freguesia": "Esmoriz",
+          "pais": "Portugal",
+          "rua": "Travessa de Cláudio Carneiro",
+          "n_porta": "63"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "238022198",
+          "nome_contacto": "BioLab 83",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 9,
+          "negocio_nif_nipc": "513195977",
+          "tipo_bem_servico": "Livros escolares",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1914.89,
+          "desconto": 27.15
+        },
+        {
+          "id_oferta": 18,
+          "negocio_nif_nipc": "513195977",
+          "tipo_bem_servico": "Consulta de enfermagem",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3997.81,
+          "desconto": 31.15
+        },
+        {
+          "id_oferta": 43,
+          "negocio_nif_nipc": "513195977",
+          "tipo_bem_servico": "Paracetamol",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3530.48,
+          "desconto": 23.53
+        },
+        {
+          "id_oferta": 78,
+          "negocio_nif_nipc": "513195977",
+          "tipo_bem_servico": "Pilhas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4924.44,
+          "desconto": 34.2
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "514419285",
+        "geo_latitude": 41.5882,
+        "geo_longitude": -8.582,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/514419285.pdf",
+        "inicio_atividade": "2014-05-07T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "514419285",
+        "nome_entidade": "SmartRede 00",
+        "email_login": "smartrede00@clix.pt",
+        "iban": "PT542834442000835284214",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4750-657",
+          "concelho": "Barcelos",
+          "distrito": "Braga",
+          "freguesia": "Roriz",
+          "pais": "Portugal",
+          "rua": "Travessa Fonseca",
+          "n_porta": "34"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "rh-83973612",
+          "nome_contacto": "SmartRede 00",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 83,
+          "negocio_nif_nipc": "514419285",
+          "tipo_bem_servico": "Casaco de inverno",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4749.3,
+          "desconto": 1.54
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "517847722",
+        "geo_latitude": 41.3276,
+        "geo_longitude": -8.6956,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/517847722.pdf",
+        "inicio_atividade": "2016-12-03T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "517847722",
+        "nome_entidade": "MarInov 38",
+        "email_login": "marinov38@hotmail.com",
+        "iban": "PT152893948083059252033",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4485-015",
+          "concelho": "Vila do Conde",
+          "distrito": "Porto",
+          "freguesia": "Fajozes",
+          "pais": "Portugal",
+          "rua": "Avenida Bruna Correia",
+          "n_porta": "89"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "258266892",
+          "nome_contacto": "MarInov 38",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "528566096",
+        "geo_latitude": 39.1324,
+        "geo_longitude": -7.5901,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/528566096.pdf",
+        "inicio_atividade": "2005-01-08T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "528566096",
+        "nome_entidade": "EcoVerde 16",
+        "email_login": "ecoverde16@hotmail.com",
+        "iban": "PT555750939121378400416",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "7460-012",
+          "concelho": "Fronteira",
+          "distrito": "Portalegre",
+          "freguesia": "Cabeço de Vide",
+          "pais": "Portugal",
+          "rua": "Alameda Faria",
+          "n_porta": "98"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "204548915",
+          "nome_contacto": "EcoVerde 16",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 19,
+          "negocio_nif_nipc": "528566096",
+          "tipo_bem_servico": "Reparações domésticas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1558.9,
+          "desconto": 37.69
+        },
+        {
+          "id_oferta": 81,
+          "negocio_nif_nipc": "528566096",
+          "tipo_bem_servico": "Camisolas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 548.52,
+          "desconto": 26.11
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "536223895",
+        "geo_latitude": 39.9187,
+        "geo_longitude": -8.4381,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/536223895.pdf",
+        "inicio_atividade": "2020-04-29T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "536223895",
+        "nome_entidade": "GreenEnergy 77",
+        "email_login": "greenenergy77@gmail.com",
+        "iban": "PT605435570088169105733",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "3240-228",
+          "concelho": "Ansião",
+          "distrito": "Leiria",
+          "freguesia": "Pinhal",
+          "pais": "Portugal",
+          "rua": "Avenida Ribeiro",
+          "n_porta": "51"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "ricardomendes@example.net",
+          "nome_contacto": "GreenEnergy 77",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "540900480",
+        "geo_latitude": 41.2272,
+        "geo_longitude": -8.6996,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/540900480.pdf",
+        "inicio_atividade": "2008-02-22T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "540900480",
+        "nome_entidade": "DigitalPorto 27",
+        "email_login": "digitalporto27@hotmail.com",
+        "iban": "PT657036105955250632173",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4455-436",
+          "concelho": "Matosinhos",
+          "distrito": "Porto",
+          "freguesia": "Perafita",
+          "pais": "Portugal",
+          "rua": "Avenida Barbosa",
+          "n_porta": "14"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "242549527",
+          "nome_contacto": "DigitalPorto 27",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "541705092",
+        "geo_latitude": 41.4757,
+        "geo_longitude": -8.145,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/541705092.pdf",
+        "inicio_atividade": "2017-11-08T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "541705092",
+        "nome_entidade": "MarInov 30",
+        "email_login": "marinov30@gmail.com",
+        "iban": "PT237068241613482230974",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4820-064",
+          "concelho": "Fafe",
+          "distrito": "Braga",
+          "freguesia": "Estorãos",
+          "pais": "Portugal",
+          "rua": "Avenida Vieira",
+          "n_porta": "27"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "tomasguerreiro@example.com",
+          "nome_contacto": "MarInov 30",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 71,
+          "negocio_nif_nipc": "541705092",
+          "tipo_bem_servico": "Limpeza de habitação",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 421.95,
+          "desconto": 9.15
+        },
+        {
+          "id_oferta": 91,
+          "negocio_nif_nipc": "541705092",
+          "tipo_bem_servico": "Cuidados ao domicílio",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2178.33,
+          "desconto": 7.46
+        },
+        {
+          "id_oferta": 93,
+          "negocio_nif_nipc": "541705092",
+          "tipo_bem_servico": "Pinturas e obras",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4300.36,
+          "desconto": 37.4
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "542034982",
+        "geo_latitude": 38.7746,
+        "geo_longitude": -9.3276,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/542034982.pdf",
+        "inicio_atividade": "2008-12-29T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "542034982",
+        "nome_entidade": "SolTec 20",
+        "email_login": "soltec20@hotmail.com",
+        "iban": "PT396058039146603895158",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2635-429",
+          "concelho": "Sintra",
+          "distrito": "Lisboa",
+          "freguesia": "Rio de Mouro",
+          "pais": "Portugal",
+          "rua": "Largo Renato Magalhães",
+          "n_porta": "73"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "961712173",
+          "nome_contacto": "SolTec 20",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 27,
+          "negocio_nif_nipc": "542034982",
+          "tipo_bem_servico": "Régua e compasso",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 304.94,
+          "desconto": 20.55
+        },
+        {
+          "id_oferta": 100,
+          "negocio_nif_nipc": "542034982",
+          "tipo_bem_servico": "Apoio a literacia digital",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4421.43,
+          "desconto": 48.22
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "544974038",
+        "geo_latitude": 37.0882,
+        "geo_longitude": -8.2503,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/544974038.pdf",
+        "inicio_atividade": "2013-08-23T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "544974038",
+        "nome_entidade": "NanoTech 91",
+        "email_login": "nanotech91@hotmail.com",
+        "iban": "PT199455606533041311658",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "8200-286",
+          "concelho": "Albufeira",
+          "distrito": "Faro",
+          "freguesia": "Albufeira",
+          "pais": "Portugal",
+          "rua": "Travessa das Japoneiras",
+          "n_porta": "62"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "enzosoares@example.com",
+          "nome_contacto": "NanoTech 91",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "545176516",
+        "geo_latitude": 39.7835,
+        "geo_longitude": -7.8383,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/545176516.pdf",
+        "inicio_atividade": "2000-07-17T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "545176516",
+        "nome_entidade": "AquaClean 08",
+        "email_login": "aquaclean08@gmail.com",
+        "iban": "PT496862202784842476355",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "6150-729",
+          "concelho": "Proença-a-Nova",
+          "distrito": "Castelo Branco",
+          "freguesia": "Póvoa",
+          "pais": "Portugal",
+          "rua": "Av de Lopes",
+          "n_porta": "74"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "anascimento@example.org",
+          "nome_contacto": "AquaClean 08",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 57,
+          "negocio_nif_nipc": "545176516",
+          "tipo_bem_servico": "Apoio social",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4749.63,
+          "desconto": 30.02
+        },
+        {
+          "id_oferta": 88,
+          "negocio_nif_nipc": "545176516",
+          "tipo_bem_servico": "Sopa em pó",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4445.86,
+          "desconto": 18.76
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "550771155",
+        "geo_latitude": 39.05,
+        "geo_longitude": -9.1167,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/550771155.pdf",
+        "inicio_atividade": "2010-10-04T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "550771155",
+        "nome_entidade": "GreenEnergy 81",
+        "email_login": "greenenergy81@clix.pt",
+        "iban": "PT722929382157499993373",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2580-261",
+          "concelho": "Alenquer",
+          "distrito": "Lisboa",
+          "freguesia": "Soeiro Cunhado",
+          "pais": "Portugal",
+          "rua": "Av Goelas de Pau",
+          "n_porta": "64"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "239196152",
+          "nome_contacto": "GreenEnergy 81",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 20,
+          "negocio_nif_nipc": "550771155",
+          "tipo_bem_servico": "Banco de horas voluntário",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 812.36,
+          "desconto": 38.89
+        },
+        {
+          "id_oferta": 47,
+          "negocio_nif_nipc": "550771155",
+          "tipo_bem_servico": "Conservas de peixe",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 36.78,
+          "desconto": 33.18
+        },
+        {
+          "id_oferta": 77,
+          "negocio_nif_nipc": "550771155",
+          "tipo_bem_servico": "Cobertor",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2518.87,
+          "desconto": 27.36
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "553768475",
+        "geo_latitude": 39.6283,
+        "geo_longitude": -8.6785,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/553768475.pdf",
+        "inicio_atividade": "2018-06-04T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "553768475",
+        "nome_entidade": "InovaMais 80",
+        "email_login": "inovamais80@hotmail.com",
+        "iban": "PT889856645680347272036",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2495-341",
+          "concelho": "Ourém",
+          "distrito": "Santarém",
+          "freguesia": "Cova da Iria",
+          "pais": "Portugal",
+          "rua": "Alameda Ema Coelho",
+          "n_porta": "24"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "Rg-92287676",
+          "nome_contacto": "InovaMais 80",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 62,
+          "negocio_nif_nipc": "553768475",
+          "tipo_bem_servico": "Açúcar",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3443.76,
+          "desconto": 10.33
+        },
+        {
+          "id_oferta": 63,
+          "negocio_nif_nipc": "553768475",
+          "tipo_bem_servico": "Serviço de mobilidade reduzida",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3340.2,
+          "desconto": 48.58
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "557852332",
+        "geo_latitude": 37.7167,
+        "geo_longitude": -25.4333,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/557852332.pdf",
+        "inicio_atividade": "2007-12-08T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "557852332",
+        "nome_entidade": "MediCare 41",
+        "email_login": "medicare41@clix.pt",
+        "iban": "PT208617591074081536586",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "9680-120",
+          "concelho": "Vila Franca do Campo",
+          "distrito": "Azores",
+          "freguesia": "Vila Franca do Campo",
+          "pais": "Portugal",
+          "rua": "Praça Guerreiro",
+          "n_porta": "28"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "gasparleonardo@example.org",
+          "nome_contacto": "MediCare 41",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 1,
+          "negocio_nif_nipc": "557852332",
+          "tipo_bem_servico": "Borracha",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 504.22,
+          "desconto": 49.5
+        },
+        {
+          "id_oferta": 3,
+          "negocio_nif_nipc": "557852332",
+          "tipo_bem_servico": "Termómetro",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1899.94,
+          "desconto": 5.11
+        },
+        {
+          "id_oferta": 29,
+          "negocio_nif_nipc": "557852332",
+          "tipo_bem_servico": "Álcool etílico",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3885.85,
+          "desconto": 8.34
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "561323529",
+        "geo_latitude": 41.5503,
+        "geo_longitude": -8.4201,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/561323529.pdf",
+        "inicio_atividade": "2002-08-17T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "561323529",
+        "nome_entidade": "SolTec 73",
+        "email_login": "soltec73@hotmail.com",
+        "iban": "PT985495549291755493453",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4700-038",
+          "concelho": "Braga",
+          "distrito": "Braga",
+          "freguesia": "Braga",
+          "pais": "Portugal",
+          "rua": "Travessa Brito",
+          "n_porta": "74"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "Vy-42449622",
+          "nome_contacto": "SolTec 73",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 54,
+          "negocio_nif_nipc": "561323529",
+          "tipo_bem_servico": "Livros escolares",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2063.01,
+          "desconto": 28.45
+        },
+        {
+          "id_oferta": 73,
+          "negocio_nif_nipc": "561323529",
+          "tipo_bem_servico": "Açúcar",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2180.94,
+          "desconto": 44.18
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "565092794",
+        "geo_latitude": 41.1023,
+        "geo_longitude": -7.1688,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/565092794.pdf",
+        "inicio_atividade": "2011-11-10T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "565092794",
+        "nome_entidade": "BioLab 07",
+        "email_login": "biolab07@clix.pt",
+        "iban": "PT806550706742218908083",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "5155-657",
+          "concelho": "Vila Nova de Foz Côa",
+          "distrito": "Guarda",
+          "freguesia": "Santo Amaro",
+          "pais": "Portugal",
+          "rua": "Avenida do Paço",
+          "n_porta": "68"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "210944239",
+          "nome_contacto": "BioLab 07",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 72,
+          "negocio_nif_nipc": "565092794",
+          "tipo_bem_servico": "Livros escolares",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2255.16,
+          "desconto": 24.17
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "566713107",
+        "geo_latitude": 41.2,
+        "geo_longitude": -8.6333,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/566713107.pdf",
+        "inicio_atividade": "2000-11-17T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "566713107",
+        "nome_entidade": "FlexWork 49",
+        "email_login": "flexwork49@sapo.pt",
+        "iban": "PT799608150279141705795",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4460-736",
+          "concelho": "Matosinhos",
+          "distrito": "Porto",
+          "freguesia": "Custóias",
+          "pais": "Portugal",
+          "rua": "Largo Bernardo Tavares",
+          "n_porta": "45"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "emendes@example.com",
+          "nome_contacto": "FlexWork 49",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 24,
+          "negocio_nif_nipc": "566713107",
+          "tipo_bem_servico": "Sapatos",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4001.92,
+          "desconto": 44.9
+        },
+        {
+          "id_oferta": 28,
+          "negocio_nif_nipc": "566713107",
+          "tipo_bem_servico": "Sabonete",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4158.9,
+          "desconto": 1.58
+        },
+        {
+          "id_oferta": 51,
+          "negocio_nif_nipc": "566713107",
+          "tipo_bem_servico": "Lixívia",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2405.98,
+          "desconto": 10.89
+        },
+        {
+          "id_oferta": 58,
+          "negocio_nif_nipc": "566713107",
+          "tipo_bem_servico": "Álcool etílico",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4129.47,
+          "desconto": 17.04
+        },
+        {
+          "id_oferta": 86,
+          "negocio_nif_nipc": "566713107",
+          "tipo_bem_servico": "Fraldas",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1503.95,
+          "desconto": 44.72
+        },
+        {
+          "id_oferta": 94,
+          "negocio_nif_nipc": "566713107",
+          "tipo_bem_servico": "Champô",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4564.71,
+          "desconto": 14.68
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "571110518",
+        "geo_latitude": 39.4245,
+        "geo_longitude": -7.7174,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/571110518.pdf",
+        "inicio_atividade": "2012-12-14T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "571110518",
+        "nome_entidade": "UrbanBuild 61",
+        "email_login": "urbanbuild61@gmail.com",
+        "iban": "PT423310756253334238475",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "6050-513",
+          "concelho": "Nisa",
+          "distrito": "Portalegre",
+          "freguesia": "Tolosa",
+          "pais": "Portugal",
+          "rua": "R. Constança Gonçalves",
+          "n_porta": "38"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "zmatos@example.org",
+          "nome_contacto": "UrbanBuild 61",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 22,
+          "negocio_nif_nipc": "571110518",
+          "tipo_bem_servico": "Sopa em pó",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1490.87,
+          "desconto": 12.38
+        },
+        {
+          "id_oferta": 46,
+          "negocio_nif_nipc": "571110518",
+          "tipo_bem_servico": "Meias",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1221.64,
+          "desconto": 37.52
+        },
+        {
+          "id_oferta": 59,
+          "negocio_nif_nipc": "571110518",
+          "tipo_bem_servico": "Leite",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2395.99,
+          "desconto": 6.3
+        },
+        {
+          "id_oferta": 60,
+          "negocio_nif_nipc": "571110518",
+          "tipo_bem_servico": "Brinquedos para crianças",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4608.7,
+          "desconto": 7.87
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "573053735",
+        "geo_latitude": 39.1324,
+        "geo_longitude": -7.5901,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/573053735.pdf",
+        "inicio_atividade": "2016-06-27T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "573053735",
+        "nome_entidade": "GreenEnergy 12",
+        "email_login": "greenenergy12@clix.pt",
+        "iban": "PT159646059415069595031",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "7460-012",
+          "concelho": "Fronteira",
+          "distrito": "Portalegre",
+          "freguesia": "Cabeço de Vide",
+          "pais": "Portugal",
+          "rua": "Alameda Faria",
+          "n_porta": "98"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "279350144",
+          "nome_contacto": "GreenEnergy 12",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 25,
+          "negocio_nif_nipc": "573053735",
+          "tipo_bem_servico": "Álcool etílico",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1576.73,
+          "desconto": 32.96
+        },
+        {
+          "id_oferta": 79,
+          "negocio_nif_nipc": "573053735",
+          "tipo_bem_servico": "Explicações escolares",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3380.42,
+          "desconto": 18.74
+        },
+        {
+          "id_oferta": 84,
+          "negocio_nif_nipc": "573053735",
+          "tipo_bem_servico": "Brinquedos para crianças",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1810.51,
+          "desconto": 1.55
+        },
+        {
+          "id_oferta": 85,
+          "negocio_nif_nipc": "573053735",
+          "tipo_bem_servico": "Apoio social",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4010.03,
+          "desconto": 25.84
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "577191165",
+        "geo_latitude": 41.3127,
+        "geo_longitude": -8.6111,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/577191165.pdf",
+        "inicio_atividade": "2009-06-14T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "577191165",
+        "nome_entidade": "TechLuso 25",
+        "email_login": "techluso25@gmail.com",
+        "iban": "PT311563882472431420068",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4745-122",
+          "concelho": "Trofa",
+          "distrito": "Porto",
+          "freguesia": "Alvarelhos",
+          "pais": "Portugal",
+          "rua": "Alameda Guilherme Machado",
+          "n_porta": "64"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "281412036",
+          "nome_contacto": "TechLuso 25",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 4,
+          "negocio_nif_nipc": "577191165",
+          "tipo_bem_servico": "Conservas de peixe",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 575.33,
+          "desconto": 10.84
+        },
+        {
+          "id_oferta": 64,
+          "negocio_nif_nipc": "577191165",
+          "tipo_bem_servico": "Meias",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2901.94,
+          "desconto": 40.1
+        },
+        {
+          "id_oferta": 99,
+          "negocio_nif_nipc": "577191165",
+          "tipo_bem_servico": "Transporte de idosos",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 1826.69,
+          "desconto": 14.87
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "577399611",
+        "geo_latitude": 38.5424,
+        "geo_longitude": -9.0537,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/577399611.pdf",
+        "inicio_atividade": "2024-04-05T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "577399611",
+        "nome_entidade": "TurboLean 33",
+        "email_login": "turbolean33@hotmail.com",
+        "iban": "PT710651210417432869737",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2975-138",
+          "concelho": "Sesimbra",
+          "distrito": "Setúbal",
+          "freguesia": "Quinta do Conde",
+          "pais": "Portugal",
+          "rua": "Avenida de Araújo",
+          "n_porta": "80"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "dv-44189747",
+          "nome_contacto": "TurboLean 33",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 7,
+          "negocio_nif_nipc": "577399611",
+          "tipo_bem_servico": "Transporte escolar",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2197.37,
+          "desconto": 9.49
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "581692331",
+        "geo_latitude": 41.2004,
+        "geo_longitude": -8.6025,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/581692331.pdf",
+        "inicio_atividade": "2002-08-05T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "581692331",
+        "nome_entidade": "SmartRede 60",
+        "email_login": "smartrede60@hotmail.com",
+        "iban": "PT933187329739690529146",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4465-083",
+          "concelho": "Matosinhos",
+          "distrito": "Porto",
+          "freguesia": "São Mamede de Infesta",
+          "pais": "Portugal",
+          "rua": "Alameda Cruz",
+          "n_porta": "31"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "968324970",
+          "nome_contacto": "SmartRede 60",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 13,
+          "negocio_nif_nipc": "581692331",
+          "tipo_bem_servico": "Gel de banho",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3433.27,
+          "desconto": 35.26
+        },
+        {
+          "id_oferta": 98,
+          "negocio_nif_nipc": "581692331",
+          "tipo_bem_servico": "Esfregão",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 3733.06,
+          "desconto": 15.08
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "586599907",
+        "geo_latitude": 41.3127,
+        "geo_longitude": -8.6111,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/586599907.pdf",
+        "inicio_atividade": "2005-03-10T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "586599907",
+        "nome_entidade": "SafeGuard 70",
+        "email_login": "safeguard70@hotmail.com",
+        "iban": "PT064238014065391717559",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4745-122",
+          "concelho": "Trofa",
+          "distrito": "Porto",
+          "freguesia": "Alvarelhos",
+          "pais": "Portugal",
+          "rua": "Alameda Guilherme Machado",
+          "n_porta": "64"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "britofilipe@example.net",
+          "nome_contacto": "SafeGuard 70",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "589060679",
+        "geo_latitude": 41.2367,
+        "geo_longitude": -8.5245,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/589060679.pdf",
+        "inicio_atividade": "2004-02-14T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "589060679",
+        "nome_entidade": "AgroConde 05",
+        "email_login": "agroconde05@hotmail.com",
+        "iban": "PT714884951342827877211",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4445-198",
+          "concelho": "Valongo",
+          "distrito": "Porto",
+          "freguesia": "Alfena",
+          "pais": "Portugal",
+          "rua": "Travessa Mota",
+          "n_porta": "73"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "935274247",
+          "nome_contacto": "AgroConde 05",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "591149411",
+        "geo_latitude": 42.0858,
+        "geo_longitude": -8.225,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/591149411.pdf",
+        "inicio_atividade": "2007-09-14T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "591149411",
+        "nome_entidade": "BioLab 45",
+        "email_login": "biolab45@gmail.com",
+        "iban": "PT269607307130580604240",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "4960-370",
+          "concelho": "Melgaço",
+          "distrito": "Viana do Castelo",
+          "freguesia": "Lobio",
+          "pais": "Portugal",
+          "rua": "Avenida Valentim Henriques",
+          "n_porta": "45"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "ribeiromelissa@example.net",
+          "nome_contacto": "BioLab 45",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 8,
+          "negocio_nif_nipc": "591149411",
+          "tipo_bem_servico": "Material de escritório",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 915.63,
+          "desconto": 17.57
+        },
+        {
+          "id_oferta": 31,
+          "negocio_nif_nipc": "591149411",
+          "tipo_bem_servico": "Lixívia",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 2473.12,
+          "desconto": 13.04
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "592012055",
+        "geo_latitude": 39.0532,
+        "geo_longitude": -9.0093,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/592012055.pdf",
+        "inicio_atividade": "2003-12-19T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "592012055",
+        "nome_entidade": "TurboLean 81",
+        "email_login": "turbolean81@clix.pt",
+        "iban": "PT521164411498501698574",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2580-289",
+          "concelho": "Alenquer",
+          "distrito": "Lisboa",
+          "freguesia": "Alenquer",
+          "pais": "Portugal",
+          "rua": "Praça de Gonçalves",
+          "n_porta": "30"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "261070627",
+          "nome_contacto": "TurboLean 81",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [
+        {
+          "id_oferta": 12,
+          "negocio_nif_nipc": "592012055",
+          "tipo_bem_servico": "Açúcar",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4439.63,
+          "desconto": 19.52
+        },
+        {
+          "id_oferta": 66,
+          "negocio_nif_nipc": "592012055",
+          "tipo_bem_servico": "Régua e compasso",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit",
+          "valor_total": 4937.29,
+          "desconto": 47.12
+        }
+      ],
+      "status": "ATIVO"
+    },
+    {
+      "resource": {
+        "nif_nipc": "599421476",
+        "geo_latitude": 39.7436,
+        "geo_longitude": -8.8071,
+        "url_certidao_permanente": "https://certidoes.negocio.pt/599421476.pdf",
+        "inicio_atividade": "2015-08-13T20:05:32.000Z"
+      },
+      "entity": {
+        "nif_nipc": "599421476",
+        "nome_entidade": "DigitalPorto 81",
+        "email_login": "digitalporto81@sapo.pt",
+        "iban": "PT265517673752144403564",
+        "blocked": false,
+        "reason": null
+      },
+      "locations": [
+        {
+          "codigo_postal": "2415-604",
+          "concelho": "Leiria",
+          "distrito": "Leiria",
+          "freguesia": "Leiria",
+          "pais": "Portugal",
+          "rua": "Praça dos Oceanos",
+          "n_porta": "29"
+        }
+      ],
+      "contacts": [
+        {
+          "contacto": "wramos@example.com",
+          "nome_contacto": "DigitalPorto 81",
+          "descricao": "Lorem Ipsum neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"
+        }
+      ],
+      "offers": [],
+      "status": "ATIVO"
+    }
+  ]
+}

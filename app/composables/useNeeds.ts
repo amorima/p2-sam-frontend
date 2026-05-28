@@ -6,9 +6,10 @@ import type {
   MatchTipo,
   GoodsService,
   Business,
+  BusinessOffer,
   Institution,
   Panel
-} from '~/utils/mockData'
+} from '~/utils/domain'
 
 interface NewItemInput {
   tipo_bem_servico: string
@@ -34,18 +35,23 @@ const _useNeeds = () => {
   // Fetch all data from API (deduped by key — runs once per SSR + once on client if needed)
   useAsyncData('needs-initial-data', async () => {
     try {
-      const [needsRes, institutionsRes, businessRes] = await Promise.all([
+      const [needsRes, institutionsRes, businessRes, goodsRes] = await Promise.all([
         $fetch<{ needs: Need[] }>('/api/needs'),
         $fetch<{ data: Institution[] }>('/api/institutions'),
-        $fetch<{ data: Business[] }>('/api/business')
+        $fetch<{ data: Business[] }>('/api/business'),
+        $fetch<{ data: GoodsService[] }>('/api/goods-services').catch(() => ({ data: [] as GoodsService[] }))
       ])
 
       needs.value = needsRes.needs ?? []
       institutions.value = institutionsRes.data ?? []
       businesses.value = businessRes.data ?? []
 
-      // Derive goods services from the need items returned by backend
+      // Start with the canonical goods services from the backend
       const gsMap = new Map<string, GoodsService>()
+      for (const g of (goodsRes.data ?? [])) {
+        gsMap.set(g.tipo_bem_servico, { tipo_bem_servico: g.tipo_bem_servico, tipo_bem: g.tipo_bem })
+      }
+      // Augment with anything referenced in needs that might be missing
       for (const need of needs.value) {
         for (const item of need.items) {
           if (!gsMap.has(item.tipo_bem_servico)) {
@@ -235,23 +241,144 @@ const _useNeeds = () => {
     }
   }
 
-  function addBusiness(business: Business) {
+  interface BackendBusinessCreatePayload {
+    entity: {
+      nif_nipc: string
+      nome_entidade: string
+      email_login: string
+      password: string
+      iban?: string
+    }
+    business: {
+      geo_latitude: number
+      geo_longitude: number
+      url_certidao_permanente: string
+      inicio_atividade: string
+    }
+    location: {
+      codigo_postal: string
+      concelho: string
+      distrito: string
+      freguesia: string
+      pais: string
+      rua: string
+      n_porta: string
+    }
+    contacts?: Array<{ contacto: string, nome_contacto: string, descricao: string }>
+    offers?: Array<{
+      tipo_bem_servico: string
+      descricao: string
+      valor_total: number
+      desconto: number
+      tipo_bem?: 'bem' | 'servico'
+    }>
+  }
+
+  async function addBusiness(business: Business) {
     if (businesses.value.some(b => b.resource.nif_nipc === business.resource.nif_nipc)) return
     businesses.value.push(business)
   }
 
-  function updateBusiness(nif: string, updater: (b: Business) => Business) {
+  async function createBusinessRemote(payload: BackendBusinessCreatePayload): Promise<Business> {
+    const created = await $fetch<{ nif_nipc: string, offers?: Array<{ id_oferta: number, tipo_bem_servico: string, descricao: string, valor_total: number | string, desconto: number | string }> }>('/api/business', {
+      method: 'POST',
+      body: payload
+    })
+
+    const newBiz: Business = {
+      resource: {
+        nif_nipc: created.nif_nipc ?? payload.entity.nif_nipc,
+        geo_latitude: payload.business.geo_latitude,
+        geo_longitude: payload.business.geo_longitude,
+        url_certidao_permanente: payload.business.url_certidao_permanente,
+        inicio_atividade: payload.business.inicio_atividade
+      },
+      entity: {
+        nif_nipc: payload.entity.nif_nipc,
+        nome_entidade: payload.entity.nome_entidade,
+        email_login: payload.entity.email_login,
+        iban: payload.entity.iban ?? '',
+        blocked: false,
+        reason: null
+      },
+      locations: [payload.location],
+      contacts: payload.contacts ?? [],
+      offers: (created.offers ?? []).map(o => ({
+        id_oferta: o.id_oferta,
+        negocio_nif_nipc: payload.entity.nif_nipc,
+        tipo_bem_servico: o.tipo_bem_servico,
+        descricao: o.descricao,
+        valor_total: Number(o.valor_total),
+        desconto: Number(o.desconto)
+      })),
+      status: 'ATIVO'
+    }
+    businesses.value = [...businesses.value, newBiz]
+    return newBiz
+  }
+
+  async function updateBusiness(nif: string, updater: (b: Business) => Business) {
     const idx = businesses.value.findIndex(b => b.resource.nif_nipc === nif)
-    if (idx >= 0) {
-      businesses.value.splice(idx, 1, updater(businesses.value[idx]!))
+    if (idx < 0) return
+    const current = businesses.value[idx]!
+    const next = updater(current)
+    businesses.value.splice(idx, 1, next)
+
+    const entityChanged
+      = current.entity.nome_entidade !== next.entity.nome_entidade
+        || current.entity.email_login !== next.entity.email_login
+        || current.entity.iban !== next.entity.iban
+        || current.entity.blocked !== next.entity.blocked
+        || current.entity.reason !== next.entity.reason
+
+    const resourceChanged
+      = current.resource.geo_latitude !== next.resource.geo_latitude
+        || current.resource.geo_longitude !== next.resource.geo_longitude
+        || current.resource.url_certidao_permanente !== next.resource.url_certidao_permanente
+        || current.resource.inicio_atividade !== next.resource.inicio_atividade
+
+    if (!entityChanged && !resourceChanged) return
+
+    try {
+      await $fetch(`/api/business/${nif}`, {
+        method: 'PATCH',
+        body: {
+          ...(entityChanged && {
+            entity: {
+              nome_entidade: next.entity.nome_entidade,
+              email_login: next.entity.email_login,
+              iban: next.entity.iban,
+              blocked: next.entity.blocked ? 1 : 0,
+              reason: next.entity.reason ?? null
+            }
+          }),
+          ...(resourceChanged && {
+            business: {
+              geo_latitude: next.resource.geo_latitude,
+              geo_longitude: next.resource.geo_longitude,
+              ...(next.resource.url_certidao_permanente && { url_certidao_permanente: next.resource.url_certidao_permanente }),
+              ...(next.resource.inicio_atividade && { inicio_atividade: next.resource.inicio_atividade })
+            }
+          })
+        }
+      })
+    } catch (e) {
+      console.error('[useNeeds] Failed to update business:', e)
+      businesses.value.splice(idx, 1, current)
+      throw e
     }
   }
 
-  function setBusinessStatus(nif: string, status: 'ATIVO' | 'SUSPENSO') {
-    updateBusiness(nif, b => ({ ...b, status }))
+  async function setBusinessStatus(nif: string, status: 'ATIVO' | 'SUSPENSO', reason?: string) {
+    await updateBusiness(nif, b => ({
+      ...b,
+      status,
+      entity: { ...b.entity, blocked: status === 'SUSPENSO', reason: status === 'SUSPENSO' ? (reason ?? b.entity.reason ?? null) : null }
+    }))
   }
 
-  function removeBusiness(nif: string) {
+  async function removeBusiness(nif: string) {
+    const previous = businesses.value
     businesses.value = businesses.value.filter(b => b.resource.nif_nipc !== nif)
     needs.value.forEach((need) => {
       need.items.forEach((item) => {
@@ -265,6 +392,84 @@ const _useNeeds = () => {
         }
       })
     })
+
+    try {
+      await $fetch(`/api/business/${nif}`, { method: 'DELETE' })
+    } catch (e) {
+      console.error('[useNeeds] Failed to delete business:', e)
+      businesses.value = previous
+      throw e
+    }
+  }
+
+  async function addBusinessOffer(nif: string, offer: Omit<BusinessOffer, 'id_oferta' | 'negocio_nif_nipc'> & { tipo_bem?: 'BEM' | 'SERVICO' }) {
+    const goods = goodsServices.value.find(g => g.tipo_bem_servico === offer.tipo_bem_servico)
+    const tipo_bem = (offer.tipo_bem ?? goods?.tipo_bem ?? 'BEM').toLowerCase()
+
+    const res = await $fetch<{ offer: BusinessOffer }>(`/api/business/${nif}/offers`, {
+      method: 'POST',
+      body: {
+        tipo_bem_servico: offer.tipo_bem_servico,
+        descricao: offer.descricao,
+        valor_total: offer.valor_total,
+        desconto: offer.desconto,
+        tipo_bem
+      }
+    })
+
+    const created: BusinessOffer = {
+      id_oferta: res.offer.id_oferta,
+      negocio_nif_nipc: nif,
+      tipo_bem_servico: res.offer.tipo_bem_servico,
+      descricao: res.offer.descricao,
+      valor_total: Number(res.offer.valor_total),
+      desconto: Number(res.offer.desconto)
+    }
+
+    const idx = businesses.value.findIndex(b => b.resource.nif_nipc === nif)
+    if (idx >= 0) {
+      const current = businesses.value[idx]!
+      businesses.value.splice(idx, 1, { ...current, offers: [...current.offers, created] })
+    }
+    return created
+  }
+
+  async function removeBusinessOffer(nif: string, idOferta: number) {
+    const idx = businesses.value.findIndex(b => b.resource.nif_nipc === nif)
+    const previous = idx >= 0 ? businesses.value[idx] : null
+    if (idx >= 0 && previous) {
+      businesses.value.splice(idx, 1, { ...previous, offers: previous.offers.filter(o => o.id_oferta !== idOferta) })
+    }
+
+    try {
+      await $fetch(`/api/business/${nif}/offers/${idOferta}`, { method: 'DELETE' })
+    } catch (e) {
+      console.error('[useNeeds] Failed to delete offer:', e)
+      if (idx >= 0 && previous) businesses.value.splice(idx, 1, previous)
+      throw e
+    }
+  }
+
+  async function updateBusinessOffer(nif: string, idOferta: number, patch: Partial<Pick<BusinessOffer, 'descricao' | 'valor_total' | 'desconto'>>) {
+    const idx = businesses.value.findIndex(b => b.resource.nif_nipc === nif)
+    if (idx < 0) return
+    const current = businesses.value[idx]!
+    const next = {
+      ...current,
+      offers: current.offers.map(o => o.id_oferta === idOferta ? { ...o, ...patch } : o)
+    }
+    businesses.value.splice(idx, 1, next)
+
+    try {
+      await $fetch(`/api/business/${nif}/offers/${idOferta}`, {
+        method: 'PATCH',
+        body: patch
+      })
+    } catch (e) {
+      console.error('[useNeeds] Failed to update offer:', e)
+      businesses.value.splice(idx, 1, current)
+      throw e
+    }
   }
 
   return {
@@ -281,9 +486,13 @@ const _useNeeds = () => {
     approveNeed,
     rejectNeed,
     addBusiness,
+    createBusinessRemote,
     updateBusiness,
     setBusinessStatus,
-    removeBusiness
+    removeBusiness,
+    addBusinessOffer,
+    removeBusinessOffer,
+    updateBusinessOffer
   }
 }
 

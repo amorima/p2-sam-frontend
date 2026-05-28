@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { haversineKm, type Panel } from '~/utils/mockData'
+import { haversineKm, type Panel } from '~/utils/domain'
 
 const RADIUS_KM = 10
 

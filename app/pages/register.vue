@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import { useNeeds } from '~/composables/useNeeds'
 
 definePageMeta({ layout: 'auth' })
 
@@ -33,11 +34,72 @@ const roleOptions: { label: string, value: RoleType, icon: string, description: 
   }
 ]
 
-const step = ref<1 | 2 | 3>(1)
+const step = ref<1 | 2 | 3 | 4>(1)
 const selectedRole = ref<RoleType>('patron')
 const isSubmitting = ref(false)
 const showPassword = ref(false)
 const showPasswordConfirm = ref(false)
+
+interface DraftOffer {
+  tipo_bem_servico: string
+  descricao: string
+  valor_total: number
+  desconto: number
+  tipo_bem: 'bem' | 'servico'
+}
+
+const { goodsServices } = useNeeds()
+
+const offers = ref<DraftOffer[]>([])
+const showAddOffer = ref(false)
+const newOfferCategory = ref('')
+const newOfferDescricao = ref('')
+const newOfferValor = ref<number | undefined>(undefined)
+const newOfferDesconto = ref<number>(100)
+const isProBono = computed(() => newOfferDesconto.value === 100)
+
+const categoryOptions = computed(() =>
+  goodsServices.value
+    .filter(g => g.tipo_bem === 'SERVICO')
+    .map(g => ({
+      label: g.tipo_bem_servico,
+      value: g.tipo_bem_servico
+    }))
+)
+
+function addOfferDraft() {
+  const cat = newOfferCategory.value.trim()
+  if (!cat || !newOfferDescricao.value.trim() || newOfferValor.value === undefined || newOfferValor.value === null || newOfferValor.value <= 0) {
+    toast.add({ title: 'Campos obrigatórios', description: 'Preencha categoria, descrição e valor.', icon: 'i-lucide-alert-circle', color: 'warning' })
+    return
+  }
+  if (offers.value.some(o => o.tipo_bem_servico === cat)) {
+    toast.add({ title: 'Categoria já adicionada', icon: 'i-lucide-alert-circle', color: 'warning' })
+    return
+  }
+  offers.value.push({
+    tipo_bem_servico: cat,
+    descricao: newOfferDescricao.value.trim(),
+    valor_total: newOfferValor.value,
+    desconto: newOfferDesconto.value,
+    tipo_bem: 'servico'
+  })
+  showAddOffer.value = false
+  newOfferCategory.value = ''
+  newOfferDescricao.value = ''
+  newOfferValor.value = undefined
+  newOfferDesconto.value = 100
+}
+
+function removeOfferDraft(idx: number) {
+  offers.value.splice(idx, 1)
+}
+
+function descontoLabel(o: DraftOffer): { text: string, color: 'success' | 'warning' | 'info' } {
+  if (o.desconto >= 100) return { text: 'Pro bono', color: 'success' }
+  if (o.desconto >= 50) return { text: `${o.desconto}% desconto`, color: 'warning' }
+  return { text: `${o.desconto}% desconto`, color: 'info' }
+}
 
 // ── File upload state ─────────────────────────────────────────────────────────
 
@@ -150,7 +212,11 @@ const locationState = reactive<Partial<LocationSchema>>({
 
 // ── Step navigation ───────────────────────────────────────────────────────────
 
-const stepTitles = ['Tipo de conta', 'Dados da entidade', 'Morada']
+const stepTitles = computed(() =>
+  selectedRole.value === 'business'
+    ? ['Tipo de conta', 'Dados da entidade', 'Morada', 'Ofertas']
+    : ['Tipo de conta', 'Dados da entidade', 'Morada']
+)
 
 async function onStep2Submit(_event: FormSubmitEvent<EntitySchema>) {
   // Validate file upload for types that require it
@@ -179,11 +245,14 @@ async function geocodeFromAddress(loc: LocationSchema): Promise<{ lat: number, l
   return { lat: 41.3526, lng: -8.7396 }
 }
 
-async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
+const savedLocation = ref<LocationSchema | null>(null)
+const savedCoords = ref<{ lat: number, lng: number }>({ lat: 41.3526, lng: -8.7396 })
+
+async function submitRegistration() {
+  if (!savedLocation.value) return
   isSubmitting.value = true
   try {
-    const coords = await geocodeFromAddress(event.data)
-
+    const coords = savedCoords.value
     const payload: Record<string, unknown> = {
       role: selectedRole.value,
       entity: {
@@ -193,7 +262,7 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
         password: entityState.password,
         iban: entityState.iban || undefined
       },
-      location: event.data
+      location: savedLocation.value
     }
 
     if (selectedRole.value === 'institution') {
@@ -210,6 +279,9 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
         geo_longitude: coords.lng,
         url_certidao_permanente: entityState.url_certidao_permanente,
         inicio_atividade: entityState.inicio_atividade
+      }
+      if (offers.value.length) {
+        payload.offers = offers.value
       }
     }
 
@@ -233,6 +305,20 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
   } finally {
     isSubmitting.value = false
   }
+}
+
+async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
+  savedLocation.value = event.data
+  savedCoords.value = await geocodeFromAddress(event.data)
+  if (selectedRole.value === 'business') {
+    step.value = 4
+    return
+  }
+  await submitRegistration()
+}
+
+async function onStep4Submit() {
+  await submitRegistration()
 }
 </script>
 
@@ -553,7 +639,7 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
     </UCard>
 
     <!-- Step 3: Location -->
-    <UCard v-else class="shadow-lg">
+    <UCard v-else-if="step === 3" class="shadow-lg">
       <template #header>
         <div class="flex items-center gap-3">
           <UButton
@@ -628,10 +714,178 @@ async function onStep3Submit(event: FormSubmitEvent<LocationSchema>) {
             <UButton
               form="step3-form"
               type="submit"
+              :label="selectedRole === 'business' ? 'Continuar' : 'Criar conta'"
+              :icon="selectedRole === 'business' ? 'i-lucide-arrow-right' : 'i-lucide-user-plus'"
+              :trailing="selectedRole === 'business'"
+              color="primary"
+              :loading="isSubmitting"
+            />
+          </div>
+          <p class="text-xs text-muted text-center">
+            Ao registar aceita os termos de utilização do SAM.
+          </p>
+        </div>
+      </template>
+    </UCard>
+
+    <!-- Step 4: Offers (business only) -->
+    <UCard v-else class="shadow-lg">
+      <template #header>
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-3 min-w-0">
+            <UButton
+              icon="i-lucide-arrow-left"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              @click="step = 3"
+            />
+            <div>
+              <h2 class="text-lg font-semibold text-highlighted">
+                Ofertas
+              </h2>
+              <p class="text-xs text-muted">
+                Adicione os serviços que o seu negócio disponibiliza. Pode adicionar mais tarde.
+              </p>
+            </div>
+          </div>
+          <UButton
+            label="Adicionar"
+            icon="i-lucide-plus"
+            color="primary"
+            variant="subtle"
+            size="sm"
+            @click="showAddOffer = !showAddOffer"
+          />
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-xs text-muted">
+          Os negócios oferecem <strong>serviços</strong> à comunidade (apoio jurídico, consultas, transporte, etc.). Os bens essenciais são doados por cidadãos via painéis municipais.
+        </p>
+
+        <div v-if="showAddOffer" class="p-4 rounded-lg border border-default bg-elevated/30 space-y-3">
+          <p class="text-xs font-semibold text-muted uppercase tracking-wide">
+            Nova Categoria / Oferta
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <UFormField label="Categoria (serviço)">
+              <USelectMenu
+                v-model="newOfferCategory"
+                :items="categoryOptions"
+                value-key="value"
+                label-key="label"
+                search-placeholder="Pesquisar serviço..."
+                placeholder="Escolher..."
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField label="Valor Base (€)">
+              <UInput
+                v-model.number="newOfferValor"
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="0,00"
+                trailing-icon="i-lucide-euro"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField label="Descrição da oferta" class="sm:col-span-2">
+              <UInput v-model="newOfferDescricao" placeholder="Ex.: Consultas jurídicas em direito civil e família" class="w-full" />
+            </UFormField>
+            <UFormField label="Desconto (%)" class="sm:col-span-2">
+              <div class="flex items-center gap-3">
+                <UInput
+                  v-model.number="newOfferDesconto"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="5"
+                  class="w-32"
+                />
+                <UBadge
+                  v-if="isProBono"
+                  color="success"
+                  variant="subtle"
+                  icon="i-lucide-heart"
+                >
+                  Pro bono
+                </UBadge>
+                <span v-else class="text-xs text-muted">
+                  0% = preço normal · 100% = pro bono
+                </span>
+              </div>
+            </UFormField>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <UButton
+              label="Cancelar"
+              color="neutral"
+              variant="subtle"
+              size="sm"
+              @click="showAddOffer = false"
+            />
+            <UButton
+              label="Adicionar"
+              icon="i-lucide-check"
+              color="primary"
+              size="sm"
+              @click="addOfferDraft"
+            />
+          </div>
+        </div>
+
+        <div v-if="offers.length === 0" class="text-center py-8 text-sm text-muted">
+          <UIcon name="i-lucide-tags" class="size-8 mb-2 mx-auto" />
+          <p>Sem ofertas adicionadas (opcional)</p>
+        </div>
+
+        <div v-else class="space-y-2">
+          <div
+            v-for="(o, idx) in offers"
+            :key="`${o.tipo_bem_servico}-${idx}`"
+            class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-3 items-center rounded-lg border border-default bg-elevated/30 px-4 py-3"
+          >
+            <div class="min-w-0">
+              <p class="font-medium text-highlighted truncate">
+                {{ o.tipo_bem_servico }}
+              </p>
+              <p class="text-xs text-muted truncate">
+                {{ o.descricao }}
+              </p>
+            </div>
+            <div class="text-sm tabular-nums text-muted">
+              {{ new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(o.valor_total) }}
+            </div>
+            <UBadge
+              :color="descontoLabel(o).color"
+              variant="subtle"
+              size="sm"
+            >
+              {{ descontoLabel(o).text }}
+            </UBadge>
+            <UButton
+              icon="i-lucide-trash-2"
+              color="error"
+              variant="ghost"
+              size="sm"
+              @click="removeOfferDraft(idx)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-end">
+            <UButton
               label="Criar conta"
               icon="i-lucide-user-plus"
               color="primary"
               :loading="isSubmitting"
+              @click="onStep4Submit"
             />
           </div>
           <p class="text-xs text-muted text-center">

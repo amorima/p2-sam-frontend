@@ -4,7 +4,7 @@ import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Column, SortingState, Table } from '@tanstack/table-core'
 import type { VNode } from 'vue'
 import { useNeeds } from '~/composables/useNeeds'
-import type { BusinessMatchEstado } from '~/utils/mockData'
+import type { BusinessMatchEstado } from '~/utils/domain'
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
