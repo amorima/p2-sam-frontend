@@ -21,19 +21,17 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody<{ blocked: boolean | 0 | 1, reason?: string | null }>(event)
-  const authHeader = getRequestHeader(event, 'authorization')
 
   try {
-    return await $fetch(`${config.backendBase}${backendPath}`, {
+    return await authBackendFetch(event, `${config.backendBase}${backendPath}`, {
       method: 'PATCH',
-      body,
-      headers: authHeader ? { authorization: authHeader } : undefined
+      body
     })
   } catch (err: unknown) {
-    const e = err as { response?: { status?: number }, data?: { description?: string, message?: string } }
+    const e = err as { statusCode?: number, statusMessage?: string, data?: { description?: string, message?: string } }
     throw createError({
-      statusCode: e?.response?.status ?? 500,
-      statusMessage: e?.data?.description ?? e?.data?.message ?? 'Failed to update block state'
+      statusCode: e?.statusCode ?? 500,
+      statusMessage: e?.statusMessage ?? e?.data?.description ?? e?.data?.message ?? 'Failed to update block state'
     })
   }
 })

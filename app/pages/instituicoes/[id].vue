@@ -5,7 +5,19 @@ import { printVoucher } from '~/utils/voucherPDF'
 
 const route = useRoute()
 const { isAdmin, isInstitution, institutionNif } = useAuth()
-const { needs, institutions, businesses, panels, setItemMatch, setBusinessMatch } = useNeeds()
+const { needs, institutions, businesses, panels, setItemMatch, setBusinessMatch, approveNeed } = useNeeds()
+
+const toast = useToast()
+
+async function handleApprove() {
+  if (!need.value) return
+  await approveNeed(need.value.id_pedido)
+  toast.add({
+    title: 'Pedido aprovado',
+    description: `#${need.value.id_pedido} — ${need.value.nome_entidade ?? need.value.nif_nipc}`,
+    color: 'success'
+  })
+}
 
 const id = Number(route.params.id)
 
@@ -177,10 +189,18 @@ const summary = computed(() => {
           />
           <UButton
             v-if="isAdmin && need?.estado === 'PENDENTE'"
+            label="Rejeitar"
+            icon="i-lucide-x-circle"
+            color="error"
+            variant="subtle"
+            @click="statusModalOpen = true"
+          />
+          <UButton
+            v-if="isAdmin && need?.estado === 'PENDENTE'"
             label="Aprovar"
             icon="i-lucide-check-circle"
             color="primary"
-            to="/instituicoes/aprovacao"
+            @click="handleApprove"
           />
         </template>
       </UDashboardNavbar>

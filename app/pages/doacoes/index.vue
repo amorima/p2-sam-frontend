@@ -113,18 +113,12 @@ const columns: TableColumn<EnrichedLead>[] = [
   },
   {
     accessorKey: 'item_pedido',
-    header: 'Bem',
+    header: 'Bem Requisitado',
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium text-highlighted' }, row.original.item_pedido),
         h('p', { class: 'text-xs text-muted' }, `Pedido #${row.original.id_pedido}`)
       ])
-  },
-  {
-    accessorKey: 'nome_entidade',
-    header: 'Destino',
-    cell: ({ row }) =>
-      h('span', { class: 'text-sm' }, row.original.nome_entidade ?? '—')
   },
   {
     accessorKey: 'nome_cidadao',
@@ -136,10 +130,18 @@ const columns: TableColumn<EnrichedLead>[] = [
       ])
   },
   {
+    accessorKey: 'data',
+    header: 'Data',
+    cell: ({ row }) => h('span', { class: 'text-sm text-muted tabular-nums' }, formatDate(row.original.data))
+  },
+  {
     accessorKey: 'painel_nome',
     header: 'Painel',
-    cell: ({ row }) =>
-      h('span', { class: 'text-sm text-muted' }, row.original.painel_nome ?? `#${row.original.id_painel}`)
+    cell: ({ row }) => {
+      const label = row.original.painel_nome
+        ?? (row.original.id_painel ? `#${row.original.id_painel}` : '—')
+      return h('span', { class: 'text-sm text-muted' }, label)
+    }
   },
   {
     accessorKey: 'pin_entrega',
