@@ -430,16 +430,23 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               Nova Categoria / Oferta
             </p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <UFormField label="Categoria (serviço)">
-                <USelectMenu
+              <UFormField
+                label="Categoria (serviço)"
+                description="Escolha uma existente ou escreva uma nova."
+              >
+                <UInput
                   v-model="newOfferCategory"
-                  :items="categoryOptions"
-                  value-key="value"
-                  label-key="label"
-                  search-placeholder="Pesquisar serviço..."
-                  placeholder="Escolher..."
+                  list="offer-category-options"
+                  placeholder="Ex.: Apoio jurídico, Transporte..."
                   class="w-full"
                 />
+                <datalist id="offer-category-options">
+                  <option
+                    v-for="opt in categoryOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                  />
+                </datalist>
               </UFormField>
               <UFormField label="Valor Base (€)">
                 <UInput
