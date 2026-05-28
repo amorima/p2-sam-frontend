@@ -1,28 +1,19 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
+import { formatDistanceToNow } from 'date-fns'
+import { pt } from 'date-fns/locale'
 
-const UBadge = resolveComponent('UBadge')
-const UIcon = resolveComponent('UIcon')
-
-interface ActivityEntry {
-  key: string
-  tipo: 'doacao' | 'pedido' | 'lead'
-  entidade: string
-  detalhe: string
-  estado: string
-  data: string
-}
-
-interface Donation {
+interface BackendDonation {
   id_doacao: number
   nome_entidade?: string
   mecena_nif_nipc: string
   valor_transacao: number
   estado: string
   data: string
+  tipo_donativo?: string
+  anonimo?: boolean
 }
 
-interface Need {
+interface BackendNeed {
   id_pedido: number
   nome_entidade?: string
   nif_nipc: string
@@ -31,7 +22,7 @@ interface Need {
   data: string
 }
 
-interface Lead {
+interface BackendLead {
   id_lead: number
   nome_cidadao: string
   item_pedido: string
@@ -39,94 +30,107 @@ interface Lead {
   data: string
 }
 
+interface ActivityEntry {
+  key: string
+  tipo: 'doacao_mecenas' | 'pedido' | 'lead'
+  titulo: string
+  detalhe: string
+  estado: string
+  data: string
+  href: string
+}
+
+const ICON: Record<ActivityEntry['tipo'], string> = {
+  doacao_mecenas: 'i-lucide-hand-coins',
+  pedido: 'i-lucide-clipboard-list',
+  lead: 'i-lucide-heart-handshake'
+}
+
+const COLOR: Record<ActivityEntry['tipo'], 'primary' | 'info' | 'success'> = {
+  doacao_mecenas: 'primary',
+  pedido: 'info',
+  lead: 'success'
+}
+
+const LABEL: Record<ActivityEntry['tipo'], string> = {
+  doacao_mecenas: 'Doação',
+  pedido: 'Pedido',
+  lead: 'Lead'
+}
+
+const ESTADO_COLOR: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = {
+  ACEITE: 'success',
+  ENTREGUE: 'success',
+  PENDENTE: 'warning',
+  REJEITADO: 'error',
+  EXPIRADO: 'error'
+}
+
+function estadoColor(e: string): 'success' | 'warning' | 'error' | 'neutral' {
+  return ESTADO_COLOR[e] ?? 'neutral'
+}
+
+function relativeTime(dateStr: string): string {
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return '—'
+  return formatDistanceToNow(date, { addSuffix: true, locale: pt })
+}
+
 const { data: activity, status } = await useAsyncData('home-activity', async () => {
   const [donationsRes, needsRes, leadsRes] = await Promise.all([
-    $fetch<{ donations: Donation[] }>('/api/donations').catch(() => ({ donations: [] })),
-    $fetch<{ needs: Need[] }>('/api/needs').catch(() => ({ needs: [] })),
-    $fetch<Lead[]>('/api/leads').catch(() => [])
+    $fetch<{ donations: BackendDonation[] }>('/api/donations').catch(() => ({ donations: [] })),
+    $fetch<{ needs: BackendNeed[] }>('/api/needs').catch(() => ({ needs: [] })),
+    $fetch<BackendLead[]>('/api/leads').catch(() => [] as BackendLead[])
   ])
 
-  const entries: ActivityEntry[] = [
-    ...(donationsRes.donations ?? []).map(d => ({
+  const formatEUR = (v: number) =>
+    new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(Number(v))
+
+  // Take the 7 most recent of each type independently so no type drowns the others
+  const donations: ActivityEntry[] = (donationsRes.donations ?? [])
+    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+    .slice(0, 7)
+    .map(d => ({
       key: `d-${d.id_doacao}`,
-      tipo: 'doacao' as const,
-      entidade: d.nome_entidade ?? d.mecena_nif_nipc,
-      detalhe: new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(Number(d.valor_transacao)),
+      tipo: 'doacao_mecenas',
+      titulo: d.anonimo ? 'Doação anónima' : (d.nome_entidade ?? d.mecena_nif_nipc),
+      detalhe: formatEUR(d.valor_transacao),
       estado: d.estado,
-      data: d.data
-    })),
-    ...(needsRes.needs ?? []).map(n => ({
+      data: d.data,
+      href: `/mecenas/${d.id_doacao}`
+    }))
+
+  const needs: ActivityEntry[] = (needsRes.needs ?? [])
+    .sort((a, b) => b.id_pedido - a.id_pedido)
+    .slice(0, 7)
+    .map(n => ({
       key: `n-${n.id_pedido}`,
-      tipo: 'pedido' as const,
-      entidade: n.nome_entidade ?? n.nif_nipc,
+      tipo: 'pedido',
+      titulo: n.nome_entidade ?? n.nif_nipc,
       detalhe: `${Array.isArray(n.items) ? n.items.length : 0} item(s)`,
       estado: n.estado,
-      data: n.data
-    })),
-    ...(leadsRes ?? []).map(l => ({
+      data: n.data,
+      href: `/instituicoes/${n.id_pedido}`
+    }))
+
+  const leads: ActivityEntry[] = (leadsRes ?? [])
+    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+    .slice(0, 7)
+    .map(l => ({
       key: `l-${l.id_lead}`,
-      tipo: 'lead' as const,
-      entidade: l.nome_cidadao,
+      tipo: 'lead',
+      titulo: l.nome_cidadao,
       detalhe: l.item_pedido,
       estado: l.estado,
-      data: l.data
+      data: l.data,
+      href: `/doacoes`
     }))
-  ]
 
-  return entries
+  // Merge all and sort by date (needs fallback to today)
+  return [...donations, ...needs, ...leads]
     .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
-    .slice(0, 15)
-}, { server: false, default: () => [] })
-
-function tipoConfig(tipo: ActivityEntry['tipo']) {
-  if (tipo === 'doacao') return { icon: 'i-lucide-hand-coins', label: 'Doação', color: 'primary' as const }
-  if (tipo === 'pedido') return { icon: 'i-lucide-clipboard-list', label: 'Pedido', color: 'info' as const }
-  return { icon: 'i-lucide-heart-handshake', label: 'Lead', color: 'secondary' as const }
-}
-
-function estadoColor(estado: string): 'success' | 'warning' | 'error' | 'neutral' {
-  if (estado === 'ACEITE' || estado === 'ENTREGUE') return 'success'
-  if (estado === 'REJEITADO' || estado === 'EXPIRADO') return 'error'
-  return 'warning'
-}
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleString('pt-PT', {
-    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false
-  })
-}
-
-const columns: TableColumn<ActivityEntry>[] = [
-  {
-    accessorKey: 'tipo',
-    header: 'Tipo',
-    cell: ({ row }) => {
-      const cfg = tipoConfig(row.original.tipo)
-      return h(UBadge, { variant: 'subtle', color: cfg.color, size: 'sm', icon: cfg.icon }, () => cfg.label)
-    }
-  },
-  {
-    accessorKey: 'entidade',
-    header: 'Entidade / Cidadão',
-    cell: ({ row }) => h('span', { class: 'font-medium text-highlighted' }, row.original.entidade)
-  },
-  {
-    accessorKey: 'detalhe',
-    header: 'Detalhe',
-    cell: ({ row }) => h('span', { class: 'text-sm text-muted' }, row.original.detalhe)
-  },
-  {
-    accessorKey: 'estado',
-    header: 'Estado',
-    cell: ({ row }) =>
-      h(UBadge, { variant: 'subtle', color: estadoColor(row.original.estado), size: 'sm' }, () => row.original.estado)
-  },
-  {
-    accessorKey: 'data',
-    header: 'Data',
-    cell: ({ row }) => h('span', { class: 'text-sm text-muted tabular-nums' }, formatDate(row.original.data))
-  }
-]
+    .slice(0, 20)
+}, { server: false, default: () => [] as ActivityEntry[] })
 </script>
 
 <template>
@@ -138,32 +142,96 @@ const columns: TableColumn<ActivityEntry>[] = [
       </h2>
     </div>
 
-    <div v-if="status === 'pending'" class="space-y-2">
-      <USkeleton v-for="i in 5" :key="i" class="h-10 w-full" />
-    </div>
+    <UCard :ui="{ body: '!p-0' }">
+      <!-- Loading skeleton -->
+      <div v-if="status === 'pending'" class="divide-y divide-default">
+        <div v-for="i in 8" :key="i" class="flex items-center gap-3 px-4 py-3">
+          <USkeleton class="size-8 rounded-full shrink-0" />
+          <div class="flex-1 space-y-1.5">
+            <USkeleton class="h-3.5 w-40" />
+            <USkeleton class="h-3 w-24" />
+          </div>
+          <USkeleton class="h-5 w-16 rounded-full" />
+          <USkeleton class="h-3 w-20" />
+        </div>
+      </div>
 
-    <UTable
-      v-else
-      :data="activity"
-      :columns="columns"
-      class="shrink-0"
-      :ui="{
-        base: 'table-fixed border-separate border-spacing-0',
-        thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-        tbody: '[&>tr]:last:[&>td]:border-b-0',
-        th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-        td: 'border-b border-default'
-      }"
-    />
+      <!-- Empty state -->
+      <div
+        v-else-if="!activity?.length"
+        class="flex flex-col items-center justify-center py-12 text-center"
+      >
+        <UIcon name="i-lucide-inbox" class="size-10 text-muted mb-2" />
+        <p class="text-sm text-muted">
+          Sem atividade registada.
+        </p>
+      </div>
 
-    <div
-      v-if="status !== 'pending' && activity.length === 0"
-      class="flex flex-col items-center justify-center py-10 text-center"
-    >
-      <UIcon name="i-lucide-inbox" class="size-10 text-muted mb-2" />
-      <p class="text-sm text-muted">
-        Sem atividade registada.
-      </p>
-    </div>
+      <!-- Activity feed -->
+      <ul v-else class="divide-y divide-default">
+        <li v-for="entry in activity" :key="entry.key">
+          <NuxtLink
+            :to="entry.href"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-elevated/50 transition-colors cursor-pointer"
+          >
+            <!-- Type icon -->
+            <div
+              class="size-8 rounded-full flex items-center justify-center shrink-0"
+              :class="{
+                'bg-primary/10': entry.tipo === 'doacao_mecenas',
+                'bg-info/10': entry.tipo === 'pedido',
+                'bg-success/10': entry.tipo === 'lead'
+              }"
+            >
+              <UIcon
+                :name="ICON[entry.tipo]"
+                class="size-4"
+                :class="{
+                  'text-primary': entry.tipo === 'doacao_mecenas',
+                  'text-info': entry.tipo === 'pedido',
+                  'text-success': entry.tipo === 'lead'
+                }"
+              />
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <UBadge
+                  :color="COLOR[entry.tipo]"
+                  variant="subtle"
+                  size="xs"
+                >
+                  {{ LABEL[entry.tipo] }}
+                </UBadge>
+                <span class="text-sm font-medium text-highlighted truncate">
+                  {{ entry.titulo }}
+                </span>
+              </div>
+              <p class="text-xs text-muted truncate mt-0.5">
+                {{ entry.detalhe }}
+              </p>
+            </div>
+
+            <!-- Status + time -->
+            <div class="flex flex-col items-end gap-1 shrink-0">
+              <UBadge
+                :color="estadoColor(entry.estado)"
+                variant="subtle"
+                size="xs"
+              >
+                {{ entry.estado }}
+              </UBadge>
+              <span class="text-xs text-dimmed tabular-nums whitespace-nowrap">
+                {{ relativeTime(entry.data) }}
+              </span>
+            </div>
+
+            <!-- Chevron hint -->
+            <UIcon name="i-lucide-chevron-right" class="size-4 text-dimmed shrink-0" />
+          </NuxtLink>
+        </li>
+      </ul>
+    </UCard>
   </div>
 </template>

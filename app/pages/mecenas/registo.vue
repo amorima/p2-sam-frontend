@@ -79,11 +79,16 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         }]
       }
     })
-    toast.add({ title: 'Mecenas registado', color: 'success' })
+    toast.add({
+      title: 'Mecenas registado',
+      description: `${event.data.nome_entidade} adicionado com sucesso.`,
+      icon: 'i-lucide-check',
+      color: 'success'
+    })
     router.push('/mecenas')
   } catch (err: unknown) {
-    const e = err as { data?: { description?: string } }
-    toast.add({ title: 'Erro ao registar', description: e?.data?.description ?? 'Tente novamente.', color: 'error' })
+    const e = err as { statusMessage?: string }
+    toast.add({ title: 'Erro ao registar', description: e?.statusMessage ?? 'Não foi possível registar o mecenas.', icon: 'i-lucide-x', color: 'error' })
   } finally {
     isSubmitting.value = false
   }
@@ -104,6 +109,22 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             class="hidden lg:flex"
           />
         </template>
+        <template #right>
+          <UButton
+            label="Cancelar"
+            color="neutral"
+            variant="ghost"
+            to="/mecenas"
+          />
+          <UButton
+            form="mecenas-form"
+            label="Registar Mecenas"
+            icon="i-lucide-save"
+            color="primary"
+            type="submit"
+            :loading="isSubmitting"
+          />
+        </template>
       </UDashboardNavbar>
     </template>
 
@@ -112,22 +133,52 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         id="mecenas-form"
         :schema="schema"
         :state="state"
-        class="space-y-6 max-w-3xl mx-auto"
+        class="space-y-6"
         @submit="onSubmit"
       >
-        <UPageCard title="Identidade" variant="subtle">
+        <!-- Dados do Mecenas -->
+        <UPageCard variant="subtle">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-hand-coins" class="size-4 text-muted" />
+              <h3 class="font-semibold text-highlighted">
+                Dados do Mecenas
+              </h3>
+            </div>
+          </template>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField name="nif_nipc" label="NIF/NIPC" required>
-              <UInput v-model="state.nif_nipc" placeholder="123456789" class="w-full" />
+            <UFormField name="nif_nipc" label="NIF / NIPC" required>
+              <UInput
+                v-model="state.nif_nipc"
+                class="w-full font-mono"
+                maxlength="9"
+                placeholder="510100200"
+              />
             </UFormField>
             <UFormField name="nome_entidade" label="Nome do Mecenas" required>
-              <UInput v-model="state.nome_entidade" class="w-full" />
+              <UInput v-model="state.nome_entidade" class="w-full" placeholder="Ex.: Empresa de Apoio, Lda." />
             </UFormField>
-            <UFormField name="email_login" label="Email" required>
-              <UInput v-model="state.email_login" type="email" class="w-full" />
+            <UFormField name="email_login" label="Email de Login" required>
+              <UInput
+                v-model="state.email_login"
+                type="email"
+                class="w-full"
+                placeholder="contacto@mecenas.pt"
+              />
             </UFormField>
-            <UFormField name="password" label="Palavra-passe" required>
-              <UInput v-model="state.password" type="password" class="w-full" />
+            <UFormField
+              name="password"
+              label="Palavra-passe (acesso inicial)"
+              required
+              help="Min. 8 caracteres, maiúscula, minúscula, número e símbolo"
+            >
+              <UInput
+                v-model="state.password"
+                type="password"
+                class="w-full font-mono"
+                placeholder="••••••••"
+              />
             </UFormField>
             <UFormField
               name="iban"
@@ -135,12 +186,22 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               required
               class="sm:col-span-2"
             >
-              <UInput v-model="state.iban" placeholder="PT50..." class="w-full" />
+              <UInput v-model="state.iban" class="w-full font-mono" placeholder="PT50 0000 0000 0000 0000 0000 0" />
             </UFormField>
           </div>
         </UPageCard>
 
-        <UPageCard title="Morada" variant="subtle">
+        <!-- Localização -->
+        <UPageCard variant="subtle">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-map-pin" class="size-4 text-muted" />
+              <h3 class="font-semibold text-highlighted">
+                Localização
+              </h3>
+            </div>
+          </template>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField
               name="rua"
@@ -148,13 +209,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               required
               class="sm:col-span-2"
             >
-              <UInput v-model="state.rua" class="w-full" />
+              <UInput v-model="state.rua" class="w-full" placeholder="Rua de Exemplo" />
             </UFormField>
-            <UFormField name="n_porta" label="Nº de Porta" required>
-              <UInput v-model="state.n_porta" class="w-full" />
+            <UFormField name="n_porta" label="Nº Porta" required>
+              <UInput v-model="state.n_porta" class="w-full" placeholder="10" />
             </UFormField>
             <UFormField name="codigo_postal" label="Código Postal" required>
-              <UInput v-model="state.codigo_postal" placeholder="4480-000" class="w-full" />
+              <UInput v-model="state.codigo_postal" class="w-full font-mono" placeholder="4480-100" />
             </UFormField>
             <UFormField name="freguesia" label="Freguesia" required>
               <UInput v-model="state.freguesia" class="w-full" />
@@ -171,35 +232,34 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           </div>
         </UPageCard>
 
-        <UPageCard title="Responsável" variant="subtle">
+        <!-- Contacto Responsável -->
+        <UPageCard variant="subtle">
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-user" class="size-4 text-muted" />
+              <h3 class="font-semibold text-highlighted">
+                Contacto Responsável
+              </h3>
+            </div>
+          </template>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField name="nome_contacto" label="Nome do Responsável" required>
-              <UInput v-model="state.nome_contacto" class="w-full" />
+            <UFormField name="nome_contacto" label="Nome" required>
+              <UInput v-model="state.nome_contacto" class="w-full" placeholder="Ex.: João Silva" />
             </UFormField>
-            <UFormField name="contacto" label="Contacto (telefone/email)" required>
-              <UInput v-model="state.contacto" class="w-full" />
+            <UFormField name="contacto" label="Telefone / Email de Contacto" required>
+              <UInput v-model="state.contacto" class="w-full" placeholder="912345678" />
             </UFormField>
-            <UFormField name="descricao_contacto" label="Função" required>
-              <UInput v-model="state.descricao_contacto" class="w-full" />
+            <UFormField
+              name="descricao_contacto"
+              label="Função"
+              required
+              class="sm:col-span-2"
+            >
+              <UInput v-model="state.descricao_contacto" class="w-full" placeholder="Responsável, Gerente, Sócio..." />
             </UFormField>
           </div>
         </UPageCard>
-
-        <div class="flex justify-end gap-3">
-          <UButton
-            label="Cancelar"
-            color="neutral"
-            variant="subtle"
-            to="/mecenas"
-          />
-          <UButton
-            form="mecenas-form"
-            type="submit"
-            label="Registar Mecenas"
-            color="primary"
-            :loading="isSubmitting"
-          />
-        </div>
       </UForm>
     </template>
   </UDashboardPanel>

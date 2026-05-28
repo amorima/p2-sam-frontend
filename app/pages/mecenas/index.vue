@@ -267,7 +267,7 @@ const statCards = computed(() => [
 
 const globalFilter = ref('')
 const columnVisibility = ref()
-const sorting = ref<SortingState>([])
+const sorting = ref<SortingState>([{ id: 'data', desc: true }])
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
 const tableRef = useTemplateRef<DonationTableRef>('tableRef')

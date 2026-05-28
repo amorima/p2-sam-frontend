@@ -277,7 +277,7 @@ const statCards = computed(() => [
 
 const globalFilter = ref('')
 const columnVisibility = ref()
-const sorting = ref<SortingState>([])
+const sorting = ref<SortingState>([{ id: 'id_pedido', desc: true }])
 const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
 const tableRef = useTemplateRef<NeedsTableRef>('tableRef')
