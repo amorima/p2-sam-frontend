@@ -37,11 +37,15 @@ const enrichedLeads = computed<EnrichedLead[]>(() =>
 )
 
 const filteredLeads = computed<EnrichedLead[]>(() => {
-  if (filterState.value === 'TODOS') return enrichedLeads.value
-  if (filterState.value === 'EXPIRA_BREVE') {
-    return enrichedLeads.value.filter(l => l.estadoEfetivo === 'PENDENTE' && l.horas_restantes < 24)
+  let result: EnrichedLead[]
+  if (filterState.value === 'TODOS') result = enrichedLeads.value
+  else if (filterState.value === 'EXPIRA_BREVE') {
+    result = enrichedLeads.value.filter(l => l.estadoEfetivo === 'PENDENTE' && l.horas_restantes < 24)
   }
-  return enrichedLeads.value.filter(l => l.estadoEfetivo === filterState.value)
+  else {
+    result = enrichedLeads.value.filter(l => l.estadoEfetivo === filterState.value)
+  }
+  return [...result].sort((a, b) => b.id_lead - a.id_lead)
 })
 
 const filteredCount = computed<number>(() => tableRef.value?.tableApi?.getFilteredRowModel().rows.length ?? filteredLeads.value.length)
