@@ -22,7 +22,13 @@ type NeedsTableRef = {
 }
 
 const { isAdmin, isInstitution, institutionNif } = useAuth()
-const { needs, institutions } = useNeeds()
+const toast = useToast()
+const { needs, institutions, approveNeed } = useNeeds()
+
+async function handleApprove(need: Need) {
+  await approveNeed(need.id_pedido)
+  toast.add({ title: 'Pedido aprovado', description: `#${need.id_pedido} — ${need.nome_entidade ?? need.nif_nipc}`, color: 'success' })
+}
 
 const statusModalOpen = ref(false)
 const selectedNeed = ref<Need | null>(null)
@@ -114,7 +120,12 @@ function getRowItems(row: Row<Need>) {
       items.push({
         label: 'Aprovar pedido',
         icon: 'i-lucide-check-circle',
-        to: '/instituicoes/aprovacao'
+        onSelect() { handleApprove(need) }
+      })
+      items.push({
+        label: 'Rejeitar pedido',
+        icon: 'i-lucide-x-circle',
+        onSelect() { openStatusModal(need) }
       })
     }
   }
