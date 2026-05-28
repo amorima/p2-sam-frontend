@@ -15,6 +15,11 @@ interface BackendNeed {
   'needItems'?: BackendNeedItem[]
 }
 
+interface BackendLead {
+  id_item: number | null
+  estado: string | null
+}
+
 // Known service-type keywords to infer tipo_bem when not available from backend
 const SERVICE_KEYWORDS = ['apoio', 'consulta', 'transporte', 'aulas', 'jurídico', 'psicológico', 'médic', 'explicação', 'serviço']
 
@@ -29,14 +34,27 @@ function inferTipoBem(tipo: string): 'BEM' | 'SERVICO' {
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
 
-  const [needsRes, institutionsRes] = await Promise.all([
+  const [needsRes, institutionsRes, leadsRes] = await Promise.all([
     $fetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`),
-    $fetch<{ data: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions`)
+    $fetch<{ data: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions`),
+    $fetch<BackendLead[]>(`${config.backendBase}/leads`).catch(() => [] as BackendLead[])
   ])
 
   const nameMap = new Map(
     (institutionsRes.data ?? []).map(i => [i.nif_nipc, i.nome_entidade])
   )
+
+  // Map each item to its lead status so the admin sees which items are claimed
+  const itemLeadStatus = new Map<number, 'pending' | 'completed'>()
+  for (const lead of leadsRes) {
+    if (lead.id_item == null) continue
+    if (lead.estado === 'ENTREGUE') {
+      itemLeadStatus.set(lead.id_item, 'completed')
+    }
+    else if (lead.estado === 'PENDENTE' && !itemLeadStatus.has(lead.id_item)) {
+      itemLeadStatus.set(lead.id_item, 'pending')
+    }
+  }
 
   let itemCounter = 0
   const today = new Date().toISOString()
@@ -50,8 +68,8 @@ export default defineEventHandler(async () => {
       id_pedido: item.id_pedido,
       tipo_bem_servico: item.tipo_bem_servico,
       tipo_bem: inferTipoBem(item.tipo_bem_servico),
-      status: 'available' as const,
-      match_tipo: null,
+      status: (itemLeadStatus.get(item.id_item ?? 0) ?? 'available') as 'available' | 'pending' | 'completed',
+      match_tipo: itemLeadStatus.has(item.id_item ?? 0) ? ('LEAD' as const) : null,
       match_ref: null,
       match_business_nif: null,
       match_business_estado: null,

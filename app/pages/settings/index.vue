@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import type { AuthSession } from '~/composables/useAuth'
 
 const fileRef = ref<HTMLInputElement>()
 const userProfile = useUserProfile()
 const { isAdmin } = useAuth()
 const { name: authName, avatar: authAvatar, updateAvatar } = userProfile
+const session = useCookie<AuthSession | null>('auth-session')
 
 const printReceiptEnabled = ref(true)
 const { isAvailable: agentAvailable, selectedPrinter, fetchPrinters, checkAvailability } = usePrintAgent()
@@ -65,13 +67,35 @@ watch(authAvatar, (url) => {
   profile.avatar = url
 })
 
-async function onSubmit(_event: FormSubmitEvent<ProfileSchema>) {
-  toast.add({
-    title: 'Sucesso',
-    description: 'As tuas definições foram atualizadas.',
-    icon: 'i-lucide-check',
-    color: 'success'
-  })
+async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
+  try {
+    const result = await $fetch<{ nome_entidade: string, email_login: string }>('/api/profile', {
+      method: 'PATCH',
+      body: {
+        nome_entidade: event.data.name,
+        ...(event.data.email ? { email_login: event.data.email } : {})
+      }
+    })
+
+    if (session.value) {
+      session.value = { ...session.value, name: result.nome_entidade }
+    }
+
+    toast.add({
+      title: 'Sucesso',
+      description: 'As tuas definições foram atualizadas.',
+      icon: 'i-lucide-check',
+      color: 'success'
+    })
+  } catch (err) {
+    console.error('[settings] profile update failed:', err)
+    toast.add({
+      title: 'Erro',
+      description: 'Não foi possível guardar as alterações.',
+      icon: 'i-lucide-x',
+      color: 'error'
+    })
+  }
 }
 
 async function onFileChange(e: Event) {

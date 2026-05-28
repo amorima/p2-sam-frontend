@@ -119,6 +119,7 @@ async function deleteCustomer(user: User) {
 
 interface BlockTarget {
   users: User[]
+  mode: 'block' | 'unblock'
   defaultReason: string | null
   subject: string | null
 }
@@ -129,6 +130,18 @@ function openBlockModal(users: User[]) {
   if (!users.length) return
   blockTarget.value = {
     users,
+    mode: 'block',
+    defaultReason: users.length === 1 ? users[0]!.reason ?? null : null,
+    subject: users.length === 1 ? users[0]!.name : null
+  }
+  blockModalOpen.value = true
+}
+
+function openUnblockModal(users: User[]) {
+  if (!users.length) return
+  blockTarget.value = {
+    users,
+    mode: 'unblock',
     defaultReason: users.length === 1 ? users[0]!.reason ?? null : null,
     subject: users.length === 1 ? users[0]!.name : null
   }
@@ -176,14 +189,24 @@ async function onBlockConfirm(reason: string) {
   const target = blockTarget.value
   blockTarget.value = null
   if (!target) return
-  const users: User[] = target.users
-  await applyBlock(users, true, reason)
+  await applyBlock(target.users, true, reason)
+}
+
+async function onUnblockConfirm() {
+  const target = blockTarget.value
+  blockTarget.value = null
+  if (!target) return
+  await applyBlock(target.users, false, null)
 }
 
 async function setUserBlocked(user: User, blocked: boolean) {
   if (!user.kind) return
   if (blocked) {
     openBlockModal([user])
+    return
+  }
+  if (user.reason) {
+    openUnblockModal([user])
     return
   }
   await applyBlock([user], false, null)
@@ -389,12 +412,14 @@ const columns: TableColumn<User>[] = [
       const u = row.original
       const color = u.blocked ? ('error' as const) : ('success' as const)
       const label = u.blocked ? 'Bloqueado' : 'Ativo'
-      const title = u.blocked && u.reason ? `Motivo: ${u.reason}` : undefined
-      return h(
-        UBadge,
-        { class: 'capitalize', variant: 'subtle', color, title },
-        () => label
-      )
+      const badge = h(UBadge, { class: 'capitalize self-start', variant: 'subtle', color }, () => label)
+      if (u.blocked && u.reason) {
+        return h('div', { class: 'flex flex-col gap-0.5' }, [
+          badge,
+          h('span', { class: 'text-xs text-[var(--ui-text-muted)] max-w-[10rem] truncate', title: u.reason }, u.reason)
+        ])
+      }
+      return badge
     }
   },
   {
@@ -559,10 +584,12 @@ const pagination = ref({
 
       <CustomersBlockReasonModal
         v-model:open="blockModalOpen"
+        :mode="blockTarget?.mode ?? 'block'"
         :count="blockTarget?.users.length ?? 1"
         :subject="blockTarget?.subject ?? null"
         :default-reason="blockTarget?.defaultReason ?? null"
         @confirm="onBlockConfirm"
+        @unblock="onUnblockConfirm"
       />
     </template>
   </UDashboardPanel>

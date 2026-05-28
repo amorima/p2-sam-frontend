@@ -2,6 +2,8 @@
 import { sub } from 'date-fns'
 import type { Period, Range } from '~/types'
 
+definePageMeta({ middleware: 'admin-only' })
+
 const { isNotificationsSlideoverOpen } = useDashboard()
 
 const range = shallowRef<Range>({
