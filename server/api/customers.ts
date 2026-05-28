@@ -18,11 +18,9 @@ interface BackendCitizen {
   reason?: string | null
 }
 
-const PRAVATAR_BASE = 'https://i.pravatar.cc/128?u='
-
-function avatarUrl(profile_pic: string | null | undefined, seed: string): string {
+function avatarSrc(profile_pic: string | null | undefined): string | undefined {
   if (profile_pic) return `/api/download/avatar?nome=${encodeURIComponent(profile_pic)}`
-  return `${PRAVATAR_BASE}${encodeURIComponent(seed)}`
+  return undefined
 }
 
 function entityToUser(
@@ -31,11 +29,12 @@ function entityToUser(
   actorType: 'Mecenas' | 'Negócio' | 'Instituição'
 ): User {
   const blocked = Boolean(e.blocked)
+  const name = e.nome_entidade ?? e.nif_nipc
   return {
     id: e.nif_nipc,
-    name: e.nome_entidade ?? e.nif_nipc,
+    name,
     email: e.email_login ?? '',
-    avatar: { src: avatarUrl(e.profile_pic, e.nif_nipc) },
+    avatar: { src: avatarSrc(e.profile_pic), alt: name },
     status: blocked ? 'unsubscribed' : 'subscribed',
     actorType,
     kind,
@@ -52,7 +51,7 @@ function citizenToUser(c: BackendCitizen): User {
     id: c.contacto,
     name: c.nome,
     email: c.contacto,
-    avatar: { src: avatarUrl(null, c.contacto) },
+    avatar: { src: avatarSrc(null), alt: c.nome },
     status: blocked ? 'unsubscribed' : 'subscribed',
     actorType: 'Cidadão',
     kind: 'citizen',

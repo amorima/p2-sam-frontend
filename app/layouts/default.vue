@@ -32,6 +32,11 @@ const links = computed<NavigationMenuItem[][]>(() => {
             label: 'Doação Manual',
             to: '/mecenas/doacao_manual',
             onSelect: () => { open.value = false }
+          },
+          {
+            label: 'Registar Mecenas',
+            to: '/mecenas/registo',
+            onSelect: () => { open.value = false }
           }
         ]
       : [
@@ -71,6 +76,11 @@ const links = computed<NavigationMenuItem[][]>(() => {
           {
             label: 'Pedido Manual',
             to: '/instituicoes/pedido_manual',
+            onSelect: () => { open.value = false }
+          },
+          {
+            label: 'Registar Instituição',
+            to: '/instituicoes/registo',
             onSelect: () => { open.value = false }
           }
         ]
@@ -169,6 +179,12 @@ const links = computed<NavigationMenuItem[][]>(() => {
       label: 'Utilizadores',
       icon: 'i-lucide-users',
       to: '/customers',
+      onSelect: () => { open.value = false }
+    },
+    {
+      label: 'Bens e Serviços',
+      icon: 'i-lucide-package',
+      to: '/bens-servicos',
       onSelect: () => { open.value = false }
     }
   ]]

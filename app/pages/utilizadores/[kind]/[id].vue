@@ -30,6 +30,10 @@ const authHeader = computed(() =>
     : undefined
 )
 
+const { isAdmin } = useAuth()
+const isOwnProfile = computed(() => session.value?.nif === id.value)
+const canAdminister = computed(() => isAdmin.value && !isOwnProfile.value)
+
 const { data: user, status, refresh, error } = await useFetch<CustomerDetail>(
   () => `/api/customers/${kind.value}/${encodeURIComponent(id.value)}`,
   { lazy: true }
@@ -130,7 +134,7 @@ function copyToClipboard(value: string, label: string) {
             @click="refresh()"
           />
           <UButton
-            v-if="user"
+            v-if="user && canAdminister"
             :icon="user.blocked ? 'i-lucide-shield-check' : 'i-lucide-shield-off'"
             :color="user.blocked ? 'success' : 'warning'"
             variant="subtle"
@@ -138,7 +142,7 @@ function copyToClipboard(value: string, label: string) {
             @click="toggleBlocked"
           />
           <UButton
-            v-if="user"
+            v-if="user && canAdminister"
             icon="i-lucide-trash"
             color="error"
             variant="subtle"
