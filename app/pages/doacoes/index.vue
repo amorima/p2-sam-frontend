@@ -41,8 +41,7 @@ const filteredLeads = computed<EnrichedLead[]>(() => {
   if (filterState.value === 'TODOS') result = enrichedLeads.value
   else if (filterState.value === 'EXPIRA_BREVE') {
     result = enrichedLeads.value.filter(l => l.estadoEfetivo === 'PENDENTE' && l.horas_restantes < 24)
-  }
-  else {
+  } else {
     result = enrichedLeads.value.filter(l => l.estadoEfetivo === filterState.value)
   }
   return [...result].sort((a, b) => b.id_lead - a.id_lead)

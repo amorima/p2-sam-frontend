@@ -58,13 +58,13 @@ watch(
     // Pre-filter to range so no out-of-range donations bleed into the first/last bucket
     const accepted = (donations.value ?? [])
       .filter(d => d.estado === 'ACEITE')
-      .filter(d => {
+      .filter((d) => {
         const date = new Date(d.data)
         return date >= start && date <= end
       })
 
-    const buckets: Date[] =
-      props.period === 'daily'
+    const buckets: Date[]
+      = props.period === 'daily'
         ? eachDayOfInterval({ start, end })
         : props.period === 'weekly'
           ? eachWeekOfInterval({ start, end }, weekOpts)
