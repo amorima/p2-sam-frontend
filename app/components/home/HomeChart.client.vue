@@ -52,15 +52,23 @@ function isSameBucket(bucketDate: Date, donationDate: Date): boolean {
 watch(
   [donations, () => props.period, () => props.range],
   () => {
-    const accepted = (donations.value ?? []).filter(d => d.estado === 'ACEITE')
+    const { start, end } = props.range
+    const weekOpts = { weekStartsOn: 1 as const }
 
-    const buckets = (
-      {
-        daily: eachDayOfInterval,
-        weekly: eachWeekOfInterval,
-        monthly: eachMonthOfInterval
-      } as Record<Period, typeof eachDayOfInterval>
-    )[props.period](props.range)
+    // Pre-filter to range so no out-of-range donations bleed into the first/last bucket
+    const accepted = (donations.value ?? [])
+      .filter(d => d.estado === 'ACEITE')
+      .filter(d => {
+        const date = new Date(d.data)
+        return date >= start && date <= end
+      })
+
+    const buckets: Date[] =
+      props.period === 'daily'
+        ? eachDayOfInterval({ start, end })
+        : props.period === 'weekly'
+          ? eachWeekOfInterval({ start, end }, weekOpts)
+          : eachMonthOfInterval({ start, end })
 
     chartData.value = buckets.map(date => ({
       date,
