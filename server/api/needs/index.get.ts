@@ -68,7 +68,7 @@ export default defineEventHandler(async () => {
       tipo_bem_servico: item.tipo_bem_servico,
       tipo_bem: inferTipoBem(item.tipo_bem_servico),
       status: (itemLeadStatus.get(item.id_item ?? 0) ?? 'available') as 'available' | 'pending' | 'completed',
-      match_tipo: itemLeadStatus.has(item.id_item ?? 0) ? ('LEAD' as const) : null,
+      match_tipo: itemLeadStatus.has(item.id_item ?? 0) ? ('PAINEL' as const) : null,
       match_ref: null,
       match_business_nif: null,
       match_business_estado: null,

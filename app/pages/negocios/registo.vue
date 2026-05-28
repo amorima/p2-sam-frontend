@@ -14,7 +14,7 @@ interface DraftOffer {
 const toast = useToast()
 const router = useRouter()
 const { isAdmin } = useAuth()
-const { businesses, goodsServices, createBusinessRemote } = useNeeds()
+const { businesses, createBusinessRemote } = useNeeds()
 
 if (!isAdmin.value) {
   await navigateTo('/negocios')
@@ -120,15 +120,6 @@ const newOfferDescricao = ref('')
 const newOfferValor = ref<number | undefined>(undefined)
 const newOfferDesconto = ref<number>(100)
 const isProBono = computed(() => newOfferDesconto.value === 100)
-
-const categoryOptions = computed(() =>
-  goodsServices.value
-    .filter(g => g.tipo_bem === 'SERVICO')
-    .map(g => ({
-      label: g.tipo_bem_servico,
-      value: g.tipo_bem_servico
-    }))
-)
 
 function addOfferDraft() {
   const cat = newOfferCategory.value.trim()
@@ -432,21 +423,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <UFormField
                 label="Categoria (serviço)"
-                description="Escolha uma existente ou escreva uma nova."
+                help="Escreva o nome da categoria de serviço a oferecer."
               >
                 <UInput
                   v-model="newOfferCategory"
-                  list="offer-category-options"
-                  placeholder="Ex.: Apoio jurídico, Transporte..."
+                  placeholder="Ex.: Apoio jurídico, Transporte, Consultas..."
                   class="w-full"
                 />
-                <datalist id="offer-category-options">
-                  <option
-                    v-for="opt in categoryOptions"
-                    :key="opt.value"
-                    :value="opt.value"
-                  />
-                </datalist>
               </UFormField>
               <UFormField label="Valor Base (€)">
                 <UInput
