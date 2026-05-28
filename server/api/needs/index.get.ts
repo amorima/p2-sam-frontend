@@ -50,8 +50,7 @@ export default defineEventHandler(async () => {
     if (lead.id_item == null) continue
     if (lead.estado === 'ENTREGUE') {
       itemLeadStatus.set(lead.id_item, 'completed')
-    }
-    else if (lead.estado === 'PENDENTE' && !itemLeadStatus.has(lead.id_item)) {
+    } else if (lead.estado === 'PENDENTE' && !itemLeadStatus.has(lead.id_item)) {
       itemLeadStatus.set(lead.id_item, 'pending')
     }
   }

@@ -127,13 +127,25 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       <UDashboardNavbar title="Registar Instituição">
         <template #leading>
           <UDashboardSidebarCollapse />
-          <UButton icon="i-lucide-arrow-left" color="neutral" variant="ghost" to="/instituicoes" class="hidden lg:flex" />
+          <UButton
+            icon="i-lucide-arrow-left"
+            color="neutral"
+            variant="ghost"
+            to="/instituicoes"
+            class="hidden lg:flex"
+          />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <UForm id="inst-registo" :schema="schema" :state="state" class="space-y-6 max-w-3xl mx-auto" @submit="onSubmit">
+      <UForm
+        id="inst-registo"
+        :schema="schema"
+        :state="state"
+        class="space-y-6 max-w-3xl mx-auto"
+        @submit="onSubmit"
+      >
         <UPageCard title="Identidade" variant="subtle">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField name="nif_nipc" label="NIF/NIPC" required>
@@ -148,7 +160,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <UFormField name="password" label="Palavra-passe" required>
               <UInput v-model="state.password" type="password" class="w-full" />
             </UFormField>
-            <UFormField name="url_comprovativo_estatuto" label="URL do Estatuto" required class="sm:col-span-2">
+            <UFormField
+              name="url_comprovativo_estatuto"
+              label="URL do Estatuto"
+              required
+              class="sm:col-span-2"
+            >
               <UInput v-model="state.url_comprovativo_estatuto" placeholder="https://..." class="w-full" />
             </UFormField>
           </div>
@@ -156,7 +173,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
         <UPageCard title="Morada" variant="subtle">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField name="rua" label="Rua" required class="sm:col-span-2">
+            <UFormField
+              name="rua"
+              label="Rua"
+              required
+              class="sm:col-span-2"
+            >
               <UInput v-model="state.rua" class="w-full" />
             </UFormField>
             <UFormField name="n_porta" label="Nº de Porta" required>
@@ -195,7 +217,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         </UPageCard>
 
         <div class="flex justify-end gap-3">
-          <UButton label="Cancelar" color="neutral" variant="subtle" to="/instituicoes" />
+          <UButton
+            label="Cancelar"
+            color="neutral"
+            variant="subtle"
+            to="/instituicoes"
+          />
           <UButton
             form="inst-registo"
             type="submit"

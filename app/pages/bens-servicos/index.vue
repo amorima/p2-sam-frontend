@@ -93,12 +93,33 @@ async function removeItem(tipo_bem_servico: string) {
           Novo item
         </p>
         <div class="flex gap-3">
-          <UInput v-model="newNome" placeholder="Nome do bem ou serviço" class="flex-1" @keydown.enter="addItem" />
-          <USelect v-model="newTipo" :items="tipoOptions" value-key="value" label-key="label" class="w-36" />
+          <UInput
+            v-model="newNome"
+            placeholder="Nome do bem ou serviço"
+            class="flex-1"
+            @keydown.enter="addItem"
+          />
+          <USelect
+            v-model="newTipo"
+            :items="tipoOptions"
+            value-key="value"
+            label-key="label"
+            class="w-36"
+          />
         </div>
         <div class="flex justify-end gap-2">
-          <UButton label="Cancelar" color="neutral" variant="subtle" @click="showForm = false" />
-          <UButton label="Adicionar" color="primary" :loading="isSubmitting" @click="addItem" />
+          <UButton
+            label="Cancelar"
+            color="neutral"
+            variant="subtle"
+            @click="showForm = false"
+          />
+          <UButton
+            label="Adicionar"
+            color="primary"
+            :loading="isSubmitting"
+            @click="addItem"
+          />
         </div>
       </div>
 
