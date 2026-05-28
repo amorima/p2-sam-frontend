@@ -69,12 +69,6 @@ const _useNeeds = () => {
     return null
   })
 
-  const nextNeedId = () => Math.max(2000, ...needs.value.map(n => n.id_pedido)) + 1
-  const nextItemId = () => {
-    const all = needs.value.flatMap(n => n.items.map(i => i.id_item))
-    return Math.max(0, ...all) + 1
-  }
-
   function ensureGoodsService(item: NewItemInput) {
     const exists = goodsServices.value.some(g => g.tipo_bem_servico === item.tipo_bem_servico)
     if (!exists) {
@@ -84,53 +78,44 @@ const _useNeeds = () => {
 
   async function createNeed(input: CreateNeedInput): Promise<Need> {
     input.items.forEach(ensureGoodsService)
-    const id_pedido = nextNeedId()
-    let id_item = nextItemId()
-    const items: NeedItem[] = input.items.map(it => ({
-      id_item: id_item++,
-      id_pedido,
+
+    const backendRes = await $fetch<{
+      need: { id_pedido: number, nif_nipc: string, estado: string, urgente: boolean }
+      items: Array<{ id_item: number, id_pedido: number, tipo_bem_servico: string }>
+    }>('/api/needs', {
+      method: 'POST',
+      body: {
+        nif_nipc: input.nif_nipc,
+        estado: input.estado,
+        urgente: input.urgente,
+        items: input.items.map(it => ({
+          tipo_bem_servico: it.tipo_bem_servico,
+          tipo_bem: it.tipo_bem
+        }))
+      }
+    })
+
+    const items: NeedItem[] = backendRes.items.map(it => ({
+      id_item: it.id_item,
+      id_pedido: backendRes.need.id_pedido,
       tipo_bem_servico: it.tipo_bem_servico,
-      tipo_bem: it.tipo_bem,
+      tipo_bem: input.items.find(i => i.tipo_bem_servico === it.tipo_bem_servico)?.tipo_bem ?? 'BEM',
       status: 'available',
       match_tipo: null,
       match_ref: null
     }))
+
     const need: Need = {
-      id_pedido,
-      nif_nipc: input.nif_nipc,
+      id_pedido: backendRes.need.id_pedido,
+      nif_nipc: backendRes.need.nif_nipc,
       nome_entidade: input.nome_entidade,
       data: input.data,
-      estado: input.estado ?? 'PENDENTE',
-      urgente: input.urgente,
+      estado: backendRes.need.estado as EstadoPedido,
+      urgente: backendRes.need.urgente,
       items
     }
-    if (need.estado === 'ACEITE' && need.urgente) {
-      need.items.forEach((it) => {
-        if (it.tipo_bem === 'BEM' && !it.match_tipo) {
-          it.match_tipo = 'VOUCHER'
-          it.match_ref = `VCH-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`
-          it.status = 'completed'
-        }
-      })
-    }
+
     needs.value = [need, ...needs.value]
-
-    try {
-      await $fetch('/api/needs', {
-        method: 'POST',
-        body: {
-          nif_nipc: input.nif_nipc,
-          estado: input.estado,
-          items: input.items.map(it => ({
-            tipo_bem_servico: it.tipo_bem_servico,
-            tipo_bem: it.tipo_bem
-          }))
-        }
-      })
-    } catch (e) {
-      console.error('[useNeeds] Failed to persist need:', e)
-    }
-
     return need
   }
 
