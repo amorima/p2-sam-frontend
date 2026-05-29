@@ -60,11 +60,12 @@ export default defineEventHandler(async (event) => {
     (institutionsRes.data ?? []).map(i => [i.nif_nipc, i.nome_entidade])
   )
 
-  // Exclude items that have an active lead (PENDENTE, ENTREGUE, or CONCLUIDO).
-  // EXPIRADO leads free the item back onto the panel.
+  // Exclude items that have an active lead (PENDENTE or ENTREGUE) — these match
+  // the states the backend treats as reserving the item. EXPIRADO leads free
+  // the item back onto the panel.
   const excludedByItemId = new Set<number>()
   for (const lead of leadsRes as BackendLead[]) {
-    if (lead.estado === 'PENDENTE' || lead.estado === 'ENTREGUE' || lead.estado === 'CONCLUIDO') {
+    if (lead.estado === 'PENDENTE' || lead.estado === 'ENTREGUE') {
       if (lead.id_item != null) excludedByItemId.add(lead.id_item)
     }
   }

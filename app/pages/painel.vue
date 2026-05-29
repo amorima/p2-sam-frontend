@@ -50,6 +50,7 @@ const weatherData = ref<WeatherData>({
 const thanksOpen = ref(false)
 const currentTime = ref('')
 const currentDate = ref('')
+const now = ref(new Date())
 const isSubmitting = ref(false)
 const submitError = ref('')
 
@@ -105,18 +106,72 @@ const weatherIcon = computed(() => {
 })
 
 const updateClock = () => {
-  const now = new Date()
-  currentTime.value = now.toLocaleTimeString('pt-PT', {
+  const d = new Date()
+  now.value = d
+  currentTime.value = d.toLocaleTimeString('pt-PT', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
   })
-  currentDate.value = now.toLocaleDateString('pt-PT', {
+  currentDate.value = d.toLocaleDateString('pt-PT', {
     weekday: 'long',
     day: 'numeric',
     month: 'long'
   })
 }
+
+// ── Dynamic dates so the "static" cards never look stale ───────────────────────
+const monthShort = (d: Date) => {
+  const m = d.toLocaleDateString('pt-PT', { month: 'short' }).replace('.', '')
+  return m.charAt(0).toUpperCase() + m.slice(1)
+}
+
+// Anchor agenda/transports to the current minute so they recompute as time
+// passes but stay stable within the minute (no per-second flicker).
+const minuteAnchor = computed(() => {
+  const d = now.value
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}-${d.getHours()}-${d.getMinutes()}`
+})
+
+interface AgendaEvent { day: string, month: string, title: string, meta: string }
+const agendaEvents = computed<AgendaEvent[]>(() => {
+  void minuteAnchor.value
+  const base = now.value
+  const mk = (offsetDays: number) => {
+    const d = new Date(base)
+    d.setDate(d.getDate() + offsetDays)
+    return { day: String(d.getDate()).padStart(2, '0'), month: monthShort(d) }
+  }
+  const e1 = mk(2)
+  const e2 = mk(5)
+  const e3 = mk(12)
+  return [
+    { ...e1, title: 'Feira Semanal do Mercado', meta: '09:00 – 14:00 · Praça do Município' },
+    { ...e2, title: 'Concerto no Auditório Municipal', meta: '21:30 · Auditório Municipal' },
+    { ...e3, title: 'Dia do Município – Festas', meta: 'Todo o dia · Centro Histórico' }
+  ]
+})
+
+interface TransportRow { badge: string, green: boolean, name: string, time: string }
+const transportRows = computed<TransportRow[]>(() => {
+  void minuteAnchor.value
+  const base = now.value
+  const at = (offsetMin: number) => {
+    const d = new Date(base.getTime() + offsetMin * 60_000)
+    return d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', hour12: false })
+  }
+  return [
+    { badge: 'L1', green: false, name: 'Porto – Vila do Conde', time: at(6) },
+    { badge: 'L2', green: false, name: 'Póvoa de Varzim', time: at(19) },
+    { badge: 'M', green: true, name: 'Metro – Linha Vermelha', time: at(33) },
+    { badge: 'L1', green: false, name: 'Porto – Vila do Conde', time: at(52) }
+  ]
+})
+
+const todayLabel = computed(() => {
+  void minuteAnchor.value
+  return now.value.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' })
+})
 
 const fetchWeather = async () => {
   try {
@@ -447,11 +502,14 @@ onBeforeUnmount(() => {
               <span>Notícias</span>
             </div>
             <div class="news-body">
-              <img
-                src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&q=80"
-                alt="Notícia"
-                class="news-image"
-              >
+              <div class="news-image-wrap">
+                <img
+                  src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&q=80"
+                  alt="Notícia"
+                  class="news-image"
+                >
+                <span class="news-date-badge">{{ todayLabel }}</span>
+              </div>
               <p class="news-text">
                 Últimas novidades da comunidade local e iniciativas comunitárias.
               </p>
@@ -465,33 +523,16 @@ onBeforeUnmount(() => {
               <span>Transportes</span>
             </div>
             <div class="transport-body">
-              <div class="transport-row">
+              <div
+                v-for="(t, idx) in transportRows"
+                :key="idx"
+                class="transport-row"
+              >
                 <div class="transport-line">
-                  <span class="transport-badge">L1</span>
-                  <span class="transport-name">Porto – Vila do Conde</span>
+                  <span class="transport-badge" :class="{ 'transport-badge--green': t.green }">{{ t.badge }}</span>
+                  <span class="transport-name">{{ t.name }}</span>
                 </div>
-                <span class="transport-time">08:42</span>
-              </div>
-              <div class="transport-row">
-                <div class="transport-line">
-                  <span class="transport-badge">L2</span>
-                  <span class="transport-name">Póvoa de Varzim</span>
-                </div>
-                <span class="transport-time">09:15</span>
-              </div>
-              <div class="transport-row">
-                <div class="transport-line">
-                  <span class="transport-badge transport-badge--green">M</span>
-                  <span class="transport-name">Metro – Linha Vermelha</span>
-                </div>
-                <span class="transport-time">09:28</span>
-              </div>
-              <div class="transport-row">
-                <div class="transport-line">
-                  <span class="transport-badge">L1</span>
-                  <span class="transport-name">Porto – Vila do Conde</span>
-                </div>
-                <span class="transport-time transport-time--next">10:10</span>
+                <span class="transport-time">{{ t.time }}</span>
               </div>
             </div>
           </div>
@@ -565,48 +606,22 @@ onBeforeUnmount(() => {
               <span>Agenda</span>
             </div>
             <div class="events-body">
-              <div class="event-row">
+              <div
+                v-for="(ev, idx) in agendaEvents"
+                :key="idx"
+                class="event-row"
+              >
                 <div class="event-date-block" aria-hidden="true">
-                  <span class="event-day">14</span>
-                  <span class="event-month">Mai</span>
+                  <span class="event-day">{{ ev.day }}</span>
+                  <span class="event-month">{{ ev.month }}</span>
                 </div>
                 <div class="event-detail">
                   <div class="event-title">
-                    Feira Semanal do Mercado
+                    {{ ev.title }}
                   </div>
                   <div class="event-meta">
                     <UIcon name="i-fa6-solid-clock" aria-hidden="true" />
-                    <span>09:00 – 14:00 · Praça do Município</span>
-                  </div>
-                </div>
-              </div>
-              <div class="event-row">
-                <div class="event-date-block" aria-hidden="true">
-                  <span class="event-day">17</span>
-                  <span class="event-month">Mai</span>
-                </div>
-                <div class="event-detail">
-                  <div class="event-title">
-                    Concerto no Auditório Municipal
-                  </div>
-                  <div class="event-meta">
-                    <UIcon name="i-fa6-solid-clock" aria-hidden="true" />
-                    <span>21:30 · Auditório Municipal</span>
-                  </div>
-                </div>
-              </div>
-              <div class="event-row">
-                <div class="event-date-block" aria-hidden="true">
-                  <span class="event-day">24</span>
-                  <span class="event-month">Mai</span>
-                </div>
-                <div class="event-detail">
-                  <div class="event-title">
-                    Dia do Município – Festas
-                  </div>
-                  <div class="event-meta">
-                    <UIcon name="i-fa6-solid-clock" aria-hidden="true" />
-                    <span>Todo o dia · Centro Histórico</span>
+                    <span>{{ ev.meta }}</span>
                   </div>
                 </div>
               </div>
@@ -651,6 +666,7 @@ onBeforeUnmount(() => {
             <div class="donate-section-label">
               <UIcon name="i-fa6-solid-box-open" aria-hidden="true" />
               Selecione o bem a doar
+              <span v-if="goods.length" class="donate-count-badge">{{ goods.length }}</span>
             </div>
             <div class="donate-goods-grid">
               <div v-if="!goodsData" class="goods-status">
@@ -668,8 +684,16 @@ onBeforeUnmount(() => {
                 :class="{ active: selectedGoodId === String(good.id_item) }"
                 @click="toggleGood(String(good.id_item))"
               >
-                <span class="good-name">{{ good.tipo_bem_servico }}</span>
-                <span class="good-institution">{{ good.nome_entidade }}</span>
+                <span class="good-chip-text">
+                  <span class="good-name">{{ good.tipo_bem_servico }}</span>
+                  <span class="good-institution">{{ good.nome_entidade }}</span>
+                </span>
+                <UIcon
+                  v-if="selectedGoodId === String(good.id_item)"
+                  name="i-fa6-solid-circle-check"
+                  class="good-check"
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </div>
@@ -963,6 +987,32 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  animation: card-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(96, 165, 250, 0.35);
+  box-shadow: 0 16px 40px rgba(6, 9, 26, 0.45);
+}
+
+.panel-grid > .glass-card:nth-child(1) { animation-delay: 0.04s; }
+.panel-grid > .glass-card:nth-child(2) { animation-delay: 0.10s; }
+.panel-grid > .glass-card:nth-child(3) { animation-delay: 0.16s; }
+.panel-grid > .glass-card:nth-child(4) { animation-delay: 0.22s; }
+.panel-grid > .glass-card:nth-child(5) { animation-delay: 0.28s; }
+.panel-grid > .glass-card:nth-child(6) { animation-delay: 0.34s; }
+.panel-grid > .glass-card:nth-child(7) { animation-delay: 0.40s; }
+
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-card { animation: none; }
+  .hero-icon { animation: none; }
 }
 
 .glass-card-header {
@@ -1106,12 +1156,33 @@ onBeforeUnmount(() => {
   padding: 16px 20px 20px;
 }
 
+.news-image-wrap {
+  position: relative;
+  margin-bottom: 14px;
+}
+
 .news-image {
   width: 100%;
   height: 160px;
   object-fit: cover;
   border-radius: 12px;
-  margin-bottom: 14px;
+  display: block;
+}
+
+.news-date-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(6, 9, 26, 0.72);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cfe0ff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
 }
 
 .news-text {
@@ -1231,13 +1302,50 @@ onBeforeUnmount(() => {
   font-weight: 500;
   text-align: left;
   min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+.good-chip:not(.active):hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+
+.good-chip-text { min-width: 0; flex: 1; }
 
 .good-chip.active {
   background: linear-gradient(135deg, #2563eb, #3b82f6);
   border-color: #60a5fa;
   color: #fff;
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+
+.good-check {
+  font-size: 20px;
+  color: #fff;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+.donate-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  margin-left: auto;
+  background: rgba(96, 165, 250, 0.18);
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #93c5fd;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .good-name {

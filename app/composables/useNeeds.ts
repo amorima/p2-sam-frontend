@@ -16,6 +16,18 @@ interface NewItemInput {
   tipo_bem: 'BEM' | 'SERVICO'
 }
 
+// The project runs a single physical citizen panel in Vila do Conde. There is
+// no IoT equipment-management backend (and none is required), so the panel is
+// declared here as the canonical default that powers the approval PanelPicker.
+const DEFAULT_PANEL: Panel = {
+  id_dispositivo: 1,
+  nome: 'Painel do Cidadão — Vila do Conde',
+  geo_latitude: 41.3537,
+  geo_longitude: -8.7427,
+  raio_alcance: 20,
+  localizacao: 'Praça do Município, Vila do Conde'
+}
+
 interface CreateNeedInput {
   nif_nipc: string
   nome_entidade?: string
@@ -30,7 +42,7 @@ const _useNeeds = () => {
   const institutions = useState<Institution[]>('needs.institutions', () => [])
   const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [])
   const businesses = useState<Business[]>('needs.businesses', () => [])
-  const panels = useState<Panel[]>('needs.panels', () => [])
+  const panels = useState<Panel[]>('needs.panels', () => [DEFAULT_PANEL])
 
   // Fetch all data from API (deduped by key — runs once per SSR + once on client if needed)
   useAsyncData('needs-initial-data', async () => {
