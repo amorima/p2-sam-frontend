@@ -60,9 +60,31 @@ function citizenToUser(c: BackendCitizen): User {
   }
 }
 
-export default defineEventHandler(async (): Promise<User[]> => {
+export default defineEventHandler(async (event): Promise<User[] | unknown> => {
   const config = useRuntimeConfig()
   const base = config.backendBase
+
+  // Create a new citizen (admin user-management "Novo utilizador" action).
+  if (getMethod(event) === 'POST') {
+    const body = await readBody<{ name?: string, email?: string, rgpd?: boolean }>(event)
+    const nome = body?.name?.trim()
+    const contacto = body?.email?.trim()
+    if (!nome || !contacto) {
+      throw createError({ statusCode: 400, statusMessage: 'Nome e email são obrigatórios.' })
+    }
+    try {
+      return await authBackendFetch(event, `${base}/citizens`, {
+        method: 'POST',
+        body: { nome, contacto, rgpd: body?.rgpd === false ? 0 : 1 }
+      })
+    } catch (err: unknown) {
+      const e = err as { statusCode?: number, statusMessage?: string, data?: { description?: string } }
+      throw createError({
+        statusCode: e?.statusCode ?? 500,
+        statusMessage: e?.statusMessage ?? e?.data?.description ?? 'Falha ao criar utilizador.'
+      })
+    }
+  }
 
   const safeFetch = async <T>(path: string): Promise<T | null> => {
     try {

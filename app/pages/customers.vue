@@ -5,6 +5,8 @@ import type { Column, Row, SortingState, Table } from '@tanstack/table-core'
 import type { User } from '~/types'
 import type { AuthSession } from '~/composables/useAuth'
 
+definePageMeta({ middleware: 'admin-only' })
+
 const UAvatar = resolveComponent('UAvatar')
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
@@ -469,7 +471,7 @@ const pagination = ref({
             :loading="status === 'pending'"
             @click="refresh()"
           />
-          <CustomersAddModal />
+          <CustomersAddModal @created="refresh()" />
         </template>
       </UDashboardNavbar>
     </template>
