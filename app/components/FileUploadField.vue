@@ -34,6 +34,14 @@ const fileLabel = computed(() => {
   return ''
 })
 
+// Open the file directly through the backend stream proxy (serves it inline)
+// instead of the raw MinIO object URL, which otherwise lands on the MinIO page.
+const viewUrl = computed(() => {
+  if (!props.modelValue) return '#'
+  const fileName = props.modelValue.split('/').pop() || ''
+  return `/api/download/${props.bucket}?nome=${encodeURIComponent(fileName)}`
+})
+
 function pick() {
   input.value?.click()
 }
@@ -115,7 +123,7 @@ function remove() {
           {{ fileLabel }}
         </p>
         <a
-          :href="modelValue"
+          :href="viewUrl"
           target="_blank"
           rel="noopener"
           class="text-xs text-primary hover:underline"

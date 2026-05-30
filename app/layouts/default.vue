@@ -160,14 +160,14 @@ const links = computed<NavigationMenuItem[][]>(() => {
       onSelect: () => { open.value = false }
     },
     notificacoesItem,
-    mecenasItem,
-    instituicoesItem,
     {
       label: 'Doações de cidadãos',
       icon: 'i-lucide-heart-handshake',
       to: '/doacoes',
       onSelect: () => { open.value = false }
     },
+    mecenasItem,
+    instituicoesItem,
     negociosItem,
     {
       label: 'Estado de equipamentos',

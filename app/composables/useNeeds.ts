@@ -212,10 +212,16 @@ const _useNeeds = () => {
       })
     }
 
+    // Persist which items were allocated to the citizen panel so the panel shows
+    // them even when the institution is outside the kiosk's GPS radius.
+    const panelItemIds = need.items
+      .filter(it => it.match_tipo === 'PAINEL')
+      .map(it => it.id_item)
+
     try {
       await $fetch(`/api/needs/${id_pedido}`, {
         method: 'PATCH',
-        body: { estado: 'ACEITE' }
+        body: { estado: 'ACEITE', panelItemIds }
       })
     } catch (e) {
       console.error('[useNeeds] Failed to approve need:', e)

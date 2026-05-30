@@ -260,14 +260,31 @@ const isPrintEnabled = (): boolean => {
 
 const { print: agentPrint, isAvailable: printerAvailable, checkAvailability: refreshPrinter } = usePrintAgent()
 
+type PrintStatus = 'idle' | 'printing' | 'done' | 'disabled' | 'unavailable' | 'error'
+const printStatus = ref<PrintStatus>('idle')
+
+const printStatusLabel = computed(() => ({
+  idle: '',
+  printing: 'A imprimir talão…',
+  done: 'Talão impresso',
+  disabled: 'Impressão de talão desativada',
+  unavailable: 'Agente de impressão offline — talão não impresso',
+  error: 'Falha ao imprimir o talão'
+}[printStatus.value]))
+
 const printReceipt = async () => {
-  if (!isPrintEnabled()) return
+  if (!isPrintEnabled()) {
+    printStatus.value = 'disabled'
+    return
+  }
+  printStatus.value = 'printing'
 
   // Validação: só imprime se o print-agent estiver ativo (fonte de verdade
   // sobre a disponibilidade da impressora). Se estiver offline, ignora-se.
   await refreshPrinter()
   if (!printerAvailable.value) {
     console.warn('[painel] print-agent offline — talão não impresso')
+    printStatus.value = 'unavailable'
     return
   }
 
@@ -291,8 +308,10 @@ const printReceipt = async () => {
       }
     })
     await agentPrint(result.bytes, printerName)
+    printStatus.value = 'done'
   } catch (err: unknown) {
     console.error('[painel] print failed:', err)
+    printStatus.value = 'error'
   }
 }
 
@@ -300,6 +319,7 @@ const submitDonation = async () => {
   if (!isDonateEnabled.value || !selectedGood.value) return
   isSubmitting.value = true
   submitError.value = ''
+  printStatus.value = 'idle'
 
   const generatedPin = generatePin()
 
@@ -367,9 +387,7 @@ onMounted(async () => {
   clockInterval = setInterval(updateClock, 1000)
   await initDeviceTelemetry()
   sendTelemetry()
-  // 30s is plenty for a kiosk panel and keeps us well under the API rate limit
-  // (5s previously meant ~180 telemetry posts per 15-min window per device).
-  telemetryInterval = setInterval(sendTelemetry, 30000)
+  telemetryInterval = setInterval(sendTelemetry, 5000)
 })
 
 onBeforeUnmount(() => {
@@ -770,6 +788,20 @@ onBeforeUnmount(() => {
             </div>
             <p class="thanks-info">
               Código enviado para {{ donorEmail }}
+            </p>
+            <p
+              v-if="printStatusLabel"
+              class="thanks-print"
+              :class="`thanks-print--${printStatus}`"
+            >
+              <UIcon
+                :name="printStatus === 'printing' ? 'i-lucide-loader-circle'
+                  : printStatus === 'done' ? 'i-fa6-solid-circle-check'
+                    : 'i-fa6-solid-triangle-exclamation'"
+                :class="printStatus === 'printing' ? 'animate-spin' : ''"
+                aria-hidden="true"
+              />
+              {{ printStatusLabel }}
             </p>
             <p class="thanks-note">
               Obrigado por ajudar a comunidade de Vila do Conde!
@@ -1534,6 +1566,22 @@ onBeforeUnmount(() => {
   font-style: italic;
   margin: 0;
 }
+
+.thanks-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+.thanks-print--printing { color: #93c5fd; background: rgba(96,165,250,0.12); }
+.thanks-print--done { color: #6ee7b7; background: rgba(52,211,153,0.12); }
+.thanks-print--unavailable,
+.thanks-print--error,
+.thanks-print--disabled { color: #fcd34d; background: rgba(251,191,36,0.12); }
 
 /* ── GOODS STATUS (loading / empty) ── */
 .goods-status {

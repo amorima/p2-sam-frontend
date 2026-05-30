@@ -1,3 +1,5 @@
+import { jsPDF } from 'jspdf'
+
 export interface VoucherInfo {
   voucher_ref: string
   id_pedido: number
@@ -6,6 +8,94 @@ export interface VoucherInfo {
   tipo_bem_servico: string
   validade?: string
   data_emissao?: string
+}
+
+// Generates the voucher as a real PDF (A4) so it can be stored in MinIO and
+// opened/printed as a proper document rather than an HTML page.
+export function generateVoucherPDFBlob(v: VoucherInfo): Blob {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const L = 20, R = 190
+  const dark: [number, number, number] = [15, 23, 42]
+  const muted: [number, number, number] = [100, 116, 139]
+  const border: [number, number, number] = [226, 232, 240]
+  const accent: [number, number, number] = [29, 78, 216]
+  const accentBg: [number, number, number] = [219, 234, 254]
+
+  const issueDate = v.data_emissao ? new Date(v.data_emissao) : new Date()
+  const validUntil = v.validade ? new Date(v.validade) : new Date(issueDate.getTime() + 90 * 24 * 60 * 60 * 1000)
+  const fmt = (d: Date) => d.toLocaleDateString('pt-PT', { year: 'numeric', month: 'long', day: 'numeric' })
+
+  // Header
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(30)
+  doc.setTextColor(...dark)
+  doc.text('SAM', L, 25)
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(7)
+  doc.setTextColor(...muted)
+  doc.text('SERVIÇO DE APOIO MUNICIPAL DE VILA DO CONDE', L, 31)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(13)
+  doc.setTextColor(...accent)
+  doc.text('VOUCHER', R, 25, { align: 'right' })
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(9)
+  doc.setTextColor(...muted)
+  doc.text(v.voucher_ref, R, 31, { align: 'right' })
+
+  doc.setDrawColor(...border)
+  doc.setLineWidth(0.4)
+  doc.line(L, 38, R, 38)
+
+  // Reference highlight box
+  doc.setFillColor(...accentBg)
+  doc.roundedRect(L, 48, R - L, 28, 3, 3, 'F')
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(8)
+  doc.setTextColor(...muted)
+  doc.text('CÓDIGO DO VOUCHER', L + 8, 58)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(22)
+  doc.setTextColor(...accent)
+  doc.text(v.voucher_ref, L + 8, 69)
+
+  // Details
+  let y = 92
+  const row = (label: string, value: string) => {
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.setTextColor(...muted)
+    doc.text(label, L, y)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(...dark)
+    doc.text(value, R, y, { align: 'right' })
+    doc.setDrawColor(...border)
+    doc.setLineWidth(0.2)
+    doc.line(L, y + 3, R, y + 3)
+    y += 11
+  }
+  row('Bem / Serviço', v.tipo_bem_servico)
+  row('Instituição', v.nome_entidade)
+  row('NIF / NIPC', v.nif_nipc)
+  row('Pedido associado', `#${v.id_pedido}`)
+  row('Data de emissão', fmt(issueDate))
+  row('Válido até', fmt(validUntil))
+
+  // Footer
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(8)
+  doc.setTextColor(...muted)
+  doc.text(
+    'Este voucher é nominativo e utilizável apenas nos termos definidos pelo SAM.',
+    L, 270
+  )
+  doc.text(
+    'Apresente este documento (impresso ou em formato digital) no momento da utilização.',
+    L, 275
+  )
+
+  return doc.output('blob')
 }
 
 export function buildVoucherHtml(v: VoucherInfo): string {

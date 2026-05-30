@@ -1,9 +1,9 @@
-import { buildVoucherHtml, printVoucher, type VoucherInfo } from '~/utils/voucherPDF'
+import { generateVoucherPDFBlob, printVoucher, type VoucherInfo } from '~/utils/voucherPDF'
 
-// A voucher is generated ONCE per reference, uploaded to MinIO, and then simply
-// re-opened from its stored URL on every subsequent click — never regenerated.
-// The map persists for the app session (module scope).
-const voucherUrlCache = new Map<string, string>()
+// A voucher is generated ONCE per reference as a PDF, uploaded to MinIO, and then
+// simply re-opened from its stored file on every subsequent click — never
+// regenerated. The map persists for the app session (module scope).
+const voucherFileCache = new Map<string, string>()
 
 function sanitizeRef(ref: string) {
   return ref.replace(/[^a-zA-Z0-9_-]/g, '_')
@@ -12,25 +12,28 @@ function sanitizeRef(ref: string) {
 export function useVouchers() {
   const toast = useToast()
 
+  // Returns a same-origin URL that streams the stored PDF inline (so it opens the
+  // file directly, not the MinIO console). Uploads the PDF on first use.
   async function ensureVoucherUrl(v: VoucherInfo): Promise<string> {
-    const cached = voucherUrlCache.get(v.voucher_ref)
+    const cached = voucherFileCache.get(v.voucher_ref)
     if (cached) return cached
 
-    const html = buildVoucherHtml(v)
-    const fileName = `voucher_${sanitizeRef(v.voucher_ref)}.html`
+    const fileName = `voucher_${sanitizeRef(v.voucher_ref)}.pdf`
+    const pdf = generateVoucherPDFBlob(v)
     const form = new FormData()
-    form.append('file', new Blob([html], { type: 'text/html' }), fileName)
+    form.append('file', new File([pdf], fileName, { type: 'application/pdf' }))
 
-    const res = await $fetch<{ url: string }>(
+    await $fetch<{ url: string }>(
       `/api/upload/files?nome=${encodeURIComponent(fileName)}`,
       { method: 'POST', body: form }
     )
-    voucherUrlCache.set(v.voucher_ref, res.url)
-    return res.url
+
+    // Serve via the backend stream proxy so the browser opens the PDF directly.
+    const viewUrl = `/api/download/files?nome=${encodeURIComponent(fileName)}`
+    voucherFileCache.set(v.voucher_ref, viewUrl)
+    return viewUrl
   }
 
-  // Open the voucher: from MinIO (uploading on first use), falling back to a
-  // direct client-side print window if the upload is unavailable.
   async function openVoucher(v: VoucherInfo): Promise<void> {
     try {
       const url = await ensureVoucherUrl(v)

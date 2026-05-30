@@ -45,7 +45,6 @@ function onPrinterChange(name: string) {
 const profileSchema = z.object({
   name: z.string().min(2, 'Demasiado curto'),
   email: z.string().email('Email inválido').optional().or(z.literal('')),
-  username: z.string().min(2, 'Demasiado curto'),
   avatar: z.string().optional(),
   bio: z.string().optional()
 })
@@ -55,12 +54,22 @@ type ProfileSchema = z.output<typeof profileSchema>
 const profile = reactive<Partial<ProfileSchema>>({
   name: authName.value,
   email: '',
-  username: authName.value,
   avatar: authAvatar.value,
   bio: undefined
 })
 
 const toast = useToast()
+const avatarUploading = ref(false)
+
+// Load the current account email so the field reflects what is actually in use.
+const { data: currentProfile } = await useFetch<{ email_login?: string, nome_entidade?: string }>(
+  '/api/auth/profile',
+  { lazy: true }
+)
+watch(currentProfile, (p) => {
+  if (p?.email_login) profile.email = p.email_login
+  if (p?.nome_entidade) profile.name = p.nome_entidade
+}, { immediate: true })
 
 // Sync preview when localStorage loads the stored avatar on mount
 watch(authAvatar, (url) => {
@@ -124,6 +133,7 @@ async function onFileChange(e: Event) {
 
   // Optimistic preview while uploading
   profile.avatar = URL.createObjectURL(file)
+  avatarUploading.value = true
 
   try {
     const formData = new FormData()
@@ -159,6 +169,8 @@ async function onFileChange(e: Event) {
       icon: 'i-lucide-x',
       color: 'error'
     })
+  } finally {
+    avatarUploading.value = false
   }
 }
 
@@ -212,24 +224,28 @@ function onFileClick() {
       </UFormField>
       <USeparator />
       <UFormField
-        name="username"
-        label="Nome de utilizador"
-        description="O teu nome de utilizador único para iniciar sessão e o URL do teu perfil."
-        required
-        class="flex max-sm:flex-col justify-between items-start gap-4"
-      >
-        <UInput v-model="profile.username" type="username" autocomplete="off" />
-      </UFormField>
-      <USeparator />
-      <UFormField
         name="avatar"
         label="Foto de perfil"
         description="JPG, GIF ou PNG. Máximo de 1 MB."
         class="flex max-sm:flex-col justify-between sm:items-center gap-4"
       >
         <div class="flex flex-wrap items-center gap-3">
-          <AppUserAvatar :src="profile.avatar" :alt="profile.name" size="lg" />
-          <UButton label="Escolher" color="neutral" @click="onFileClick" />
+          <div class="relative">
+            <AppUserAvatar :src="profile.avatar" :alt="profile.name" size="lg" />
+            <div
+              v-if="avatarUploading"
+              class="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 backdrop-blur-[1px]"
+            >
+              <UIcon name="i-lucide-loader-circle" class="size-5 text-white animate-spin" />
+            </div>
+          </div>
+          <UButton
+            label="Escolher"
+            color="neutral"
+            :loading="avatarUploading"
+            :disabled="avatarUploading"
+            @click="onFileClick"
+          />
           <input
             ref="fileRef"
             type="file"

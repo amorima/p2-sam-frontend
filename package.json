@@ -37,8 +37,12 @@
   "devDependencies": {
     "@iconify-json/fa6-solid": "^1.2.4",
     "@nuxt/eslint": "^1.15.2",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vue/test-utils": "^2.4.10",
     "eslint": "^10.0.3",
+    "happy-dom": "^20.9.0",
     "typescript": "^5.9.3",
+    "vitest": "^4.1.7",
     "vue-tsc": "^3.2.5"
   },
   "packageManager": "pnpm@10.32.1"
