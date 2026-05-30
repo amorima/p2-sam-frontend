@@ -68,19 +68,69 @@ try {
 `
 
 function getDefaultPrinter() {
-  const r = spawnSync('powershell', [
-    '-NoProfile', '-Command',
-    'Get-WmiObject Win32_Printer -Filter "Default=True" | Select-Object -ExpandProperty Name'
-  ], { encoding: 'utf8', timeout: 5000 })
+  const r = spawnSync(
+    'powershell',
+    [
+      '-NoProfile',
+      '-Command',
+      'try { Get-Printer | Where-Object { $_.Default -eq $true } | Select-Object -ExpandProperty Name } catch { exit 1 }'
+    ],
+    { encoding: 'utf8', timeout: 5000 }
+  )
+  if (r.status !== 0 || r.error) {
+    // If it fails, fallback to registry
+    const rReg = spawnSync(
+      'powershell',
+      [
+        '-NoProfile',
+        '-Command',
+        '(Get-ItemProperty "HKCU:\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" -Name "Device" -ErrorAction SilentlyContinue).Device.Split(",")[0]'
+      ],
+      { encoding: 'utf8', timeout: 5000 }
+    )
+    return (rReg.stdout || '').trim()
+  }
   return (r.stdout || '').trim()
 }
 
 function listPrinters() {
-  const r = spawnSync('powershell', [
-    '-NoProfile', '-Command',
-    'Get-WmiObject Win32_Printer | Select-Object -ExpandProperty Name'
-  ], { encoding: 'utf8', timeout: 8000 })
-  return (r.stdout || '').split('\n').map(p => p.trim()).filter(Boolean)
+  const r = spawnSync(
+    'powershell',
+    [
+      '-NoProfile',
+      '-Command',
+      'try { Get-Printer | Select-Object -ExpandProperty Name } catch { throw $_ }'
+    ],
+    { encoding: 'utf8', timeout: 8000 }
+  )
+  if (r.status !== 0 || r.error) {
+    if (
+      (r.stderr || '').includes('spooler')
+      || (r.stderr || '').includes('0x800706ba')
+    ) {
+      throw new Error(
+        'O serviço "Spooler de Impressão" do Windows encontra-se parado. Por favor inicie-o nos Serviços do Windows.'
+      )
+    }
+    // Fallback to WMI
+    const rWmi = spawnSync(
+      'powershell',
+      [
+        '-NoProfile',
+        '-Command',
+        'Get-WmiObject Win32_Printer | Select-Object -ExpandProperty Name'
+      ],
+      { encoding: 'utf8', timeout: 8000 }
+    )
+    return (rWmi.stdout || '')
+      .split('\n')
+      .map(p => p.trim())
+      .filter(Boolean)
+  }
+  return (r.stdout || '')
+    .split('\n')
+    .map(p => p.trim())
+    .filter(Boolean)
 }
 
 function sendRawToPrinter(data, printerName) {
@@ -95,24 +145,45 @@ function sendRawToPrinter(data, printerName) {
     writeFileSync(dataFile, Buffer.from(data))
     writeFileSync(psFile, PS_SCRIPT, { encoding: 'utf8' })
 
-    const r = spawnSync('powershell', [
-      '-NoProfile', '-ExecutionPolicy', 'Bypass',
-      '-File', psFile,
-      '-Printer', name,
-      '-DataFile', dataFile
-    ], { encoding: 'utf8', timeout: 20000 })
+    const r = spawnSync(
+      'powershell',
+      [
+        '-NoProfile',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        psFile,
+        '-Printer',
+        name,
+        '-DataFile',
+        dataFile
+      ],
+      { encoding: 'utf8', timeout: 20000 }
+    )
 
     const out = (r.stdout || '').trim()
     const err = (r.stderr || '').trim()
     if (r.error) throw r.error
-    if (r.status !== 0) throw new Error(`PowerShell exited ${r.status}: ${err || out}`)
+    if (r.status !== 0) {
+      const errorMsg = err || out
+      if (errorMsg.includes('OpenPrinter failed: 1722')) {
+        throw new Error(
+          'Falha a ligar à impressora (Erro 1722). O serviço "Spooler de Impressão" (Print Spooler) do Windows pode estar parado ou a impressora ser inválida.'
+        )
+      }
+      throw new Error(`PowerShell exited ${r.status}: ${errorMsg}`)
+    }
   } finally {
     try {
       unlinkSync(dataFile)
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     try {
       unlinkSync(psFile)
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 }
 
