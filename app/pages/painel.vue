@@ -214,28 +214,31 @@ const detectLocation = () => {
 
 // ── Telemetry ─────────────────────────────────────────────────────────────────
 const { init: initDeviceTelemetry, dispose: disposeDeviceTelemetry, sample: sampleTelemetry } = useDeviceTelemetry()
+const { connected: wsConnected, sendTelemetry: wsSendTelemetry } = useNotifications()
 
 const sendTelemetry = async () => {
+  const s = sampleTelemetry()
+  const payload = {
+    locker_id: PANEL_LOCKER_ID,
+    tipo: 'painel',
+    geo_latitude: panelLat.value ?? 0,
+    geo_longitude: panelLng.value ?? 0,
+    bateria_estado: s.bateria_estado,
+    cpu_temperatura: s.cpu_temperatura,
+    dnb_sinal: s.dnb_sinal,
+    aviso: s.aviso,
+    evento: s.evento,
+    versao: s.versao,
+    status: s.status,
+    device: s.device,
+    timestamp: new Date().toISOString()
+  }
+
+  // Prefer WebSocket (zero-overhead, real-time); fall back to HTTP when disconnected
+  if (wsConnected.value && wsSendTelemetry(payload)) return
+
   try {
-    const s = sampleTelemetry()
-    await $fetch('/api/painel/telemetry', {
-      method: 'POST',
-      body: {
-        locker_id: PANEL_LOCKER_ID,
-        tipo: 'painel',
-        geo_latitude: panelLat.value ?? 0,
-        geo_longitude: panelLng.value ?? 0,
-        bateria_estado: s.bateria_estado,
-        cpu_temperatura: s.cpu_temperatura,
-        dnb_sinal: s.dnb_sinal,
-        aviso: s.aviso,
-        evento: s.evento,
-        versao: s.versao,
-        status: s.status,
-        device: s.device,
-        timestamp: new Date().toISOString()
-      }
-    })
+    await $fetch('/api/painel/telemetry', { method: 'POST', body: payload })
   } catch { /* best-effort */ }
 }
 

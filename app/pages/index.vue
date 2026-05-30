@@ -4,8 +4,6 @@ import type { Period, Range } from '~/types'
 
 definePageMeta({ middleware: 'admin-only' })
 
-const { isNotificationsSlideoverOpen } = useDashboard()
-
 const range = shallowRef<Range>({
   start: sub(new Date(), { days: 14 }),
   end: new Date()
@@ -22,18 +20,7 @@ const period = ref<Period>('daily')
         </template>
 
         <template #right>
-          <UTooltip text="Notificações" :shortcuts="['N']">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              square
-              @click="isNotificationsSlideoverOpen = true"
-            >
-              <UChip color="error" inset>
-                <UIcon name="i-lucide-bell" class="size-5 shrink-0" />
-              </UChip>
-            </UButton>
-          </UTooltip>
+          <AppNotificationBell />
         </template>
       </UDashboardNavbar>
 
