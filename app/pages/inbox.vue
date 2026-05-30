@@ -8,7 +8,10 @@ const tabItems = [
 ]
 const selectedTab = ref('all')
 
-const { notifications, unreadCount, markAllAsRead } = useNotifications()
+const { notifications, unreadCount, markAllAsRead, loadHistory, loading } = useNotifications()
+
+// Always load fresh from MongoDB when the inbox opens, regardless of socket state
+onMounted(() => loadHistory())
 
 const filteredNotifications = computed<AppNotification[]>(() => {
   if (selectedTab.value === 'unread') return notifications.value.filter(n => !n.lida)
@@ -70,7 +73,11 @@ const isMobile = breakpoints.smaller('lg')
       </template>
     </UDashboardNavbar>
 
+    <div v-if="loading && notifications.length === 0" class="flex items-center justify-center py-16">
+      <UIcon name="i-lucide-loader-circle" class="size-8 text-muted animate-spin" />
+    </div>
     <InboxList
+      v-else
       v-model="selectedNotification"
       :notifications="filteredNotifications"
     />

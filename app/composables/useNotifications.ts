@@ -29,29 +29,50 @@ const _useNotifications = () => {
   const notifications = ref<AppNotification[]>([])
   const latestTelemetry = ref<TelemetryFrame | null>(null)
   const connected = ref(false)
+  const loading = ref(false)
   let socket: Socket | null = null
+  // Track whether we have an authenticated connection so loadHistory
+  // only runs when there is actually a user session to query.
+  let authed = false
 
   const unreadCount = computed(() =>
     notifications.value.filter(n => !n.lida).length
   )
 
   function addNotification(n: AppNotification) {
-    // Prevent duplicates by _id
-    if (!notifications.value.find(x => x._id === n._id)) {
+    if (!n?._id) return
+    // Update in-place if already present (e.g. telemetry upsert), else prepend
+    const idx = notifications.value.findIndex(x => x._id === n._id)
+    if (idx !== -1) {
+      notifications.value[idx] = n
+    } else {
       notifications.value.unshift(n)
     }
   }
 
+  /**
+   * Load notification history from MongoDB via the REST API.
+   * Can be called explicitly (e.g. on inbox mount) or implicitly on socket connect.
+   * No-ops silently when the user is not authenticated.
+   */
   async function loadHistory() {
+    if (!authed) return
+    loading.value = true
     try {
       const data = await $fetch<AppNotification[]>('/api/notifications/inbox')
-      // Merge without duplicates, history goes after any already-received live ones
       for (const n of data) {
-        if (!notifications.value.find(x => x._id === n._id)) {
+        const idx = notifications.value.findIndex(x => x._id === n._id)
+        if (idx !== -1) {
+          notifications.value[idx] = n
+        } else {
           notifications.value.push(n)
         }
       }
-    } catch { /* non-fatal */ }
+    } catch (e) {
+      console.warn('[notifications] loadHistory failed:', e)
+    } finally {
+      loading.value = false
+    }
   }
 
   async function markAsRead(id: string) {
@@ -79,8 +100,17 @@ const _useNotifications = () => {
   }
 
   function connect(token?: string) {
-    if (socket?.connected) return
+    // Don't reconnect if already connected with the same auth state
+    if (socket?.connected && authed === !!token) return
 
+    // Disconnect any existing socket before creating a new one
+    if (socket) {
+      socket.disconnect()
+      socket = null
+      connected.value = false
+    }
+
+    authed = !!token
     const backendUrl = config.public.backendBase as string
 
     socket = io(backendUrl, {
@@ -93,11 +123,16 @@ const _useNotifications = () => {
 
     socket.on('connect', () => {
       connected.value = true
+      // Load history from MongoDB on every (re)connect
       loadHistory()
     })
 
     socket.on('disconnect', () => {
       connected.value = false
+    })
+
+    socket.on('connect_error', (err) => {
+      console.warn('[notifications] socket connect error:', err.message)
     })
 
     socket.on('notification:new', (notif: AppNotification) => {
@@ -113,6 +148,7 @@ const _useNotifications = () => {
     socket?.disconnect()
     socket = null
     connected.value = false
+    authed = false
   }
 
   // Send telemetry frame via WebSocket (used by the panel kiosk)
@@ -126,12 +162,14 @@ const _useNotifications = () => {
     notifications,
     latestTelemetry,
     connected,
+    loading,
     unreadCount,
     connect,
     disconnect,
     sendTelemetry,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    loadHistory
   }
 }
 

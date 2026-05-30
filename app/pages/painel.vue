@@ -214,7 +214,7 @@ const detectLocation = () => {
 
 // ── Telemetry ─────────────────────────────────────────────────────────────────
 const { init: initDeviceTelemetry, dispose: disposeDeviceTelemetry, sample: sampleTelemetry } = useDeviceTelemetry()
-const { connected: wsConnected, sendTelemetry: wsSendTelemetry } = useNotifications()
+const { connected: wsConnected, sendTelemetry: wsSendTelemetry, connect, disconnect } = useNotifications()
 
 const sendTelemetry = async () => {
   const s = sampleTelemetry()
@@ -389,6 +389,9 @@ onMounted(async () => {
   updateClock()
   clockInterval = setInterval(updateClock, 1000)
   await initDeviceTelemetry()
+  // The panel has no user session — connect without auth to join room:panel
+  // so telemetry can be sent via WebSocket
+  connect(undefined)
   sendTelemetry()
   telemetryInterval = setInterval(sendTelemetry, 5000)
 })
@@ -396,6 +399,7 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   clearTimers()
   disposeDeviceTelemetry()
+  disconnect()
 })
 </script>
 
