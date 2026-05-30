@@ -3,7 +3,7 @@ import type { AppNotification } from '~/composables/useNotifications'
 
 const props = defineProps<{ notification: AppNotification }>()
 const emit = defineEmits<{ close: [] }>()
-const { markAsRead } = useNotifications()
+const { markAsRead, deleteNotification } = useNotifications()
 
 onMounted(() => markAsRead(props.notification._id))
 watch(() => props.notification._id, id => markAsRead(id))
@@ -16,6 +16,11 @@ const tipoTitle: Record<string, string> = {
   pedido_criado: 'Novo Pedido',
   pedido_atualizado: 'Pedido Atualizado',
   telemetria_alerta: 'Alertas de Telemetria'
+}
+
+async function handleDelete() {
+  await deleteNotification(props.notification._id)
+  emit('close')
 }
 </script>
 
@@ -30,6 +35,17 @@ const tipoTitle: Record<string, string> = {
           class="-ms-1.5"
           @click="emit('close')"
         />
+      </template>
+
+      <template #right>
+        <UTooltip text="Apagar notificação">
+          <UButton
+            icon="i-lucide-trash-2"
+            color="neutral"
+            variant="ghost"
+            @click="handleDelete"
+          />
+        </UTooltip>
       </template>
     </UDashboardNavbar>
 

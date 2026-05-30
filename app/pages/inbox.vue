@@ -8,7 +8,7 @@ const tabItems = [
 ]
 const selectedTab = ref('all')
 
-const { notifications, unreadCount, markAllAsRead, loadHistory, loading } = useNotifications()
+const { notifications, unreadCount, markAllAsRead, deleteAllRead, loadHistory, loading } = useNotifications()
 
 // Always load fresh from MongoDB when the inbox opens, regardless of socket state
 onMounted(() => loadHistory())
@@ -60,15 +60,30 @@ const isMobile = breakpoints.smaller('lg')
             :content="false"
             size="xs"
           />
-          <UTooltip v-if="unreadCount > 0" text="Marcar todas como lidas">
+          <UDropdownMenu
+            :items="[
+              [{
+                label: 'Marcar todas como lidas',
+                icon: 'i-lucide-check-check',
+                disabled: unreadCount === 0,
+                onSelect: markAllAsRead
+              }],
+              [{
+                label: 'Apagar lidas',
+                icon: 'i-lucide-trash-2',
+                color: 'error',
+                disabled: notifications.filter(n => n.lida).length === 0,
+                onSelect: () => { deleteAllRead(); selectedNotification = null }
+              }]
+            ]"
+          >
             <UButton
-              icon="i-lucide-check-check"
+              icon="i-lucide-ellipsis-vertical"
               color="neutral"
               variant="ghost"
               size="xs"
-              @click="markAllAsRead()"
             />
-          </UTooltip>
+          </UDropdownMenu>
         </div>
       </template>
     </UDashboardNavbar>

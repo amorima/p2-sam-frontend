@@ -60,14 +60,9 @@ const _useNotifications = () => {
     loading.value = true
     try {
       const data = await $fetch<AppNotification[]>('/api/notifications/inbox')
-      for (const n of data) {
-        const idx = notifications.value.findIndex(x => x._id === n._id)
-        if (idx !== -1) {
-          notifications.value[idx] = n
-        } else {
-          notifications.value.push(n)
-        }
-      }
+      // Replace the full list — ensures no cross-account bleed.
+      // Live notifications received via WS after this point are merged by addNotification.
+      notifications.value = data
     } catch (e) {
       console.warn('[notifications] loadHistory failed:', e)
     } finally {
@@ -96,6 +91,27 @@ const _useNotifications = () => {
       notifications.value.forEach((n) => {
         n.lida = false
       })
+    }
+  }
+
+  async function deleteNotification(id: string) {
+    const idx = notifications.value.findIndex(x => x._id === id)
+    const removed = idx !== -1 ? notifications.value.splice(idx, 1)[0] : null
+    try {
+      await $fetch(`/api/notifications/${id}`, { method: 'DELETE' })
+    } catch {
+      if (removed) notifications.value.splice(idx, 0, removed)
+    }
+  }
+
+  async function deleteAllRead() {
+    const kept = notifications.value.filter(n => !n.lida)
+    const removed = notifications.value.filter(n => n.lida)
+    notifications.value = kept
+    try {
+      await $fetch('/api/notifications/read-all', { method: 'DELETE' })
+    } catch {
+      notifications.value = [...kept, ...removed]
     }
   }
 
@@ -149,6 +165,9 @@ const _useNotifications = () => {
     socket = null
     connected.value = false
     authed = false
+    // Clear notifications so they don't bleed into the next session
+    notifications.value = []
+    latestTelemetry.value = null
   }
 
   // Send telemetry frame via WebSocket (used by the panel kiosk)
@@ -169,6 +188,8 @@ const _useNotifications = () => {
     sendTelemetry,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
+    deleteAllRead,
     loadHistory
   }
 }

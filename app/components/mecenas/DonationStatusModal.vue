@@ -53,7 +53,7 @@ watch(() => props.donation, (d) => {
     state.estado = d.estado
     state.motivo_recusa = d.estado === 'REJEITADO' ? d.url_comprovativo : ''
   }
-})
+}, { immediate: true })
 
 const estadoBadgeColor = computed(() => {
   const map: Record<string, 'warning' | 'success' | 'error'> = {
