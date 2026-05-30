@@ -56,12 +56,13 @@ const KIND_ACTOR: Record<CustomerKind, 'Mecenas' | 'Negócio' | 'Instituição' 
 export default defineEventHandler(async (event): Promise<CustomerDetail> => {
   const config = useRuntimeConfig()
   const kind = getRouterParam(event, 'kind') as CustomerKind | undefined
-  const id = getRouterParam(event, 'id')
+  const rawId = getRouterParam(event, 'id')
 
-  if (!kind || !id || !KIND_PATH[kind]) {
+  if (!kind || !rawId || !KIND_PATH[kind]) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid customer kind' })
   }
 
+  const id = decodeURIComponent(rawId)
   const url = `${config.backendBase}/${KIND_PATH[kind]}/${encodeURIComponent(id)}`
 
   const avatarSrc = (profile_pic: string | null | undefined): string | undefined =>

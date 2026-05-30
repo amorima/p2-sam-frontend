@@ -8,12 +8,13 @@ const KIND_TO_PATH: Record<string, string> = {
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const kind = getRouterParam(event, 'kind')
-  const id = getRouterParam(event, 'id')
+  const rawId = getRouterParam(event, 'id')
 
-  if (!kind || !id || !KIND_TO_PATH[kind]) {
+  if (!kind || !rawId || !KIND_TO_PATH[kind]) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid customer kind' })
   }
 
+  const id = decodeURIComponent(rawId)
   const authHeader = getRequestHeader(event, 'authorization')
 
   try {

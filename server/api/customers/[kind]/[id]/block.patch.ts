@@ -3,11 +3,13 @@ const ENTITY_KINDS = new Set(['patron', 'business', 'institution'])
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const kind = getRouterParam(event, 'kind')
-  const id = getRouterParam(event, 'id')
+  const rawId = getRouterParam(event, 'id')
 
-  if (!kind || !id) {
+  if (!kind || !rawId) {
     throw createError({ statusCode: 400, statusMessage: 'Missing kind or id' })
   }
+
+  const id = decodeURIComponent(rawId)
 
   const backendPath
     = kind === 'citizen'
