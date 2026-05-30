@@ -1,50 +1,30 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
 import { breakpointsTailwind } from '@vueuse/core'
-import type { Mail } from '~/types'
+import type { AppNotification } from '~/composables/useNotifications'
 
 const tabItems = [
-  {
-    label: 'Todas',
-    value: 'all'
-  },
-  {
-    label: 'Não Lidas',
-    value: 'unread'
-  }
+  { label: 'Todas', value: 'all' },
+  { label: 'Não Lidas', value: 'unread' }
 ]
 const selectedTab = ref('all')
 
-const { data: mails } = await useFetch<Mail[]>('/api/mails', {
-  default: () => []
+const { notifications, unreadCount, markAllAsRead } = useNotifications()
+
+const filteredNotifications = computed<AppNotification[]>(() => {
+  if (selectedTab.value === 'unread') return notifications.value.filter(n => !n.lida)
+  return notifications.value
 })
 
-// Filter mails based on the selected tab
-const filteredMails = computed(() => {
-  if (selectedTab.value === 'unread') {
-    return mails.value.filter(mail => !!mail.unread)
-  }
+const selectedNotification = ref<AppNotification | null>(null)
 
-  return mails.value
+const isDetailOpen = computed({
+  get: () => !!selectedNotification.value,
+  set: (v) => { if (!v) selectedNotification.value = null }
 })
 
-const selectedMail = ref<Mail | null>()
-
-const isMailPanelOpen = computed({
-  get() {
-    return !!selectedMail.value
-  },
-  set(value: boolean) {
-    if (!value) {
-      selectedMail.value = null
-    }
-  }
-})
-
-// Reset selected mail if it's not in the filtered mails
-watch(filteredMails, () => {
-  if (!filteredMails.value.find(mail => mail.id === selectedMail.value?.id)) {
-    selectedMail.value = null
+watch(filteredNotifications, () => {
+  if (selectedNotification.value && !filteredNotifications.value.find(n => n._id === selectedNotification.value!._id)) {
+    selectedNotification.value = null
   }
 })
 
@@ -54,48 +34,69 @@ const isMobile = breakpoints.smaller('lg')
 
 <template>
   <UDashboardPanel
-    id="inbox-1"
-    :default-size="25"
-    :min-size="20"
-    :max-size="30"
+    id="inbox-list"
+    :default-size="28"
+    :min-size="22"
+    :max-size="36"
     resizable
   >
     <UDashboardNavbar title="Notificações">
       <template #leading>
         <UDashboardSidebarCollapse />
       </template>
+
       <template #trailing>
-        <UBadge :label="filteredMails.length" variant="subtle" />
+        <UBadge :label="filteredNotifications.length" variant="subtle" />
       </template>
 
       <template #right>
-        <UTabs
-          v-model="selectedTab"
-          :items="tabItems"
-          :content="false"
-          size="xs"
-        />
+        <div class="flex items-center gap-2">
+          <UTabs
+            v-model="selectedTab"
+            :items="tabItems"
+            :content="false"
+            size="xs"
+          />
+          <UTooltip v-if="unreadCount > 0" text="Marcar todas como lidas">
+            <UButton
+              icon="i-lucide-check-check"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              @click="markAllAsRead()"
+            />
+          </UTooltip>
+        </div>
       </template>
     </UDashboardNavbar>
-    <InboxList v-model="selectedMail" :mails="filteredMails" />
+
+    <InboxList
+      v-model="selectedNotification"
+      :notifications="filteredNotifications"
+    />
   </UDashboardPanel>
 
-  <InboxMail
-    v-if="selectedMail"
-    :mail="selectedMail"
-    @close="selectedMail = null"
+  <InboxNotificationDetail
+    v-if="selectedNotification && !isMobile"
+    :notification="selectedNotification"
+    @close="selectedNotification = null"
   />
-  <div v-else class="hidden lg:flex flex-1 items-center justify-center">
-    <UIcon name="i-lucide-bell" class="size-32 text-dimmed" />
+  <div v-else-if="!isMobile" class="hidden lg:flex flex-1 items-center justify-center">
+    <div class="text-center space-y-2">
+      <UIcon name="i-lucide-bell" class="size-16 text-dimmed mx-auto" />
+      <p class="text-muted text-sm">
+        Selecione uma notificação
+      </p>
+    </div>
   </div>
 
   <ClientOnly>
-    <USlideover v-if="isMobile" v-model:open="isMailPanelOpen">
+    <USlideover v-if="isMobile" v-model:open="isDetailOpen">
       <template #content>
-        <InboxMail
-          v-if="selectedMail"
-          :mail="selectedMail"
-          @close="selectedMail = null"
+        <InboxNotificationDetail
+          v-if="selectedNotification"
+          :notification="selectedNotification"
+          @close="selectedNotification = null"
         />
       </template>
     </USlideover>

@@ -47,9 +47,9 @@ export default defineEventHandler(async (event) => {
 
   // Defensive mapping to ensure the frontend receive the structure it expects
   // useNeeds.ts expects: { need: { id_pedido, ... }, items: [...] }
-  const result: { need: Record<string, unknown>, items: unknown[] } = {
-    need: response.need ?? (response.id_pedido ? response : {}),
-    items: response.items ?? response.needItems ?? response['need items'] ?? []
+  const result = {
+    need: (response.need ?? (response.id_pedido ? response : {})) as Record<string, unknown>,
+    items: (response.items ?? response.needItems ?? response['need items'] ?? []) as unknown[]
   }
 
   // Fallback for id_pedido if it's at the root and not in .need

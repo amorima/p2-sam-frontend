@@ -3,6 +3,8 @@ import type { NavigationMenuItem, CommandPaletteItem } from '@nuxt/ui'
 
 const toast = useToast()
 const { isAdmin, isInstitution, isBusiness } = useAuth()
+const { unreadCount } = useNotifications()
+useDashboard()
 
 const open = ref(false)
 
@@ -11,6 +13,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
     label: 'Notificações',
     icon: 'i-lucide-bell',
     to: '/inbox',
+    badge: unreadCount.value > 0 ? String(unreadCount.value > 99 ? '99+' : unreadCount.value) : undefined,
     onSelect: () => { open.value = false }
   }
 
@@ -293,7 +296,5 @@ onMounted(async () => {
     <UDashboardSearch :groups="groups" placeholder="Escreva um comando ou pesquise" />
 
     <slot />
-
-    <NotificationsSlideover />
   </UDashboardGroup>
 </template>
