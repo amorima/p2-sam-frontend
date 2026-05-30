@@ -107,6 +107,10 @@ const _useNeeds = () => {
       }
     })
 
+    if (!backendRes || !backendRes.need || !backendRes.items) {
+      throw new Error('Resposta do servidor inválida ao criar pedido.')
+    }
+
     const items: NeedItem[] = backendRes.items.map(it => ({
       id_item: it.id_item,
       id_pedido: backendRes.need.id_pedido,
