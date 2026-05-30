@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useNeeds } from '~/composables/useNeeds'
 import type { MatchTipo, NeedItem } from '~/utils/domain'
-import { printVoucher } from '~/utils/voucherPDF'
+import { useVouchers } from '~/composables/useVouchers'
 
 const route = useRoute()
 const { isAdmin, isInstitution, institutionNif } = useAuth()
 const { needs, institutions, businesses, panels, setItemMatch, setBusinessMatch, approveNeed } = useNeeds()
+const { openVoucher } = useVouchers()
 
 const toast = useToast()
 
@@ -91,7 +92,7 @@ function formatDate(d: string) {
 
 function downloadVoucher(item: NeedItem) {
   if (!need.value || !item.match_ref) return
-  printVoucher({
+  openVoucher({
     voucher_ref: item.match_ref,
     id_pedido: need.value.id_pedido,
     nif_nipc: need.value.nif_nipc,

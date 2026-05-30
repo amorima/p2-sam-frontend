@@ -367,7 +367,9 @@ onMounted(async () => {
   clockInterval = setInterval(updateClock, 1000)
   await initDeviceTelemetry()
   sendTelemetry()
-  telemetryInterval = setInterval(sendTelemetry, 5000)
+  // 30s is plenty for a kiosk panel and keeps us well under the API rate limit
+  // (5s previously meant ~180 telemetry posts per 15-min window per device).
+  telemetryInterval = setInterval(sendTelemetry, 30000)
 })
 
 onBeforeUnmount(() => {

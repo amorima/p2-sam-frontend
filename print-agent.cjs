@@ -125,6 +125,12 @@ const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  // Private Network Access: modern Chrome (since ~v117/130) sends a preflight
+  // with `Access-Control-Request-Private-Network: true` for requests from a web
+  // page to a loopback/local address. Without this header the browser silently
+  // blocks the request, which is why printing "stopped working" after a Chrome
+  // update. Granting it allows the panel page to reach this local agent.
+  res.setHeader('Access-Control-Allow-Private-Network', 'true')
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204)

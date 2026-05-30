@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useNeeds } from '~/composables/useNeeds'
 import type { MatchTipo, Need } from '~/utils/domain'
-import { printVoucher } from '~/utils/voucherPDF'
+import { useVouchers } from '~/composables/useVouchers'
 
 const toast = useToast()
 const { isAdmin } = useAuth()
 const { needs, businesses, panels, institutions, setItemMatch, setBusinessMatch, approveNeed, rejectNeed } = useNeeds()
+const { openVoucher } = useVouchers()
 
 if (!isAdmin.value) {
   await navigateTo('/instituicoes')
@@ -114,7 +115,7 @@ async function approve(need: Need) {
     if (updated) {
       updated.items
         .filter(i => i.match_tipo === 'VOUCHER' && i.match_ref)
-        .forEach(it => printVoucher({
+        .forEach(it => openVoucher({
           voucher_ref: it.match_ref!,
           id_pedido: updated.id_pedido,
           nif_nipc: updated.nif_nipc,

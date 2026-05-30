@@ -78,9 +78,8 @@ const newValor = ref<number | undefined>(undefined)
 const newDesconto = ref<number>(100)
 const isProBono = computed(() => newDesconto.value === 100)
 
-const categoryOptions = computed(() =>
-  goodsServices.value.map(g => ({ label: `${g.tipo_bem_servico} (${g.tipo_bem === 'BEM' ? 'Bem' : 'Serviço'})`, value: g.tipo_bem_servico }))
-)
+const newCategoryTipo = ref<'BEM' | 'SERVICO'>('BEM')
+const existingCategories = computed(() => myBusiness.value?.offers.map(o => o.tipo_bem_servico) ?? [])
 
 const savingOffer = ref(false)
 
@@ -97,7 +96,9 @@ async function addOffer() {
   }
   savingOffer.value = true
   try {
-    const tipo_bem = goodsServices.value.find(g => g.tipo_bem_servico === cat)?.tipo_bem ?? 'BEM'
+    // Existing canonical category keeps its tipo; a freshly-created one uses the
+    // tipo chosen in the CategoryField.
+    const tipo_bem = goodsServices.value.find(g => g.tipo_bem_servico === cat)?.tipo_bem ?? newCategoryTipo.value
     await addBusinessOffer(myBusiness.value.resource.nif_nipc, {
       tipo_bem_servico: cat,
       descricao: newDescription.value.trim(),
@@ -108,6 +109,7 @@ async function addOffer() {
     toast.add({ title: 'Categoria adicionada', description: `${cat} adicionada ao seu negócio.`, icon: 'i-lucide-check', color: 'success' })
     showAddOffer.value = false
     newCategory.value = ''
+    newCategoryTipo.value = 'BEM'
     newDescription.value = ''
     newValor.value = undefined
     newDesconto.value = 100
@@ -265,14 +267,11 @@ function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'wa
             </p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <UFormField label="Categoria (bem/serviço)">
-                <USelectMenu
+                <NegociosCategoryField
                   v-model="newCategory"
-                  :items="categoryOptions"
-                  value-key="value"
-                  label-key="label"
-                  search-placeholder="Pesquisar categoria..."
-                  placeholder="Escolher..."
-                  class="w-full"
+                  v-model:tipo="newCategoryTipo"
+                  :goods-services="goodsServices"
+                  :exclude="existingCategories"
                 />
               </UFormField>
               <UFormField label="Valor Base (€)">

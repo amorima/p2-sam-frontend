@@ -213,15 +213,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             </UFormField>
             <UFormField
               name="url_comprovativo_estatuto"
-              label="URL do Estatuto"
+              label="Comprovativo de Estatuto"
               required
               class="sm:col-span-2"
             >
-              <UInput
-                v-model="state.url_comprovativo_estatuto"
-                class="w-full font-mono"
-                placeholder="https://..."
-              />
+              <FileUploadField v-model="state.url_comprovativo_estatuto" hint="Comprovativo de estatuto (PDF ou imagem)" />
             </UFormField>
           </div>
         </UPageCard>

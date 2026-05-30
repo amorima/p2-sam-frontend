@@ -8,7 +8,7 @@ export interface VoucherInfo {
   data_emissao?: string
 }
 
-export function printVoucher(v: VoucherInfo) {
+export function buildVoucherHtml(v: VoucherInfo): string {
   const issueDate = v.data_emissao
     ? new Date(v.data_emissao)
     : new Date()
@@ -138,8 +138,13 @@ export function printVoucher(v: VoucherInfo) {
 </body>
 </html>`
 
+  return html
+}
+
+// Immediate client-side print window (fallback / direct use).
+export function printVoucher(v: VoucherInfo) {
   const win = window.open('', '_blank', 'width=900,height=700')
   if (!win) return
-  win.document.write(html)
+  win.document.write(buildVoucherHtml(v))
   win.document.close()
 }

@@ -1,10 +1,6 @@
-const RADIUS_KM = 20
-
 interface FlatInstitution {
   nif_nipc: string
   nome_entidade: string
-  geo_latitude: number
-  geo_longitude: number
 }
 
 interface BackendNeedItem {
@@ -27,35 +23,22 @@ interface BackendLead {
   estado: string | null
 }
 
-function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371
-  const dLat = (lat2 - lat1) * Math.PI / 180
-  const dLon = (lon2 - lon1) * Math.PI / 180
-  const a = Math.sin(dLat / 2) ** 2
-    + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-}
-
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
-  const query = getQuery(event)
-  const panelLat = query.lat ? parseFloat(String(query.lat)) : null
-  const panelLng = query.lng ? parseFloat(String(query.lng)) : null
 
+  // All three reads are best-effort: a transient backend hiccup (e.g. a 429)
+  // should degrade gracefully to fewer goods rather than failing the whole
+  // panel listing with an error.
   const [institutionsRes, needsRes, leadsRes] = await Promise.all([
-    $fetch<{ data: FlatInstitution[] }>(`${config.backendBase}/institutions`),
-    $fetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`),
+    $fetch<{ data: FlatInstitution[] }>(`${config.backendBase}/institutions`).catch(() => ({ data: [] as FlatInstitution[] })),
+    $fetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`).catch(() => ({ needs: [] as BackendNeed[] })),
     $fetch<BackendLead[]>(`${config.backendBase}/leads`).catch(() => [] as BackendLead[])
   ])
 
-  const nearbyNifs = new Set(
-    (institutionsRes.data ?? [])
-      .filter(i => panelLat == null || panelLng == null
-        ? true
-        : haversineKm(panelLat, panelLng, i.geo_latitude ?? 0, i.geo_longitude ?? 0) <= RADIUS_KM)
-      .map(i => i.nif_nipc)
-  )
-
+  // This is the single national citizen panel — there is no per-device catchment
+  // area, so every approved need's items belong on it. (A geographic radius
+  // filter previously hid all needs whenever the kiosk's GPS was far from the
+  // institutions, which is why approved/allocated pedidos never appeared.)
   const nameMap = new Map(
     (institutionsRes.data ?? []).map(i => [i.nif_nipc, i.nome_entidade])
   )
@@ -80,7 +63,6 @@ export default defineEventHandler(async (event) => {
   for (const need of needsRes.needs ?? []) {
     // Only include needs that have been approved
     if (need.estado != null && need.estado !== 'ACEITE') continue
-    if (!nearbyNifs.has(need.nif_nipc)) continue
 
     const items: BackendNeedItem[] = need['need items'] ?? need.NeedItems ?? need.needItems ?? []
     for (const item of items) {

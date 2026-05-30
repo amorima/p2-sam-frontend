@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import { type Column, type Row, type SortingState, type Table, getPaginationRowModel } from '@tanstack/table-core'
-import { printVoucher } from '~/utils/voucherPDF'
 import type { Need, NeedItem } from '~/utils/domain'
 import { useNeeds } from '~/composables/useNeeds'
+import { useVouchers } from '~/composables/useVouchers'
+
+const { openVoucher } = useVouchers()
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
@@ -90,7 +92,7 @@ function nomeInstituicao(nif: string): string {
 
 function downloadVoucher(need: Need, item: NeedItem) {
   if (!item.match_ref) return
-  printVoucher({
+  openVoucher({
     voucher_ref: item.match_ref,
     id_pedido: need.id_pedido,
     nif_nipc: need.nif_nipc,

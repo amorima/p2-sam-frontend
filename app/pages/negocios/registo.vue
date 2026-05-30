@@ -14,7 +14,7 @@ interface DraftOffer {
 const toast = useToast()
 const router = useRouter()
 const { isAdmin } = useAuth()
-const { businesses, createBusinessRemote } = useNeeds()
+const { businesses, createBusinessRemote, goodsServices } = useNeeds()
 
 if (!isAdmin.value) {
   await navigateTo('/negocios')
@@ -78,12 +78,6 @@ const state = reactive<Partial<Schema>>({
 
 const isSubmitting = ref(false)
 
-watch(() => state.nif_nipc, (v) => {
-  if (v && !state.url_certidao_permanente) {
-    state.url_certidao_permanente = `https://certidoes.negocio.pt/${v}.pdf`
-  }
-})
-
 let geocodeTimer: ReturnType<typeof setTimeout> | null = null
 
 async function resolveCoordinates() {
@@ -116,6 +110,7 @@ watch(
 const offers = ref<DraftOffer[]>([])
 const showAddOffer = ref(false)
 const newOfferCategory = ref('')
+const newOfferTipo = ref<'BEM' | 'SERVICO'>('SERVICO')
 const newOfferDescricao = ref('')
 const newOfferValor = ref<number | undefined>(undefined)
 const newOfferDesconto = ref<number>(100)
@@ -136,10 +131,11 @@ function addOfferDraft() {
     descricao: newOfferDescricao.value.trim(),
     valor_total: newOfferValor.value,
     desconto: newOfferDesconto.value,
-    tipo_bem: 'servico'
+    tipo_bem: newOfferTipo.value === 'BEM' ? 'bem' : 'servico'
   })
   showAddOffer.value = false
   newOfferCategory.value = ''
+  newOfferTipo.value = 'SERVICO'
   newOfferDescricao.value = ''
   newOfferValor.value = undefined
   newOfferDesconto.value = 100
@@ -319,11 +315,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             </UFormField>
             <UFormField
               name="url_certidao_permanente"
-              label="URL Certidão Permanente"
+              label="Certidão Permanente"
               required
               class="sm:col-span-2"
             >
-              <UInput v-model="state.url_certidao_permanente" class="w-full font-mono" placeholder="https://..." />
+              <FileUploadField v-model="state.url_certidao_permanente" hint="Certidão permanente (PDF ou imagem)" />
             </UFormField>
           </div>
         </UPageCard>
@@ -422,13 +418,14 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             </p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <UFormField
-                label="Categoria (serviço)"
-                help="Escreva o nome da categoria de serviço a oferecer."
+                label="Categoria"
+                help="Escolha uma categoria existente ou crie uma nova."
               >
-                <UInput
+                <NegociosCategoryField
                   v-model="newOfferCategory"
-                  placeholder="Ex.: Apoio jurídico, Transporte, Consultas..."
-                  class="w-full"
+                  v-model:tipo="newOfferTipo"
+                  :goods-services="goodsServices"
+                  :exclude="offers.map(o => o.tipo_bem_servico)"
                 />
               </UFormField>
               <UFormField label="Valor Base (€)">
