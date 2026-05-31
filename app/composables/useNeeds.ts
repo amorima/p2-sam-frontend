@@ -50,7 +50,7 @@ const _useNeeds = () => {
       const [needsRes, institutionsRes, businessRes, goodsRes] = await Promise.all([
         $fetch<{ needs: Need[] }>('/api/needs'),
         $fetch<{ data: Institution[] }>('/api/institutions'),
-        $fetch<{ data: Business[] }>('/api/business'),
+        $fetch<{ data: Business[] }>('/api/business').catch(() => ({ data: [] as Business[] })),
         $fetch<{ data: GoodsService[] }>('/api/goods-services').catch(() => ({ data: [] as GoodsService[] }))
       ])
 

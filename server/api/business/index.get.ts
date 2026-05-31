@@ -38,15 +38,21 @@ interface Offer {
   desconto: number
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
-  const businessRes = await $fetch<{ data: FlatBusiness[] }>(`${config.backendBase}/business`)
-  const businesses = businessRes.data ?? []
+  let businesses: FlatBusiness[] = []
+  try {
+    const businessRes = await authBackendFetch<{ data: FlatBusiness[] }>(event, `${config.backendBase}/business`)
+    businesses = businessRes.data ?? []
+  } catch {
+    // Non-admin users get 403 — return empty list gracefully
+    return { data: [] }
+  }
 
   const offersResults = await Promise.allSettled(
     businesses.map(b =>
-      $fetch<{ offers: Offer[] }>(`${config.backendBase}/business/${b.nif_nipc}/offers`)
+      authBackendFetch<{ offers: Offer[] }>(event, `${config.backendBase}/business/${b.nif_nipc}/offers`)
     )
   )
 
