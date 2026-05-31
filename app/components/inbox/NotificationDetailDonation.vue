@@ -23,7 +23,9 @@ const fetchUrl = computed(() =>
   isAdmin.value ? '/api/donations' : `/api/patrons/${patronNif.value}/donations`
 )
 
-const { data: rawData, status, refresh } = await useFetch<{ donations: Donation[] }>(
+// No await — keeps this a synchronous component so refs (statusModalOpen)
+// remain reactive and modals can open correctly.
+const { data: rawData, status, refresh } = useFetch<{ donations: Donation[] }>(
   fetchUrl,
   { lazy: true, server: false }
 )
@@ -65,8 +67,25 @@ function downloadPDF() {
 </script>
 
 <template>
-  <div v-if="status === 'pending'" class="flex items-center justify-center py-16">
-    <UIcon name="i-lucide-loader-circle" class="size-8 text-muted animate-spin" />
+  <div v-if="status === 'pending'" class="p-6 space-y-6 animate-pulse">
+    <div class="flex items-start justify-between gap-4">
+      <div class="space-y-2">
+        <USkeleton class="h-3 w-16" />
+        <USkeleton class="h-5 w-44" />
+        <USkeleton class="h-3.5 w-28" />
+      </div>
+      <USkeleton class="h-5 w-16 rounded-full" />
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div v-for="i in 4" :key="i" class="space-y-1.5">
+        <USkeleton class="h-3 w-16" />
+        <USkeleton class="h-4 w-24" />
+      </div>
+    </div>
+    <div class="flex gap-2 pt-2 border-t border-default">
+      <USkeleton class="h-8 w-28 rounded-md" />
+      <USkeleton class="h-8 w-36 rounded-md" />
+    </div>
   </div>
 
   <div v-else-if="!donation" class="p-6 text-center text-muted text-sm">
@@ -170,7 +189,7 @@ function downloadPDF() {
     </div>
   </div>
 
-  <DonationStatusModal
+  <MecenasDonationStatusModal
     v-if="isAdmin && donation"
     v-model:open="statusModalOpen"
     :donation="donation"

@@ -48,6 +48,12 @@ const state = reactive<Partial<Schema>>({
   motivo_recusa: ''
 })
 
+// Writable computed gives UModal a proper two-way binding in Nuxt UI 4
+const isOpen = computed({
+  get: () => props.open,
+  set: v => emit('update:open', v)
+})
+
 watch(() => props.donation, (d) => {
   if (d) {
     state.estado = d.estado
@@ -127,10 +133,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <UModal
-    :open="open"
+    v-model:open="isOpen"
     title="Atualizar Estado da Doação"
     :description="donation ? `Doação #${donation.id_doacao} — ${donation.nome_entidade ?? donation.mecena_nif_nipc}` : ''"
-    @update:open="emit('update:open', $event)"
   >
     <template #body>
       <UForm

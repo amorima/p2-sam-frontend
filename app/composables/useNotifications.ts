@@ -74,11 +74,9 @@ const _useNotifications = () => {
     const n = notifications.value.find(x => x._id === id)
     if (!n || n.lida) return
     n.lida = true
-    try {
-      await $fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
-    } catch {
+    $fetch(`/api/notifications/${id}`, { method: 'PATCH' }).catch(() => {
       n.lida = false
-    }
+    })
   }
 
   async function markAllAsRead() {

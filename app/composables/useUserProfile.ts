@@ -49,7 +49,13 @@ export const useUserProfile = () => {
     }
   }
 
-  onMounted(loadStoredAvatar)
+  // React to account switches (login/logout) — nif changes when a different
+  // account is loaded, so watching it is sufficient to reload the avatar.
+  watch(
+    () => authCookie.value?.nif,
+    () => { if (import.meta.client) loadStoredAvatar() },
+    { immediate: true }
+  )
 
   return { name, avatar, updateAvatar }
 }

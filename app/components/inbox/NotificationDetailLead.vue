@@ -19,7 +19,7 @@ interface Lead {
 
 const leadId = computed(() => props.notification.payload?.id_lead as number | undefined)
 
-const { data: lead, status, refresh } = await useFetch<Lead>(
+const { data: lead, status, refresh } = useFetch<Lead>(
   () => `/api/leads/${leadId.value}`,
   { lazy: true, server: false, watch: [leadId] }
 )
@@ -53,8 +53,25 @@ async function validateLead() {
 </script>
 
 <template>
-  <div v-if="status === 'pending'" class="flex items-center justify-center py-16">
-    <UIcon name="i-lucide-loader-circle" class="size-8 text-muted animate-spin" />
+  <div v-if="status === 'pending'" class="p-6 space-y-6 animate-pulse">
+    <div class="flex items-start justify-between gap-4">
+      <div class="space-y-2">
+        <USkeleton class="h-3 w-16" />
+        <USkeleton class="h-5 w-40" />
+        <USkeleton class="h-3.5 w-32" />
+      </div>
+      <USkeleton class="h-5 w-16 rounded-full" />
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div v-for="i in 4" :key="i" class="space-y-1.5">
+        <USkeleton class="h-3 w-20" />
+        <USkeleton class="h-4 w-24" />
+      </div>
+    </div>
+    <div class="flex gap-2 pt-2 border-t border-default">
+      <USkeleton class="h-8 w-36 rounded-md" />
+      <USkeleton class="h-8 w-32 rounded-md" />
+    </div>
   </div>
 
   <div v-else-if="!lead" class="p-6 text-center text-muted text-sm">

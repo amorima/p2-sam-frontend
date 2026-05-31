@@ -44,7 +44,7 @@ watch(() => props.need, (n) => {
     state.estado = n.estado
     state.motivo_recusa = n.motivo_recusa ?? ''
   }
-})
+}, { immediate: true })
 
 const estadoBadgeColor = computed(() => {
   const map: Record<string, 'warning' | 'success' | 'error'> = {

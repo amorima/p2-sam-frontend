@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import type { GoodsService, TipoBem } from '~/utils/domain'
 
-// Single combobox for choosing a business-offer category: as you type, the list
-// of existing categories filters below; pick one to select it. If what you type
-// isn't an existing category, it simply becomes a new category — and a Bem/Serviço
-// selector appears beside the field so you can classify the new entry.
 const props = withDefaults(defineProps<{
   modelValue: string
   tipo?: TipoBem
@@ -15,10 +11,11 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: string]
   'update:tipo': [value: TipoBem]
+  'confirm': []
 }>()
 
 const open = ref(false)
-const inputEl = ref<HTMLInputElement | null>(null)
+const highlightedIndex = ref(-1)
 
 const available = computed(() =>
   props.goodsServices.filter(g => !props.exclude.includes(g.tipo_bem_servico))
@@ -30,7 +27,11 @@ const filtered = computed(() => {
   return available.value.filter(g => g.tipo_bem_servico.toLowerCase().includes(q))
 })
 
-// The current text matches an existing canonical category → no tipo choice needed.
+// Reset highlight when the list changes
+watch(filtered, () => {
+  highlightedIndex.value = -1
+})
+
 const matchedExisting = computed(() =>
   props.goodsServices.find(g => g.tipo_bem_servico.toLowerCase() === props.modelValue.trim().toLowerCase())
 )
@@ -40,19 +41,38 @@ function choose(g: GoodsService) {
   emit('update:modelValue', g.tipo_bem_servico)
   emit('update:tipo', g.tipo_bem)
   open.value = false
+  highlightedIndex.value = -1
+}
+
+function onArrowDown() {
+  if (!open.value) {
+    open.value = true
+    return
+  }
+  highlightedIndex.value = Math.min(highlightedIndex.value + 1, filtered.value.length - 1)
+}
+
+function onArrowUp() {
+  highlightedIndex.value = Math.max(highlightedIndex.value - 1, -1)
 }
 
 function onEnter() {
-  // If the typed value matches an existing option, adopt its tipo; otherwise it
-  // stays as a brand-new category (the tipo selector handles classification).
+  if (open.value && highlightedIndex.value >= 0 && filtered.value[highlightedIndex.value]) {
+    // Select the highlighted item
+    choose(filtered.value[highlightedIndex.value]!)
+    emit('confirm')
+    return
+  }
   if (matchedExisting.value) emit('update:tipo', matchedExisting.value.tipo_bem)
   open.value = false
+  highlightedIndex.value = -1
+  if (props.modelValue.trim()) emit('confirm')
 }
 
 function onBlur() {
-  // Delay so a click on an option registers before the list closes.
   setTimeout(() => {
     open.value = false
+    highlightedIndex.value = -1
   }, 150)
 }
 </script>
@@ -61,15 +81,17 @@ function onBlur() {
   <div class="flex items-start gap-2">
     <div class="relative flex-1">
       <UInput
-        ref="inputEl"
         :model-value="modelValue"
         placeholder="Escreva ou escolha uma categoria..."
         class="w-full"
         icon="i-lucide-tag"
-        @update:model-value="emit('update:modelValue', String($event))"
+        @update:model-value="(v) => { emit('update:modelValue', String(v)); open = true }"
         @focus="open = true"
         @blur="onBlur"
         @keydown.enter.prevent="onEnter"
+        @keydown.arrow-down.prevent="onArrowDown"
+        @keydown.arrow-up.prevent="onArrowUp"
+        @keydown.escape="() => { open = false; highlightedIndex = -1 }"
       />
 
       <div
@@ -77,11 +99,13 @@ function onBlur() {
         class="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto rounded-lg border border-default bg-default shadow-lg ring ring-default"
       >
         <button
-          v-for="g in filtered"
+          v-for="(g, i) in filtered"
           :key="g.tipo_bem_servico"
           type="button"
-          class="w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-elevated"
+          class="w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-sm transition-colors"
+          :class="i === highlightedIndex ? 'bg-primary/10 text-primary' : 'hover:bg-elevated'"
           @mousedown.prevent="choose(g)"
+          @mouseenter="highlightedIndex = i"
         >
           <span class="truncate">{{ g.tipo_bem_servico }}</span>
           <UBadge :color="g.tipo_bem === 'BEM' ? 'primary' : 'info'" variant="subtle" size="sm">

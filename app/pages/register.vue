@@ -101,57 +101,10 @@ function descontoLabel(o: DraftOffer): { text: string, color: 'success' | 'warni
   return { text: `${o.desconto}% desconto`, color: 'info' }
 }
 
-// ── File upload state ─────────────────────────────────────────────────────────
-
-const fileInput = ref<HTMLInputElement | null>(null)
-const isUploading = ref(false)
-const uploadedFileName = ref('')
-const uploadedUrl = ref('')
-
-async function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (!file) return
-
-  isUploading.value = true
-  uploadedFileName.value = ''
-  uploadedUrl.value = ''
-
-  try {
-    const safeName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`
-    const formData = new FormData()
-    formData.append('file', file)
-
-    const result = await $fetch<{ url: string }>(`/api/upload/files?nome=${encodeURIComponent(safeName)}`, {
-      method: 'POST',
-      body: formData
-    })
-
-    uploadedUrl.value = result.url
-    uploadedFileName.value = file.name
-
-    // Store into entity state
-    if (selectedRole.value === 'institution') {
-      entityState.url_comprovativo_estatuto = result.url
-    } else if (selectedRole.value === 'business') {
-      entityState.url_certidao_permanente = result.url
-    }
-
-    toast.add({ title: 'Ficheiro enviado', icon: 'i-lucide-check', color: 'success' })
-  } catch {
-    toast.add({ title: 'Erro no upload', description: 'Não foi possível enviar o ficheiro.', icon: 'i-lucide-alert-circle', color: 'error' })
-  } finally {
-    isUploading.value = false
-  }
-}
-
-// Reset upload when role changes
+// Reset upload fields when role changes
 watch(selectedRole, () => {
-  uploadedUrl.value = ''
-  uploadedFileName.value = ''
   entityState.url_comprovativo_estatuto = ''
   entityState.url_certidao_permanente = ''
-  if (fileInput.value) fileInput.value.value = ''
 })
 
 // ── Step 2: Entity schema & state ─────────────────────────────────────────────
@@ -219,12 +172,11 @@ const stepTitles = computed(() =>
 )
 
 async function onStep2Submit(_event: FormSubmitEvent<EntitySchema>) {
-  // Validate file upload for types that require it
-  if (selectedRole.value === 'institution' && !uploadedUrl.value) {
+  if (selectedRole.value === 'institution' && !entityState.url_comprovativo_estatuto) {
     toast.add({ title: 'Ficheiro obrigatório', description: 'Carregue o comprovativo de estatuto antes de continuar.', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
-  if (selectedRole.value === 'business' && !uploadedUrl.value) {
+  if (selectedRole.value === 'business' && !entityState.url_certidao_permanente) {
     toast.add({ title: 'Ficheiro obrigatório', description: 'Carregue a certidão permanente antes de continuar.', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
@@ -540,37 +492,10 @@ async function onStep4Submit() {
         <template v-if="selectedRole === 'institution'">
           <USeparator label="Dados da instituição" />
           <UFormField label="Comprovativo de estatuto" required>
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <input
-                  ref="fileInput"
-                  type="file"
-                  class="hidden"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                  @change="onFileChange"
-                >
-                <UButton
-                  :icon="isUploading ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
-                  :label="isUploading ? 'A enviar...' : 'Escolher ficheiro'"
-                  color="neutral"
-                  variant="outline"
-                  :disabled="isUploading"
-                  @click="fileInput?.click()"
-                />
-                <span v-if="uploadedFileName" class="text-sm text-muted truncate max-w-40">{{ uploadedFileName }}</span>
-              </div>
-              <UBadge
-                v-if="uploadedUrl"
-                color="success"
-                variant="subtle"
-                icon="i-lucide-check-circle"
-              >
-                Ficheiro enviado com sucesso
-              </UBadge>
-              <p class="text-xs text-muted">
-                Aceita PDF, JPG, PNG, DOC. Será guardado em armazenamento seguro.
-              </p>
-            </div>
+            <FileUploadField
+              v-model="entityState.url_comprovativo_estatuto"
+              hint="PDF, JPG ou PNG — comprovativo de estatuto"
+            />
           </UFormField>
         </template>
 
@@ -579,37 +504,10 @@ async function onStep4Submit() {
           <USeparator label="Dados do negócio" />
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <UFormField label="Certidão permanente" required class="sm:col-span-2">
-              <div class="space-y-2">
-                <div class="flex items-center gap-2">
-                  <input
-                    ref="fileInput"
-                    type="file"
-                    class="hidden"
-                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                    @change="onFileChange"
-                  >
-                  <UButton
-                    :icon="isUploading ? 'i-lucide-loader-circle' : 'i-lucide-upload'"
-                    :label="isUploading ? 'A enviar...' : 'Escolher ficheiro'"
-                    color="neutral"
-                    variant="outline"
-                    :disabled="isUploading"
-                    @click="fileInput?.click()"
-                  />
-                  <span v-if="uploadedFileName" class="text-sm text-muted truncate max-w-40">{{ uploadedFileName }}</span>
-                </div>
-                <UBadge
-                  v-if="uploadedUrl"
-                  color="success"
-                  variant="subtle"
-                  icon="i-lucide-check-circle"
-                >
-                  Ficheiro enviado com sucesso
-                </UBadge>
-                <p class="text-xs text-muted">
-                  Aceita PDF, JPG, PNG, DOC. Será guardado em armazenamento seguro.
-                </p>
-              </div>
+              <FileUploadField
+                v-model="entityState.url_certidao_permanente"
+                hint="PDF, JPG ou PNG — certidão permanente do negócio"
+              />
             </UFormField>
 
             <UFormField

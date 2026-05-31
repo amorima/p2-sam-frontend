@@ -41,6 +41,9 @@ const showRejectModal = ref(false)
 const rejectTarget = ref<Need | null>(null)
 const rejectReason = ref('')
 
+const showAutoVoucherModal = ref(false)
+const autoVoucherTarget = ref<Need | null>(null)
+
 function openReject(need: Need) {
   rejectTarget.value = need
   rejectReason.value = ''
@@ -92,37 +95,42 @@ function institutionCoords(nif: string): { lat: number, lng: number } {
 async function approve(need: Need) {
   const unmatched = need.items.filter(i => !i.match_tipo)
   if (unmatched.length > 0 && !need.urgente) {
-    toast.add({
-      title: 'Itens sem match',
-      description: `${unmatched.length} item(ns) sem destino. Defina o match para cada um antes de aprovar.`,
-      icon: 'i-lucide-alert-circle',
-      color: 'warning'
-    })
+    autoVoucherTarget.value = need
+    showAutoVoucherModal.value = true
     return
   }
+  await doApprove(need)
+}
+
+async function confirmAutoVoucherApprove() {
+  const need = autoVoucherTarget.value
+  if (!need) return
+  need.items.filter(i => !i.match_tipo).forEach(item => updateMatch(need, item.id_item, 'VOUCHER'))
+  showAutoVoucherModal.value = false
+  autoVoucherTarget.value = null
+  await doApprove(need)
+}
+
+async function doApprove(need: Need) {
   await approveNeed(need.id_pedido)
+  const updated = needs.value.find(n => n.id_pedido === need.id_pedido)
+  const voucherItems = updated?.items.filter(i => i.match_tipo === 'VOUCHER' && i.match_ref) ?? []
   toast.add({
     title: 'Pedido aprovado',
-    description: need.urgente
-      ? `Pedido #${need.id_pedido} aprovado. Vouchers emitidos automaticamente para os bens.`
+    description: voucherItems.length > 0
+      ? `Pedido #${need.id_pedido} aprovado. ${voucherItems.length} voucher(s) emitido(s) automaticamente.`
       : `Pedido #${need.id_pedido} aprovado com sucesso.`,
     icon: 'i-lucide-check',
     color: 'success'
   })
-  // Auto-download vouchers for urgent needs that just got vouchers
-  if (need.urgente) {
-    const updated = needs.value.find(n => n.id_pedido === need.id_pedido)
-    if (updated) {
-      updated.items
-        .filter(i => i.match_tipo === 'VOUCHER' && i.match_ref)
-        .forEach(it => openVoucher({
-          voucher_ref: it.match_ref!,
-          id_pedido: updated.id_pedido,
-          nif_nipc: updated.nif_nipc,
-          nome_entidade: updated.nome_entidade ?? updated.nif_nipc,
-          tipo_bem_servico: it.tipo_bem_servico
-        }))
-    }
+  if (updated) {
+    voucherItems.forEach(it => openVoucher({
+      voucher_ref: it.match_ref!,
+      id_pedido: updated.id_pedido,
+      nif_nipc: updated.nif_nipc,
+      nome_entidade: updated.nome_entidade ?? updated.nif_nipc,
+      tipo_bem_servico: it.tipo_bem_servico
+    }))
   }
 }
 
@@ -322,6 +330,40 @@ function formatDate(d: string) {
           </template>
         </UPageCard>
       </div>
+
+      <UModal
+        v-model:open="showAutoVoucherModal"
+        title="Aprovar com Vouchers Automáticos"
+        :description="autoVoucherTarget
+          ? `${autoVoucherTarget.items.filter(i => !i.match_tipo).length} item(ns) sem match serão atribuídos automaticamente um voucher.`
+          : ''"
+      >
+        <template #body>
+          <div class="space-y-4">
+            <UAlert
+              icon="i-lucide-ticket"
+              color="warning"
+              variant="subtle"
+              title="Itens sem destino definido"
+              :description="`Todos os itens sem match receberão um voucher gerado automaticamente. Pode transferi-los após a aprovação.`"
+            />
+            <div class="flex justify-end gap-2">
+              <UButton
+                label="Cancelar"
+                color="neutral"
+                variant="subtle"
+                @click="showAutoVoucherModal = false"
+              />
+              <UButton
+                label="Aprovar e Emitir Vouchers"
+                icon="i-lucide-ticket"
+                color="primary"
+                @click="confirmAutoVoucherApprove"
+              />
+            </div>
+          </div>
+        </template>
+      </UModal>
 
       <UModal
         v-model:open="showRejectModal"

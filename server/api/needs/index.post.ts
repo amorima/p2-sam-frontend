@@ -29,30 +29,43 @@ export default defineEventHandler(async (event) => {
 
   const { nif_nipc, items, ...rest } = body
 
-  // Prepare items for the backend: remove tipo_bem as it's inferred on GET
+  // Backend DB stores tipo_bem as lowercase ('bem'/'servico') — frontend uses
+  // uppercase ('BEM'/'SERVICO'). The ensureGoodsServicesForItems conflict check
+  // is case-sensitive, so 'BEM' !== 'bem' triggers a false 422 → 500.
   const backendItems = (items || []).map((it: NewItem) => ({
-    tipo_bem_servico: it.tipo_bem_servico
+    tipo_bem_servico: it.tipo_bem_servico,
+    tipo_bem: it.tipo_bem?.toLowerCase()
   }))
 
-  const response = await authBackendFetch<BackendCreateResponse>(event, `${config.backendBase}/institutions/${nif_nipc}/needs`, {
-    method: 'POST',
-    body: {
-      ...rest,
-      'nif_nipc': nif_nipc,
-      'items': backendItems,
-      'needItems': backendItems,
-      'need items': backendItems
-    }
-  })
+  const backendBody = {
+    ...rest,
+    'nif_nipc': nif_nipc,
+    'items': backendItems,
+    'needItems': backendItems,
+    'need items': backendItems
+  }
 
-  // Defensive mapping to ensure the frontend receive the structure it expects
-  // useNeeds.ts expects: { need: { id_pedido, ... }, items: [...] }
+  console.log('[needs/create] →', `POST /institutions/${nif_nipc}/needs`, JSON.stringify({ items: backendItems, estado: rest.estado, urgente: rest.urgente }))
+
+  let response: BackendCreateResponse
+  try {
+    response = await authBackendFetch<BackendCreateResponse>(event, `${config.backendBase}/institutions/${nif_nipc}/needs`, {
+      method: 'POST',
+      body: backendBody
+    })
+  } catch (err: unknown) {
+    const e = err as { statusCode?: number, statusMessage?: string, data?: unknown }
+    console.error('[needs/create] ✗ backend error:', e?.statusCode, e?.statusMessage, JSON.stringify(e?.data))
+    throw err
+  }
+
+  console.log('[needs/create] ✓ backend ok:', JSON.stringify(response))
+
   const result = {
     need: (response.need ?? (response.id_pedido ? response : {})) as Record<string, unknown>,
     items: (response.items ?? response.needItems ?? response['need items'] ?? []) as unknown[]
   }
 
-  // Fallback for id_pedido if it's at the root and not in .need
   if (!result.need.id_pedido && response.id_pedido) {
     result.need = response as unknown as Record<string, unknown>
   }

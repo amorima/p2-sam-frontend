@@ -20,35 +20,28 @@ const items = computed({
   set: v => emit('update:modelValue', v)
 })
 
-const newName = ref('')
-const newTipo = ref<TipoBem>('BEM')
-const showCreate = ref(false)
-const selectedExisting = ref<string | undefined>(undefined)
+const currentName = ref('')
+const currentTipo = ref<TipoBem>('BEM')
 
-const availableOptions = computed(() =>
-  props.goodsServices
-    .filter(g => !items.value.some(i => i.tipo_bem_servico === g.tipo_bem_servico))
-    .map(g => ({ label: `${g.tipo_bem_servico} (${g.tipo_bem === 'BEM' ? 'Bem' : 'Serviço'})`, value: g.tipo_bem_servico }))
-)
+const exclude = computed(() => items.value.map(i => i.tipo_bem_servico))
 
-function addExisting() {
-  const sel = selectedExisting.value
-  if (!sel) return
-  const gs = props.goodsServices.find(g => g.tipo_bem_servico === sel)
-  if (!gs) return
-  if (items.value.some(i => i.tipo_bem_servico === gs.tipo_bem_servico)) return
-  items.value = [...items.value, { tipo_bem_servico: gs.tipo_bem_servico, tipo_bem: gs.tipo_bem }]
-  selectedExisting.value = undefined
-}
-
-function addNew() {
-  const name = newName.value.trim()
+function addItem() {
+  const name = currentName.value.trim()
   if (!name) return
   if (items.value.some(i => i.tipo_bem_servico.toLowerCase() === name.toLowerCase())) return
-  items.value = [...items.value, { tipo_bem_servico: name, tipo_bem: newTipo.value }]
-  newName.value = ''
-  newTipo.value = 'BEM'
-  showCreate.value = false
+
+  // Always use the canonical tipo_bem from the existing goods service record.
+  // If the user typed a name without clicking the dropdown suggestion, the
+  // CategoryField may not have emitted update:tipo yet — looking it up here
+  // prevents a tipo_bem conflict 422 from the backend.
+  const canonical = props.goodsServices.find(
+    g => g.tipo_bem_servico.toLowerCase() === name.toLowerCase()
+  )
+  const tipo: TipoBem = canonical ? canonical.tipo_bem : currentTipo.value
+
+  items.value = [...items.value, { tipo_bem_servico: canonical?.tipo_bem_servico ?? name, tipo_bem: tipo }]
+  currentName.value = ''
+  currentTipo.value = 'BEM'
 }
 
 function removeItem(index: number) {
@@ -58,56 +51,23 @@ function removeItem(index: number) {
 
 <template>
   <div class="space-y-4">
-    <div class="flex flex-col sm:flex-row gap-2">
-      <USelectMenu
-        v-model="selectedExisting"
-        :items="availableOptions"
-        value-key="value"
-        label-key="label"
-        placeholder="Pesquisar artigo/serviço existente..."
-        search-placeholder="Pesquisar..."
-        class="flex-1"
-      />
+    <div class="flex items-start gap-2">
+      <div class="flex-1">
+        <NegociosCategoryField
+          v-model="currentName"
+          v-model:tipo="currentTipo"
+          :goods-services="goodsServices"
+          :exclude="exclude"
+          @confirm="addItem"
+        />
+      </div>
       <UButton
         label="Adicionar"
         icon="i-lucide-plus"
         color="primary"
         variant="subtle"
-        :disabled="!selectedExisting"
-        @click="addExisting"
-      />
-      <UButton
-        label="Criar novo"
-        icon="i-lucide-square-plus"
-        color="neutral"
-        variant="outline"
-        @click="showCreate = !showCreate"
-      />
-    </div>
-
-    <div v-if="showCreate" class="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-2 p-3 rounded-lg border border-default bg-elevated/30">
-      <UInput
-        v-model="newName"
-        placeholder="Nome do novo bem/serviço"
-        class="w-full"
-        @keyup.enter="addNew"
-      />
-      <USelect
-        v-model="newTipo"
-        :items="[
-          { label: 'Bem', value: 'BEM' },
-          { label: 'Serviço', value: 'SERVICO' }
-        ]"
-        value-key="value"
-        label-key="label"
-        class="w-32"
-      />
-      <UButton
-        label="Criar"
-        icon="i-lucide-check"
-        color="primary"
-        :disabled="!newName.trim()"
-        @click="addNew"
+        :disabled="!currentName.trim()"
+        @click="addItem"
       />
     </div>
 

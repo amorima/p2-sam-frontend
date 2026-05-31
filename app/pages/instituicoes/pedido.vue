@@ -71,8 +71,10 @@ async function onSubmit() {
       color: 'success'
     })
     router.push('/instituicoes')
-  } catch {
-    toast.add({ title: 'Erro ao submeter', description: 'Não foi possível registar o pedido.', icon: 'i-lucide-x', color: 'error' })
+  } catch (e: unknown) {
+    const err = e as { statusMessage?: string, data?: { description?: string, statusMessage?: string } }
+    const msg = err?.statusMessage ?? err?.data?.description ?? err?.data?.statusMessage ?? 'Não foi possível registar o pedido.'
+    toast.add({ title: 'Erro ao submeter', description: msg, icon: 'i-lucide-x', color: 'error' })
   } finally {
     isSubmitting.value = false
   }

@@ -88,8 +88,17 @@ const isMobile = breakpoints.smaller('lg')
       </template>
     </UDashboardNavbar>
 
-    <div v-if="loading && notifications.length === 0" class="flex items-center justify-center py-16">
-      <UIcon name="i-lucide-loader-circle" class="size-8 text-muted animate-spin" />
+    <div v-if="loading && notifications.length === 0" class="divide-y divide-default">
+      <div v-for="i in 6" :key="i" class="p-4 sm:px-6 space-y-1.5">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <USkeleton class="size-4 rounded shrink-0" />
+            <USkeleton class="h-3.5 w-36" />
+          </div>
+          <USkeleton class="h-3 w-10" />
+        </div>
+        <USkeleton class="h-3 w-52 ml-6" />
+      </div>
     </div>
     <InboxList
       v-else
