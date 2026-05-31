@@ -158,7 +158,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
     {
       label: 'Início',
       icon: 'i-lucide-house',
-      to: '/',
+      to: '/home',
       exact: true,
       onSelect: () => { open.value = false }
     },

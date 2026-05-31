@@ -1,6 +1,6 @@
 import type { AuthSession } from '~/composables/useAuth'
 
-const PUBLIC_ROUTES = ['/login', '/register', '/painel']
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/painel']
 
 export default defineNuxtRouteMiddleware((to) => {
   if (PUBLIC_ROUTES.includes(to.path)) return

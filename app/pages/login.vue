@@ -26,7 +26,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
     const result = await login(event.data.nif_nipc, event.data.password)
     const redirectMap: Record<UserRole, string> = {
-      admin: '/',
+      admin: '/home',
       patron: '/mecenas',
       institution: '/instituicoes',
       business: '/negocios'
