@@ -7,7 +7,7 @@ interface BackendNeedItem {
 interface BackendNeed {
   'id_pedido': number
   'nif_nipc': string
-  'createdAt': string | null
+  'data': string | null
   'estado': string | null
   'urgente': boolean | number
   'need items'?: BackendNeedItem[]
@@ -56,7 +56,6 @@ export default defineEventHandler(async () => {
   }
 
   let itemCounter = 0
-  const today = new Date().toISOString()
 
   const needs = (needsRes.needs ?? []).map((need) => {
     // Sequelize names the hasMany association key using the model name "need item" → "need items"
@@ -79,7 +78,7 @@ export default defineEventHandler(async () => {
       id_pedido: need.id_pedido,
       nif_nipc: need.nif_nipc,
       nome_entidade: nameMap.get(need.nif_nipc) ?? need.nif_nipc,
-      data: need.createdAt ?? today,
+      data: need.data ?? new Date().toISOString(),
       estado: need.estado ?? 'PENDENTE',
       urgente: Boolean(need.urgente),
       items

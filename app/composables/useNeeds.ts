@@ -92,7 +92,7 @@ const _useNeeds = () => {
     input.items.forEach(ensureGoodsService)
 
     const backendRes = await $fetch<{
-      need: { id_pedido: number, nif_nipc: string, estado: string, urgente: boolean }
+      need: { id_pedido: number, nif_nipc: string, estado: string, urgente: boolean, data?: string }
       items: Array<{ id_item: number, id_pedido: number, tipo_bem_servico: string }>
     }>('/api/needs', {
       method: 'POST',
@@ -125,7 +125,7 @@ const _useNeeds = () => {
       id_pedido: backendRes.need.id_pedido,
       nif_nipc: backendRes.need.nif_nipc,
       nome_entidade: input.nome_entidade,
-      data: input.data,
+      data: backendRes.need.data ?? input.data,
       estado: backendRes.need.estado as EstadoPedido,
       urgente: backendRes.need.urgente,
       items
