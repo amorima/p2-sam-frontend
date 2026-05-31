@@ -8,7 +8,7 @@ const homePath = computed(() => {
     case 'patron': return '/mecenas'
     case 'institution': return '/instituicoes'
     case 'business': return '/negocios'
-    default: return '/'
+    default: return '/home'
   }
 })
 </script>
@@ -26,11 +26,9 @@ const homePath = computed(() => {
       alt="SAM"
       class="h-8 w-8 object-contain"
     >
-    <img
-      v-else
-      src="/logo_big.svg"
-      alt="SAM"
-      class="h-8 w-auto object-contain"
-    >
+    <template v-else>
+      <img src="/logo_big_light.svg" alt="SAM" class="h-8 w-auto object-contain dark:hidden">
+      <img src="/logo_big.svg" alt="SAM" class="h-8 w-auto object-contain hidden dark:block">
+    </template>
   </NuxtLink>
 </template>

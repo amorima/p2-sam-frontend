@@ -4,7 +4,8 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <NuxtLink to="/" class="flex items-center gap-3 group">
-            <img src="/logo_big.svg" alt="SAM" class="h-8 transition-opacity group-hover:opacity-75">
+            <img src="/logo_big_light.svg" alt="SAM" class="h-8 transition-opacity group-hover:opacity-75 dark:hidden">
+            <img src="/logo_big.svg" alt="SAM" class="h-8 transition-opacity group-hover:opacity-75 hidden dark:block">
             <div class="hidden sm:flex flex-col leading-none gap-0.5">
               <span class="text-sm font-bold text-highlighted tracking-tight">SAM</span>
               <span class="text-xs text-muted">Vila do Conde</span>
@@ -38,7 +39,8 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-5">
           <div class="flex items-center gap-3">
-            <img src="/logo_big.svg" alt="SAM" class="h-6 opacity-50">
+            <img src="/logo_big_light.svg" alt="SAM" class="h-6 opacity-50 dark:hidden">
+            <img src="/logo_big.svg" alt="SAM" class="h-6 opacity-50 hidden dark:block">
             <p class="text-sm text-muted">
               Sistema de Apoio Municipal
             </p>

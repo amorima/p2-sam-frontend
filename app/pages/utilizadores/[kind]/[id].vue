@@ -30,14 +30,29 @@ const authHeader = computed(() =>
     : undefined
 )
 
-const { isAdmin } = useAuth()
+const { isAdmin, role } = useAuth()
 const isOwnProfile = computed(() => session.value?.nif === id.value)
 const canAdminister = computed(() => isAdmin.value && !isOwnProfile.value)
+
+const ownSectionMap: Record<string, string> = {
+  patron: '/mecenas',
+  institution: '/instituicoes',
+  business: '/negocios'
+}
+const ownSection = computed(() => role.value ? (ownSectionMap[role.value] ?? '/') : '/')
 
 const { data: user, status, refresh, error } = await useFetch<CustomerDetail>(
   () => `/api/customers/${kind.value}/${encodeURIComponent(id.value)}`,
   { lazy: true }
 )
+
+watch(error, (err) => {
+  if (!err) return
+  const code = (err as { statusCode?: number })?.statusCode
+  if ((code === 401 || code === 403) && isOwnProfile.value && !isAdmin.value) {
+    navigateTo(ownSection.value)
+  }
+})
 
 const fullAddress = computed(() => {
   const loc = user.value?.locations?.[0]
@@ -154,7 +169,7 @@ function copyToClipboard(value: string, label: string) {
     </template>
 
     <template #body>
-      <div v-if="status === 'pending'" class="flex items-center justify-center py-16 text-muted gap-2">
+      <div v-if="status === 'idle' || status === 'pending'" class="flex items-center justify-center py-16 text-muted gap-2">
         <UIcon name="i-lucide-loader-circle" class="animate-spin" />
         A carregar utilizador…
       </div>
@@ -165,8 +180,8 @@ function copyToClipboard(value: string, label: string) {
         <UButton
           color="neutral"
           variant="subtle"
-          to="/customers"
-          label="Voltar à lista"
+          :to="isAdmin ? '/customers' : ownSection"
+          :label="isAdmin ? 'Voltar à lista' : 'Voltar à minha área'"
         />
       </div>
 
@@ -281,7 +296,7 @@ function copyToClipboard(value: string, label: string) {
                 <UButton
                   variant="link"
                   trailing-icon="i-lucide-external-link"
-                  :to="user.url_comprovativo_estatuto"
+                  :to="`/api/download/files?nome=${encodeURIComponent(user.url_comprovativo_estatuto.split('/').pop() ?? '')}`"
                   target="_blank"
                   label="Abrir documento"
                 />

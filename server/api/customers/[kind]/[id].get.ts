@@ -78,53 +78,42 @@ export default defineEventHandler(async (event): Promise<CustomerDetail> => {
       ? `/api/download/avatar?nome=${encodeURIComponent(profile_pic)}`
       : undefined
 
-  try {
-    if (kind === 'citizen') {
-      const c = await $fetch<BackendCitizen>(url)
-      const blocked = Boolean(c.blocked)
-      return {
-        id: c.contacto,
-        name: c.nome,
-        email: c.contacto,
-        avatar: { src: avatarSrc(null), alt: c.nome },
-        status: blocked ? 'unsubscribed' : 'subscribed',
-        actorType: 'Cidadão',
-        kind: 'citizen',
-        blocked,
-        reason: c.reason ?? null,
-        rgpd: c.rgpd === 1
-      }
-    }
-
-    const e = await $fetch<BackendEntityResource>(url)
-    const blocked = Boolean(e.blocked)
-    const name = e.nome_entidade ?? e.nif_nipc
+  if (kind === 'citizen') {
+    const c = await authBackendFetch<BackendCitizen>(event, url)
+    const blocked = Boolean(c.blocked)
     return {
-      id: e.nif_nipc,
-      name,
-      email: e.email_login ?? '',
-      avatar: { src: avatarSrc(e.profile_pic), alt: name },
+      id: c.contacto,
+      name: c.nome,
+      email: c.contacto,
+      avatar: { src: avatarSrc(null), alt: c.nome },
       status: blocked ? 'unsubscribed' : 'subscribed',
-      actorType: KIND_ACTOR[kind],
-      kind,
+      actorType: 'Cidadão',
+      kind: 'citizen',
       blocked,
-      reason: e.reason ?? null,
-      iban: e.iban ?? null,
-      profile_pic: e.profile_pic ?? null,
-      locations: e.locations ?? [],
-      contacts: e.contacts ?? [],
-      geo_latitude: e.geo_latitude ?? null,
-      geo_longitude: e.geo_longitude ?? null,
-      url_comprovativo_estatuto: e.url_comprovativo_estatuto ?? null
+      reason: c.reason ?? null,
+      rgpd: c.rgpd === 1
     }
-  } catch (err: unknown) {
-    const er = err as {
-      response?: { status?: number }
-      data?: { description?: string }
-    }
-    throw createError({
-      statusCode: er?.response?.status ?? 500,
-      statusMessage: er?.data?.description ?? 'Failed to fetch customer'
-    })
+  }
+
+  const e = await authBackendFetch<BackendEntityResource>(event, url)
+  const blocked = Boolean(e.blocked)
+  const name = e.nome_entidade ?? e.nif_nipc
+  return {
+    id: e.nif_nipc,
+    name,
+    email: e.email_login ?? '',
+    avatar: { src: avatarSrc(e.profile_pic), alt: name },
+    status: blocked ? 'unsubscribed' : 'subscribed',
+    actorType: KIND_ACTOR[kind],
+    kind,
+    blocked,
+    reason: e.reason ?? null,
+    iban: e.iban ?? null,
+    profile_pic: e.profile_pic ?? null,
+    locations: e.locations ?? [],
+    contacts: e.contacts ?? [],
+    geo_latitude: e.geo_latitude != null ? Number(e.geo_latitude) : null,
+    geo_longitude: e.geo_longitude != null ? Number(e.geo_longitude) : null,
+    url_comprovativo_estatuto: e.url_comprovativo_estatuto ?? null
   }
 })

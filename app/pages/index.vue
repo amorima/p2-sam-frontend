@@ -441,7 +441,8 @@ if (session.value) {
     <section class="border-t border-default bg-elevated/25 py-24">
       <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 text-center">
         <div class="mb-6 flex justify-center">
-          <img src="/logo_big.svg" alt="SAM" class="h-14 opacity-80">
+          <img src="/logo_big_light.svg" alt="SAM" class="h-14 opacity-80 dark:hidden">
+          <img src="/logo_big.svg" alt="SAM" class="h-14 opacity-80 hidden dark:block">
         </div>
         <h2 class="text-3xl font-bold text-highlighted sm:text-4xl">
           Pronto para fazer a diferença?

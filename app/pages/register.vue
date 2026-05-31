@@ -34,8 +34,12 @@ const roleOptions: { label: string, value: RoleType, icon: string, description: 
   }
 ]
 
+const route = useRoute()
 const step = ref<1 | 2 | 3 | 4>(1)
-const selectedRole = ref<RoleType>('patron')
+const initialRole = (['patron', 'institution', 'business'] as RoleType[]).includes(route.query.role as RoleType)
+  ? (route.query.role as RoleType)
+  : 'patron'
+const selectedRole = ref<RoleType>(initialRole)
 const isSubmitting = ref(false)
 const showPassword = ref(false)
 const showPasswordConfirm = ref(false)
