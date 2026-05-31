@@ -14,12 +14,12 @@ interface FlatPatron {
   nome_entidade: string
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   const [donationsRes, patronsRes] = await Promise.all([
-    $fetch<{ donations: Donation[] }>(`${config.backendBase}/donations`),
-    $fetch<{ data: FlatPatron[] }>(`${config.backendBase}/patrons`)
+    authBackendFetch<{ donations: Donation[] }>(event, `${config.backendBase}/donations`),
+    authBackendFetch<{ data: FlatPatron[] }>(event, `${config.backendBase}/patrons`)
   ])
 
   // Backend returns flat format (nif_nipc and nome_entidade at top level)

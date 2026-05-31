@@ -7,9 +7,9 @@ interface FlatPatron {
   contacts: unknown[]
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const res = await $fetch<{ data: FlatPatron[] }>(`${config.backendBase}/patrons`)
+  const res = await authBackendFetch<{ data: FlatPatron[] }>(event, `${config.backendBase}/patrons`)
 
   const data = (res.data ?? []).map(p => ({
     resource: { nif_nipc: p.nif_nipc },
