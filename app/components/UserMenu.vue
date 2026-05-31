@@ -11,6 +11,7 @@ const userProfile = useUserProfile()
 const { logout, role } = useAuth()
 const session = useCookie<import('~/composables/useAuth').AuthSession | null>('auth-session')
 const isCollapsed = computed(() => !!props.collapsed)
+const isAdmin = computed(() => role.value === 'admin')
 
 const displayName = computed(() => userProfile.name.value)
 const displayAvatar = computed(() => userProfile.avatar.value)
@@ -135,6 +136,20 @@ const items = computed<DropdownMenuItem[][]>(() => [
       ]
     }
   ],
+  ...(!isAdmin.value
+    ? [[
+        {
+          label: 'API',
+          icon: 'i-lucide-key',
+          to: '/settings/api'
+        },
+        {
+          label: 'Documentação',
+          icon: 'i-lucide-book-open',
+          to: '/docs/api'
+        }
+      ]]
+    : []),
   [
     {
       label: 'Terminar sessão',

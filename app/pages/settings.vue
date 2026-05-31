@@ -18,6 +18,11 @@ const links = [
       label: 'Segurança',
       icon: 'i-lucide-shield',
       to: '/settings/security'
+    },
+    {
+      label: 'API',
+      icon: 'i-lucide-key',
+      to: '/settings/api'
     }
   ]
 ] satisfies NavigationMenuItem[][]
