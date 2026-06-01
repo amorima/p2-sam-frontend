@@ -425,7 +425,7 @@ const columns: TableColumn<Business>[] = [
         v-if="businesses.length === 0"
         class="flex flex-col items-center justify-center py-16 text-center"
       >
-        <UIcon name="i-lucide-store-off" class="size-12 text-muted mb-3" />
+        <UIcon name="i-lucide-store" class="size-12 text-muted mb-3" />
         <p class="font-medium text-highlighted">
           Sem negócios registados
         </p>

@@ -139,7 +139,12 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatEUR(d.amount
         :opacity="0.1"
       />
       <VisAxis type="x" :x="x" :tick-format="xTicks" />
-      <VisCrosshair color="var(--ui-primary)" :template="template" />
+      <VisCrosshair
+        :x="x"
+        :y="y"
+        color="var(--ui-primary)"
+        :template="template"
+      />
       <VisTooltip />
     </VisXYContainer>
   </UCard>

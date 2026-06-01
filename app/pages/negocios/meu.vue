@@ -183,7 +183,7 @@ function descontoLabel(o: BusinessOffer): { text: string, color: 'success' | 'wa
 
     <template #body>
       <div v-if="!myBusiness" class="flex flex-col items-center justify-center py-24 text-center">
-        <UIcon name="i-lucide-store-off" class="size-12 text-muted mb-3" />
+        <UIcon name="i-lucide-store" class="size-12 text-muted mb-3" />
         <p class="font-medium text-highlighted">
           Negócio não encontrado
         </p>

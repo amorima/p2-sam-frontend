@@ -91,7 +91,7 @@ function selectOption(opt: PartnerOption) {
 
         <div class="overflow-y-auto p-2 space-y-1">
           <div v-if="filteredOptions.length === 0" class="text-center py-8 text-sm text-muted">
-            <UIcon name="i-lucide-store-off" class="size-8 mb-2" />
+            <UIcon name="i-lucide-store" class="size-8 mb-2" />
             <p>Nenhum negócio parceiro disponível para esta categoria.</p>
           </div>
 
