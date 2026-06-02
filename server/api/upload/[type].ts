@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const runtimeConfig = useRuntimeConfig()
   const backendBase = runtimeConfig.backendBase || 'https://apisam.netdw.tech'
+  const internalKey = runtimeConfig.internalApiKey as string
   const target = `${backendBase.replace(/\/+$/, '')}/api/upload/${type}?nome=${encodeURIComponent(String(nome))}`
 
   // Forward content-type if provided by the client, otherwise infer from filename
@@ -52,7 +53,7 @@ export default defineEventHandler(async (event) => {
     if (method === 'GET') {
       const res = await $fetch(target, {
         method: 'GET',
-        headers
+        headers: { ...headers, 'x-internal-key': internalKey }
       })
 
       return res
@@ -67,7 +68,7 @@ export default defineEventHandler(async (event) => {
 
     const res = await $fetch(target, {
       method: method,
-      headers,
+      headers: { ...headers, 'x-internal-key': internalKey },
       body: body
     })
 

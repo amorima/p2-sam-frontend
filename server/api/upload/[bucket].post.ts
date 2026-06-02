@@ -21,7 +21,10 @@ export default defineEventHandler(async (event) => {
   const response = await fetch(`${config.backendBase}/api/upload/${bucket}?nome=${encodeURIComponent(nome)}`, {
     method: 'POST',
     body: rawBody as unknown as ArrayBuffer,
-    headers: { 'content-type': contentType }
+    headers: {
+      'content-type': contentType,
+      'x-internal-key': config.internalApiKey as string
+    }
   })
 
   if (!response.ok) {

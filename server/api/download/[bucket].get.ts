@@ -9,7 +9,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const response = await fetch(
-    `${config.backendBase}/api/upload/${bucket}/download?nome=${encodeURIComponent(nome)}`
+    `${config.backendBase}/api/upload/${bucket}/download?nome=${encodeURIComponent(nome)}`,
+    { headers: { 'x-internal-key': config.internalApiKey as string } }
   )
 
   if (!response.ok) {
