@@ -29,7 +29,7 @@ export function internalFetch<T = unknown>(
     method: options.method,
     body: options.body as Record<string, unknown> | undefined,
     headers: { 'X-Internal-Key': config.internalApiKey as string }
-  })
+  }) as Promise<T>
 }
 
 interface FetchErrorLike {
@@ -62,7 +62,7 @@ export async function authBackendFetch<T = unknown>(
     if (status === 401 && session?.refreshToken) {
       try {
         const refreshed = await $fetch<{ accessToken: string, refreshToken: string }>(
-          `${config.backendBase}/auth/refresh`,
+          `${config.backendBase}/users/refresh`,
           { method: 'POST', body: { refreshToken: session.refreshToken } }
         )
 

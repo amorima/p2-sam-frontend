@@ -42,7 +42,7 @@ export default defineEventHandler(async (event): Promise<AvatarResponse> => {
   const session = readSession(event)
 
   const callBackend = async (token?: string) => {
-    const response = await fetch(`${config.backendBase}/auth/avatar`, {
+    const response = await fetch(`${config.backendBase}/users/avatar`, {
       method: 'PATCH',
       body: rawBody as unknown as ArrayBuffer,
       headers: {
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event): Promise<AvatarResponse> => {
   if (response.status === 401 && session?.refreshToken) {
     try {
       const refreshed = await $fetch<{ accessToken: string, refreshToken: string }>(
-        `${config.backendBase}/auth/refresh`,
+        `${config.backendBase}/users/refresh`,
         { method: 'POST', body: { refreshToken: session.refreshToken } }
       )
 

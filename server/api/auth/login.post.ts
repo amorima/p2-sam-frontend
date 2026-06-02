@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
   let authResult: BackendLoginResponse
   try {
-    authResult = await $fetch<BackendLoginResponse>(`${config.backendBase}/auth/login`, {
+    authResult = await $fetch<BackendLoginResponse>(`${config.backendBase}/users/login`, {
       method: 'POST',
       body: { nif_nipc, password }
     })
