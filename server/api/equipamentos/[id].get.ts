@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
   let pings: BackendPing[] = []
   try {
-    const raw = await $fetch<BackendPing[] | BackendPing>(`${config.backendBase}/telemetry/${id}`)
+    const raw = await internalFetch<BackendPing[] | BackendPing>(`${config.backendBase}/telemetry/${id}`)
     pings = Array.isArray(raw) ? raw : raw ? [raw] : []
   } catch {
     pings = []

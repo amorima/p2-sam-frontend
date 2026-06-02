@@ -35,9 +35,9 @@ export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
 
   const [needsRes, institutionsRes, leadsRes] = await Promise.all([
-    $fetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`),
-    $fetch<{ data: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions`),
-    $fetch<BackendLead[]>(`${config.backendBase}/leads`).catch(() => [] as BackendLead[])
+    internalFetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`),
+    internalFetch<{ data: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions`),
+    internalFetch<BackendLead[]>(`${config.backendBase}/leads`).catch(() => [] as BackendLead[])
   ])
 
   const nameMap = new Map(

@@ -24,7 +24,7 @@ function computeSaude(bateria: number, temp: number, sinal: number, evento: stri
 
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
-  const events = await $fetch<TelemetryEvent[]>(`${config.backendBase}/telemetry`)
+  const events = await internalFetch<TelemetryEvent[]>(`${config.backendBase}/telemetry`)
 
   if (!Array.isArray(events) || events.length === 0) {
     return { lockers: [] }
