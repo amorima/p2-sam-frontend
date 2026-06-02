@@ -126,12 +126,16 @@ function addOfferDraft() {
     toast.add({ title: 'Categoria já adicionada', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
+  const existingService = goodsServices.value.find(g => g.tipo_bem_servico === cat)
+  const tipo_bem = existingService
+    ? existingService.tipo_bem as 'bem' | 'servico'
+    : (newOfferTipo.value === 'BEM' ? 'bem' : 'servico')
   offers.value.push({
     tipo_bem_servico: cat,
     descricao: newOfferDescricao.value.trim(),
     valor_total: newOfferValor.value,
     desconto: newOfferDesconto.value,
-    tipo_bem: newOfferTipo.value === 'BEM' ? 'bem' : 'servico'
+    tipo_bem
   })
   showAddOffer.value = false
   newOfferCategory.value = ''

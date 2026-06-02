@@ -39,7 +39,7 @@ const permanentTokenCurl = `# Substituir <token> pelo token obtido em Definiçõ
 curl -H "Authorization: Bearer sam_a3f8c2e1..." \\
   https://apisam.netdw.tech/patrons/123456789`
 
-const loginCurl = `curl -X POST https://apisam.netdw.tech/auth/login \\
+const loginCurl = `curl -X POST https://apisam.netdw.tech/users/login \\
   -H "Content-Type: application/json" \\
   -d '{"nif_nipc": "123456789", "password": "a-sua-password"}'`
 
@@ -51,7 +51,7 @@ const loginResponse = `{
   "name": "Nome da Entidade"
 }`
 
-const refreshCurl = `curl -X POST https://apisam.netdw.tech/auth/refresh \\
+const refreshCurl = `curl -X POST https://apisam.netdw.tech/users/refresh \\
   -H "Content-Type: application/json" \\
   -d '{"refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}'`
 
@@ -358,7 +358,7 @@ const deleteReadAllCurl = `curl -X DELETE https://apisam.netdw.tech/notification
 
 // Auth profile
 const getProfileCurl = `curl -H "Authorization: Bearer <token>" \\
-  https://apisam.netdw.tech/auth/profile`
+  https://apisam.netdw.tech/users/profile`
 
 const getProfileResponse = `{
   "nif_nipc": "123456789",
@@ -373,7 +373,7 @@ const patchProfileBody = `{
   "iban": "PT50000201231234567890154"
 }`
 
-const patchProfileCurl = `curl -X PATCH https://apisam.netdw.tech/auth/profile \\
+const patchProfileCurl = `curl -X PATCH https://apisam.netdw.tech/users/profile \\
   -H "Authorization: Bearer <token>" \\
   -H "Content-Type: application/json" \\
   -d '{"nome_entidade": "João Manuel Silva"}'`
@@ -391,7 +391,7 @@ const changePasswordBody = `{
   "newPassword": "nova-password-segura"
 }`
 
-const changePasswordCurl = `curl -X PATCH https://apisam.netdw.tech/auth/change-password \\
+const changePasswordCurl = `curl -X PATCH https://apisam.netdw.tech/users/change-password \\
   -H "Authorization: Bearer <token>" \\
   -H "Content-Type: application/json" \\
   -d '{"currentPassword":"password-atual","newPassword":"nova-password-segura"}'`
@@ -522,7 +522,7 @@ const changePasswordResponse = `{
                   </div>
 
                   <p class="text-sm text-muted">
-                    Os endpoints <code class="bg-elevated px-1 rounded text-xs font-mono">/auth/login</code> e <code class="bg-elevated px-1 rounded text-xs font-mono">/auth/refresh</code> destinam-se principalmente à aplicação web SAM. Se optar por usá-los para acesso programático, tenha em conta que o <code class="bg-elevated px-1 rounded text-xs font-mono">accessToken</code> expira periodicamente e precisa de ser renovado com o <code class="bg-elevated px-1 rounded text-xs font-mono">refreshToken</code>.
+                    Os endpoints <code class="bg-elevated px-1 rounded text-xs font-mono">/users/login</code> e <code class="bg-elevated px-1 rounded text-xs font-mono">/users/refresh</code> destinam-se principalmente à aplicação web SAM. Se optar por usá-los para acesso programático, tenha em conta que o <code class="bg-elevated px-1 rounded text-xs font-mono">accessToken</code> expira periodicamente e precisa de ser renovado com o <code class="bg-elevated px-1 rounded text-xs font-mono">refreshToken</code>.
                   </p>
 
                   <div>
@@ -530,7 +530,7 @@ const changePasswordResponse = `{
                       <UBadge color="success" variant="solid" size="sm">
                         POST
                       </UBadge>
-                      <code class="font-mono text-sm break-all min-w-0">/auth/login</code>
+                      <code class="font-mono text-sm break-all min-w-0">/users/login</code>
                       <span class="text-sm text-muted font-normal">— Iniciar sessão</span>
                     </div>
                     <p class="text-sm text-muted mb-3">
@@ -578,7 +578,7 @@ const changePasswordResponse = `{
                       <UBadge color="success" variant="solid" size="sm">
                         POST
                       </UBadge>
-                      <code class="font-mono text-sm break-all min-w-0">/auth/refresh</code>
+                      <code class="font-mono text-sm break-all min-w-0">/users/refresh</code>
                       <span class="text-sm text-muted font-normal">— Renovar accessToken</span>
                     </div>
                     <p class="text-sm text-muted mb-3">
@@ -1609,13 +1609,13 @@ const changePasswordResponse = `{
                 </h2>
               </template>
               <div class="flex flex-col gap-8 mt-2 min-w-0">
-                <!-- GET /auth/profile -->
+                <!-- GET /users/profile -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
                     <UBadge color="info" variant="solid" size="sm">
                       GET
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/auth/profile</code>
+                    <code class="font-mono text-sm break-all min-w-0">/users/profile</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
                     Devolve os dados do utilizador autenticado, incluindo o seu role.
@@ -1651,13 +1651,13 @@ const changePasswordResponse = `{
                   </div>
                 </div>
 
-                <!-- PATCH /auth/profile -->
+                <!-- PATCH /users/profile -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
                     <UBadge color="warning" variant="solid" size="sm">
                       PATCH
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/auth/profile</code>
+                    <code class="font-mono text-sm break-all min-w-0">/users/profile</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
                     Atualiza dados gerais do utilizador. Aceita <code class="bg-elevated px-1 rounded text-xs font-mono">nome_entidade</code> e <code class="bg-elevated px-1 rounded text-xs font-mono">iban</code> (ambos opcionais).
@@ -1702,13 +1702,13 @@ const changePasswordResponse = `{
                   </div>
                 </div>
 
-                <!-- PATCH /auth/change-password -->
+                <!-- PATCH /users/change-password -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
                     <UBadge color="warning" variant="solid" size="sm">
                       PATCH
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/auth/change-password</code>
+                    <code class="font-mono text-sm break-all min-w-0">/users/change-password</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
                     Altera a password do utilizador autenticado. É necessário fornecer a password atual para confirmar a operação.
