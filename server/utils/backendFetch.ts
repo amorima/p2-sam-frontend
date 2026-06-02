@@ -20,6 +20,18 @@ function readSession(event: H3Event): StoredSession | null {
 type HttpMethod = 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE'
   | 'get' | 'head' | 'patch' | 'post' | 'put' | 'delete' | 'connect' | 'options' | 'trace'
 
+export function internalFetch<T = unknown>(
+  url: string,
+  options: { method?: HttpMethod, body?: unknown } = {}
+): Promise<T> {
+  const config = useRuntimeConfig()
+  return $fetch<T>(url, {
+    method: options.method,
+    body: options.body as Record<string, unknown> | undefined,
+    headers: { 'X-Internal-Key': config.internalApiKey as string }
+  })
+}
+
 interface FetchErrorLike {
   response?: { status?: number }
   statusCode?: number

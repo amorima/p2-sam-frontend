@@ -44,8 +44,8 @@ function toNestedInstitution(flat: FlatInstitution) {
   }
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const res = await $fetch<{ data: FlatInstitution[] }>(`${config.backendBase}/institutions`)
+  const res = await authBackendFetch<{ data: FlatInstitution[] }>(event, `${config.backendBase}/institutions`)
   return { data: (res.data ?? []).map(toNestedInstitution) }
 })

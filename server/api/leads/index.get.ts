@@ -18,12 +18,12 @@ interface BackendLead {
   'nome_entidade': string | null
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   let leads: BackendLead[] = []
   try {
-    leads = await $fetch<BackendLead[]>(`${config.backendBase}/leads`) ?? []
+    leads = await authBackendFetch<BackendLead[]>(event, `${config.backendBase}/leads`) ?? []
   } catch (err: unknown) {
     console.error('[leads] Backend error:', (err as { message?: string })?.message)
     return []

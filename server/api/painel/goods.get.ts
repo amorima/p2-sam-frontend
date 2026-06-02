@@ -48,9 +48,9 @@ export default defineEventHandler(async (event) => {
   // Best-effort reads: a transient backend hiccup (e.g. a 429) should degrade
   // gracefully to fewer goods rather than failing the whole panel listing.
   const [institutionsRes, needsRes, leadsRes] = await Promise.all([
-    $fetch<{ data: FlatInstitution[] }>(`${config.backendBase}/institutions`).catch(() => ({ data: [] as FlatInstitution[] })),
-    $fetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`).catch(() => ({ needs: [] as BackendNeed[] })),
-    $fetch<BackendLead[]>(`${config.backendBase}/leads`).catch(() => [] as BackendLead[])
+    internalFetch<{ data: FlatInstitution[] }>(`${config.backendBase}/institutions`).catch(() => ({ data: [] as FlatInstitution[] })),
+    internalFetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`).catch(() => ({ needs: [] as BackendNeed[] })),
+    internalFetch<BackendLead[]>(`${config.backendBase}/leads`).catch(() => [] as BackendLead[])
   ])
 
   // Institutions within the panel's catchment radius (when GPS is available).
