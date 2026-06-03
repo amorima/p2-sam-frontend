@@ -63,7 +63,7 @@ const _useNeeds = () => {
     try {
       const res = await $fetch<PaginatedResponse<Need>>(`/api/needs?limit=${limit}&offset=${offset}`)
       needs.value = res.items ?? []
-      needsPagination.value = { total: res.total, limit: res.limit, offset: res.offset }
+      needsPagination.value = { ...res }
     } catch (e) {
       console.error('[useNeeds] Failed to load needs page:', e)
     }
@@ -90,7 +90,7 @@ const _useNeeds = () => {
         gsMap.set(g.tipo_bem_servico, { tipo_bem_servico: g.tipo_bem_servico, tipo_bem: g.tipo_bem })
       }
       // Augment with anything referenced in needs that might be missing
-      for (const need of needs.value) {
+      for (const need of (needsRes.items ?? [])) {
         for (const item of need.items) {
           if (!gsMap.has(item.tipo_bem_servico)) {
             gsMap.set(item.tipo_bem_servico, {
