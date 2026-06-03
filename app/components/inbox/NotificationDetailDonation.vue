@@ -2,7 +2,7 @@
 import type { AppNotification } from '~/composables/useNotifications'
 
 const props = defineProps<{ notification: AppNotification }>()
-const { isAdmin, patronNif } = useAuth()
+const { isAdmin } = useAuth()
 const toast = useToast()
 
 interface Donation {
@@ -18,21 +18,20 @@ interface Donation {
 }
 
 const donationId = computed(() => props.notification.payload?.id_doacao as number | undefined)
-// Admin fetches all; patron fetches own
-const fetchUrl = computed(() =>
-  isAdmin.value ? '/api/donations' : `/api/patrons/${patronNif.value}/donations`
-)
 
 // No await — keeps this a synchronous component so refs (statusModalOpen)
 // remain reactive and modals can open correctly.
-const { data: rawData, status, refresh } = useFetch<{ items: Donation[] }>(
-  fetchUrl,
-  { lazy: true, server: false }
+const { data: donationData, status, refresh } = useAsyncData<Donation | null>(
+  `notification-donation-${props.notification._id}`,
+  async () => {
+    if (!donationId.value) return null
+    const res = await $fetch<{ donation: Donation }>(`/api/donations/${donationId.value}`)
+    return res.donation ?? null
+  },
+  { server: false, default: () => null, lazy: true }
 )
 
-const donation = computed<Donation | null>(() =>
-  (rawData.value?.items ?? []).find(d => d.id_doacao === donationId.value) ?? null
-)
+const donation = computed<Donation | null>(() => donationData.value ?? null)
 
 const estadoColor = (e: string) =>
   e === 'ACEITE' ? 'success' : e === 'REJEITADO' ? 'error' : 'warning'

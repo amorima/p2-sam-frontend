@@ -118,10 +118,6 @@ const tabItems = computed(() => [
   { label: `Recusados (${stats.value.recusados})`, value: 'RECUSADO' }
 ])
 
-watch([globalFilter, filterState], () => {
-  loadNeedsPage(0)
-})
-
 function estadoBadge(e: BusinessMatchEstado): { color: 'warning' | 'success' | 'error' | 'info', label: string, icon: string } {
   if (e === 'ACEITE') return { color: 'info', label: 'Aceite', icon: 'i-lucide-thumbs-up' }
   if (e === 'RECUSADO') return { color: 'error', label: 'Recusado', icon: 'i-lucide-thumbs-down' }

@@ -1,7 +1,8 @@
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
   try {
-    return await internalFetch(`${config.backendBase}/notifications`)
+    const res = await internalFetch<{ items: unknown[] }>(`${config.backendBase}/notifications?limit=100`)
+    return res.items ?? []
   } catch {
     return []
   }

@@ -12,25 +12,19 @@ interface Donation {
 }
 
 const route = useRoute()
-const { isAdmin, patronNif } = useAuth()
+const { isAdmin } = useAuth()
 const id = Number(route.params.id)
 
 const statusModalOpen = ref(false)
 
-const fetchUrl = computed(() =>
-  isAdmin.value
-    ? '/api/donations'
-    : `/api/patrons/${patronNif.value}/donations`
-)
-
-const { data: rawData, status, refresh } = await useFetch<{ items: Donation[] }>(
-  fetchUrl,
+const { data, status, refresh } = await useFetch(
+  `/api/donations/${id}`,
   { lazy: true, server: false }
 )
 
 const donation = computed<Donation | null>(() => {
-  const list = rawData.value?.items ?? []
-  return list.find(d => d.id_doacao === id) ?? null
+  const res = data.value as { donation: Donation } | null
+  return res?.donation ?? null
 })
 
 const modoLabel: Record<string, string> = {
