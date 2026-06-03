@@ -25,13 +25,13 @@ const fetchUrl = computed(() =>
 
 // No await — keeps this a synchronous component so refs (statusModalOpen)
 // remain reactive and modals can open correctly.
-const { data: rawData, status, refresh } = useFetch<{ donations: Donation[] }>(
+const { data: rawData, status, refresh } = useFetch<{ items: Donation[] }>(
   fetchUrl,
   { lazy: true, server: false }
 )
 
 const donation = computed<Donation | null>(() =>
-  (rawData.value?.donations ?? []).find(d => d.id_doacao === donationId.value) ?? null
+  (rawData.value?.items ?? []).find(d => d.id_doacao === donationId.value) ?? null
 )
 
 const estadoColor = (e: string) =>

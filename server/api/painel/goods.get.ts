@@ -48,14 +48,14 @@ export default defineEventHandler(async (event) => {
   // Best-effort reads: a transient backend hiccup (e.g. a 429) should degrade
   // gracefully to fewer goods rather than failing the whole panel listing.
   const [institutionsRes, needsRes, leadsRes] = await Promise.all([
-    internalFetch<{ data: FlatInstitution[] }>(`${config.backendBase}/institutions`).catch(() => ({ data: [] as FlatInstitution[] })),
-    internalFetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`).catch(() => ({ needs: [] as BackendNeed[] })),
-    internalFetch<BackendLead[]>(`${config.backendBase}/leads`).catch(() => [] as BackendLead[])
+    internalFetch<{ items: FlatInstitution[] }>(`${config.backendBase}/institutions?limit=500`).catch(() => ({ items: [] as FlatInstitution[] })),
+    internalFetch<{ items: BackendNeed[] }>(`${config.backendBase}/needs?limit=500`).catch(() => ({ items: [] as BackendNeed[] })),
+    internalFetch<{ items: BackendLead[] }>(`${config.backendBase}/leads?limit=1000`).catch(() => ({ items: [] as BackendLead[] }))
   ])
 
   // Institutions within the panel's catchment radius (when GPS is available).
   const nearbyNifs = new Set(
-    (institutionsRes.data ?? [])
+    (institutionsRes.items ?? [])
       .filter(i => panelLat == null || panelLng == null
         ? true
         : haversineKm(panelLat, panelLng, i.geo_latitude ?? 0, i.geo_longitude ?? 0) <= RADIUS_KM)
@@ -63,14 +63,14 @@ export default defineEventHandler(async (event) => {
   )
 
   const nameMap = new Map(
-    (institutionsRes.data ?? []).map(i => [i.nif_nipc, i.nome_entidade])
+    (institutionsRes.items ?? []).map(i => [i.nif_nipc, i.nome_entidade])
   )
 
   // Exclude items that have an active lead (PENDENTE or ENTREGUE) — these match
   // the states the backend treats as reserving the item. EXPIRADO leads free
   // the item back onto the panel.
   const excludedByItemId = new Set<number>()
-  for (const lead of leadsRes as BackendLead[]) {
+  for (const lead of (leadsRes.items ?? [])) {
     if (lead.estado === 'PENDENTE' || lead.estado === 'ENTREGUE') {
       if (lead.id_item != null) excludedByItemId.add(lead.id_item)
     }
@@ -83,7 +83,7 @@ export default defineEventHandler(async (event) => {
     nome_entidade: string
   }> = []
 
-  for (const need of needsRes.needs ?? []) {
+  for (const need of needsRes.items ?? []) {
     // Only include needs that have been approved
     if (need.estado != null && need.estado !== 'ACEITE') continue
 

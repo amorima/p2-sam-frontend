@@ -5,11 +5,11 @@ definePageMeta({ middleware: 'admin-only' })
 
 const toast = useToast()
 
-const { data, status, refresh } = await useFetch<{ data: GoodsService[] }>('/api/goods-services', {
+const { data, status, refresh } = await useFetch<{ items: GoodsService[] }>('/api/goods-services', {
   lazy: true, server: false
 })
 
-const items = computed<GoodsService[]>(() => data.value?.data ?? [])
+const items = computed<GoodsService[]>(() => data.value?.items ?? [])
 const bens = computed(() => items.value.filter(g => g.tipo_bem === 'BEM'))
 const servicos = computed(() => items.value.filter(g => g.tipo_bem === 'SERVICO'))
 

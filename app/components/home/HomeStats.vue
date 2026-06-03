@@ -12,13 +12,13 @@ interface Lead {
 
 const { data, status } = await useAsyncData('home-stats', async () => {
   const [donationsRes, needsRes, leadsRes] = await Promise.all([
-    $fetch<{ donations: Donation[] }>('/api/donations').catch(() => ({ donations: [] })),
-    $fetch<{ needs: Need[] }>('/api/needs').catch(() => ({ needs: [] })),
-    $fetch<Lead[]>('/api/leads').catch(() => [])
+    $fetch<{ items: Donation[] }>('/api/donations?limit=200').catch(() => ({ items: [] })),
+    $fetch<{ items: Need[] }>('/api/needs?limit=200').catch(() => ({ items: [] })),
+    $fetch<{ items: Lead[] }>('/api/leads?limit=200').catch(() => ({ items: [] }))
   ])
-  const donations = donationsRes.donations ?? []
-  const needs = needsRes.needs ?? []
-  const leads = leadsRes ?? []
+  const donations = donationsRes.items ?? []
+  const needs = needsRes.items ?? []
+  const leads = leadsRes.items ?? []
 
   return {
     totalAceite: donations.filter(d => d.estado === 'ACEITE').reduce((s, d) => s + Number(d.valor_transacao), 0),

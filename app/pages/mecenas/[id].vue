@@ -23,13 +23,13 @@ const fetchUrl = computed(() =>
     : `/api/patrons/${patronNif.value}/donations`
 )
 
-const { data: rawData, status, refresh } = await useFetch<{ donations: Donation[] }>(
+const { data: rawData, status, refresh } = await useFetch<{ items: Donation[] }>(
   fetchUrl,
   { lazy: true, server: false }
 )
 
 const donation = computed<Donation | null>(() => {
-  const list = rawData.value?.donations ?? []
+  const list = rawData.value?.items ?? []
   return list.find(d => d.id_doacao === id) ?? null
 })
 

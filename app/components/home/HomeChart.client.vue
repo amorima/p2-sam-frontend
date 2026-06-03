@@ -39,7 +39,7 @@ const chartData = ref<DataRecord[]>([])
 
 const { data: donations } = await useAsyncData<Donation[]>(
   'home-chart-donations',
-  () => $fetch<{ donations: Donation[] }>('/api/donations').then(r => r.donations ?? []).catch(() => []),
+  () => $fetch<{ items: Donation[] }>('/api/donations?limit=200').then(r => r.items ?? []).catch(() => []),
   { server: false, default: () => [] }
 )
 

@@ -20,12 +20,12 @@ if (isPatron.value) {
   await navigateTo('/mecenas/doacao')
 }
 
-const { data: patronsData, status: patronsStatus, refresh: refreshPatrons } = await useFetch<{ data: Patron[] }>('/api/patrons', {
+const { data: patronsData, status: patronsStatus, refresh: refreshPatrons } = await useFetch<{ items: Patron[] }>('/api/patrons', {
   lazy: true,
   server: false
 })
 
-const patrons = computed(() => patronsData.value?.data ?? [])
+const patrons = computed(() => patronsData.value?.items ?? [])
 
 const patronOptions = computed(() =>
   patrons.value.map(p => ({

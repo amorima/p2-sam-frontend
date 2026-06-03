@@ -78,16 +78,16 @@ function relativeTime(dateStr: string): string {
 
 const { data: activity, status } = await useAsyncData('home-activity', async () => {
   const [donationsRes, needsRes, leadsRes] = await Promise.all([
-    $fetch<{ donations: BackendDonation[] }>('/api/donations').catch(() => ({ donations: [] })),
-    $fetch<{ needs: BackendNeed[] }>('/api/needs').catch(() => ({ needs: [] })),
-    $fetch<BackendLead[]>('/api/leads').catch(() => [] as BackendLead[])
+    $fetch<{ items: BackendDonation[] }>('/api/donations?limit=50').catch(() => ({ items: [] })),
+    $fetch<{ items: BackendNeed[] }>('/api/needs?limit=50').catch(() => ({ items: [] })),
+    $fetch<{ items: BackendLead[] }>('/api/leads?limit=50').catch(() => ({ items: [] }))
   ])
 
   const formatEUR = (v: number) =>
     new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(Number(v))
 
   // Take the 7 most recent of each type independently so no type drowns the others
-  const donations: ActivityEntry[] = (donationsRes.donations ?? [])
+  const donations: ActivityEntry[] = (donationsRes.items ?? [])
     .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
     .slice(0, 7)
     .map(d => ({
@@ -100,7 +100,7 @@ const { data: activity, status } = await useAsyncData('home-activity', async () 
       href: `/mecenas/${d.id_doacao}`
     }))
 
-  const needs: ActivityEntry[] = (needsRes.needs ?? [])
+  const needs: ActivityEntry[] = (needsRes.items ?? [])
     .sort((a, b) => b.id_pedido - a.id_pedido)
     .slice(0, 7)
     .map(n => ({
@@ -113,7 +113,7 @@ const { data: activity, status } = await useAsyncData('home-activity', async () 
       href: `/instituicoes/${n.id_pedido}`
     }))
 
-  const leads: ActivityEntry[] = (leadsRes ?? [])
+  const leads: ActivityEntry[] = (leadsRes.items ?? [])
     .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
     .slice(0, 7)
     .map(l => ({
