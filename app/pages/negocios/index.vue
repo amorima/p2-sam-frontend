@@ -51,6 +51,10 @@ function onPageChange(page: number) {
   loadNeedsPage((page - 1) * needsPagination.value.limit)
 }
 
+watch([globalFilter, filterState], () => {
+  loadNeedsPage(0)
+})
+
 const allBusinessPedidos = computed<BusinessPedido[]>(() => {
   const result: BusinessPedido[] = []
   for (const need of needs.value) {

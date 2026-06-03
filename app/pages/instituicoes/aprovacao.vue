@@ -5,7 +5,7 @@ import { useVouchers } from '~/composables/useVouchers'
 
 const toast = useToast()
 const { isAdmin } = useAuth()
-const { needs, businesses, panels, institutions, setItemMatch, setBusinessMatch, approveNeed, rejectNeed } = useNeeds()
+const { needs, needsPagination, loadNeedsPage, businesses, panels, institutions, setItemMatch, setBusinessMatch, approveNeed, rejectNeed } = useNeeds()
 const { openVoucher } = useVouchers()
 
 if (!isAdmin.value) {
@@ -13,6 +13,12 @@ if (!isAdmin.value) {
 }
 
 const pendingNeeds = computed(() => needs.value.filter(n => n.estado === 'PENDENTE'))
+
+const serverPage = computed(() => Math.floor(needsPagination.value.offset / needsPagination.value.limit) + 1)
+
+function onPageChange(page: number) {
+  loadNeedsPage((page - 1) * needsPagination.value.limit)
+}
 
 const matchOptions = (tipo_bem: 'BEM' | 'SERVICO') => {
   const opts = [
@@ -329,6 +335,21 @@ function formatDate(d: string) {
             </div>
           </template>
         </UPageCard>
+      </div>
+
+      <div
+        v-if="needsPagination.total > needsPagination.limit"
+        class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-4"
+      >
+        <div class="text-sm text-muted">
+          {{ needsPagination.total }} pedido(s) total · página {{ serverPage }} de {{ Math.ceil(needsPagination.total / needsPagination.limit) || 1 }}
+        </div>
+        <UPagination
+          :page="serverPage"
+          :items-per-page="needsPagination.limit"
+          :total="needsPagination.total"
+          @update:page="onPageChange"
+        />
       </div>
 
       <UModal

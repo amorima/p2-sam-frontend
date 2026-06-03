@@ -63,7 +63,7 @@ const _useNeeds = () => {
     try {
       const res = await $fetch<PaginatedResponse<Need>>(`/api/needs?limit=${limit}&offset=${offset}`)
       needs.value = res.items ?? []
-      needsPagination.value = { ...res }
+      needsPagination.value = { total: res.total, limit: res.limit, offset: res.offset }
     } catch (e) {
       console.error('[useNeeds] Failed to load needs page:', e)
     }
