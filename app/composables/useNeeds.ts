@@ -37,30 +37,56 @@ interface CreateNeedInput {
   items: NewItemInput[]
 }
 
+interface PaginationMeta {
+  total: number
+  limit: number
+  offset: number
+}
+
+interface PaginatedResponse<T> {
+  items: T[]
+  total: number
+  limit: number
+  offset: number
+}
+
 const _useNeeds = () => {
   const needs = useState<Need[]>('needs.list', () => [])
+  const needsPagination = useState<PaginationMeta>('needs.pagination', () => ({ total: 0, limit: 25, offset: 0 }))
   const institutions = useState<Institution[]>('needs.institutions', () => [])
   const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [])
   const businesses = useState<Business[]>('needs.businesses', () => [])
   const panels = useState<Panel[]>('needs.panels', () => [DEFAULT_PANEL])
 
+  async function loadNeedsPage(offset: number) {
+    const limit = needsPagination.value.limit
+    try {
+      const res = await $fetch<PaginatedResponse<Need>>(`/api/needs?limit=${limit}&offset=${offset}`)
+      needs.value = res.items ?? []
+      needsPagination.value = { total: res.total, limit: res.limit, offset: res.offset }
+    } catch (e) {
+      console.error('[useNeeds] Failed to load needs page:', e)
+    }
+  }
+
   // Fetch all data from API (deduped by key — runs once per SSR + once on client if needed)
   useAsyncData('needs-initial-data', async () => {
     try {
       const [needsRes, institutionsRes, businessRes, goodsRes] = await Promise.all([
-        $fetch<{ needs: Need[] }>('/api/needs'),
-        $fetch<{ data: Institution[] }>('/api/institutions'),
-        $fetch<{ data: Business[] }>('/api/business').catch(() => ({ data: [] as Business[] })),
-        $fetch<{ data: GoodsService[] }>('/api/goods-services').catch(() => ({ data: [] as GoodsService[] }))
+        $fetch<PaginatedResponse<Need>>('/api/needs?limit=25&offset=0'),
+        $fetch<PaginatedResponse<Institution>>('/api/institutions?limit=500'),
+        $fetch<PaginatedResponse<Business>>('/api/business?limit=500').catch(() => ({ items: [] as Business[], total: 0, limit: 500, offset: 0 })),
+        $fetch<PaginatedResponse<GoodsService>>('/api/goods-services?limit=500').catch(() => ({ items: [] as GoodsService[], total: 0, limit: 500, offset: 0 }))
       ])
 
-      needs.value = needsRes.needs ?? []
-      institutions.value = institutionsRes.data ?? []
-      businesses.value = businessRes.data ?? []
+      needs.value = needsRes.items ?? []
+      needsPagination.value = { total: needsRes.total, limit: needsRes.limit, offset: needsRes.offset }
+      institutions.value = institutionsRes.items ?? []
+      businesses.value = businessRes.items ?? []
 
       // Start with the canonical goods services from the backend
       const gsMap = new Map<string, GoodsService>()
-      for (const g of (goodsRes.data ?? [])) {
+      for (const g of (goodsRes.items ?? [])) {
         gsMap.set(g.tipo_bem_servico, { tipo_bem_servico: g.tipo_bem_servico, tipo_bem: g.tipo_bem })
       }
       // Augment with anything referenced in needs that might be missing
@@ -481,6 +507,8 @@ const _useNeeds = () => {
 
   return {
     needs,
+    needsPagination,
+    loadNeedsPage,
     institutions,
     goodsServices,
     businesses,

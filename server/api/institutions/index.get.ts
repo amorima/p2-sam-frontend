@@ -44,8 +44,26 @@ function toNestedInstitution(flat: FlatInstitution) {
   }
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const res = await internalFetch<{ data: FlatInstitution[] }>(`${config.backendBase}/institutions`)
-  return { data: (res.data ?? []).map(toNestedInstitution) }
+  const query = getQuery(event)
+  const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 500)
+  const offset = Math.max(0, parseInt(String(query.offset)) || 0)
+
+  const res = await internalFetch<{ items: FlatInstitution[], total: number, limit: number, offset: number }>(
+    `${config.backendBase}/institutions?limit=${limit}&offset=${offset}`
+  )
+
+  const items = (res.items ?? []).map(toNestedInstitution)
+  const total = res.total ?? 0
+  const lastOffset = total > 0 ? Math.max(0, (Math.ceil(total / limit) - 1) * limit) : 0
+  const links: Record<string, string> = {
+    self: `/api/institutions?limit=${limit}&offset=${offset}`,
+    first: `/api/institutions?limit=${limit}&offset=0`,
+    last: `/api/institutions?limit=${limit}&offset=${lastOffset}`
+  }
+  if (offset + limit < total) links.next = `/api/institutions?limit=${limit}&offset=${offset + limit}`
+  if (offset > 0) links.prev = `/api/institutions?limit=${limit}&offset=${Math.max(0, offset - limit)}`
+
+  return { items, total, limit, offset, links }
 })

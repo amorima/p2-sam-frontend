@@ -31,22 +31,25 @@ function inferTipoBem(tipo: string): 'BEM' | 'SERVICO' {
   return 'BEM'
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
+  const query = getQuery(event)
+  const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 200)
+  const offset = Math.max(0, parseInt(String(query.offset)) || 0)
 
   const [needsRes, institutionsRes, leadsRes] = await Promise.all([
-    internalFetch<{ needs: BackendNeed[] }>(`${config.backendBase}/needs`),
-    internalFetch<{ data: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions`),
-    internalFetch<BackendLead[]>(`${config.backendBase}/leads`).catch(() => [] as BackendLead[])
+    internalFetch<{ items: BackendNeed[], total: number, limit: number, offset: number }>(`${config.backendBase}/needs?limit=${limit}&offset=${offset}`),
+    internalFetch<{ items: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions?limit=500`),
+    internalFetch<{ items: BackendLead[] }>(`${config.backendBase}/leads?limit=1000`).catch(() => ({ items: [] as BackendLead[] }))
   ])
 
   const nameMap = new Map(
-    (institutionsRes.data ?? []).map(i => [i.nif_nipc, i.nome_entidade])
+    (institutionsRes.items ?? []).map(i => [i.nif_nipc, i.nome_entidade])
   )
 
   // Map each item to its lead status so the admin sees which items are claimed
   const itemLeadStatus = new Map<number, 'pending' | 'completed'>()
-  for (const lead of leadsRes) {
+  for (const lead of (leadsRes.items ?? [])) {
     if (lead.id_item == null) continue
     if (lead.estado === 'ENTREGUE') {
       itemLeadStatus.set(lead.id_item, 'completed')
@@ -57,11 +60,11 @@ export default defineEventHandler(async () => {
 
   let itemCounter = 0
 
-  const needs = (needsRes.needs ?? []).map((need) => {
+  const items = (needsRes.items ?? []).map((need) => {
     // Sequelize names the hasMany association key using the model name "need item" → "need items"
     const rawItems: BackendNeedItem[] = need['need items'] ?? need.NeedItems ?? need.needItems ?? []
 
-    const items = rawItems.map(item => ({
+    const mappedItems = rawItems.map(item => ({
       id_item: item.id_item ?? ++itemCounter,
       id_pedido: item.id_pedido,
       tipo_bem_servico: item.tipo_bem_servico,
@@ -81,9 +84,19 @@ export default defineEventHandler(async () => {
       data: need.data ?? new Date().toISOString(),
       estado: need.estado ?? 'PENDENTE',
       urgente: Boolean(need.urgente),
-      items
+      items: mappedItems
     }
   })
 
-  return { needs }
+  const total = needsRes.total ?? 0
+  const lastOffset = total > 0 ? Math.max(0, (Math.ceil(total / limit) - 1) * limit) : 0
+  const links: Record<string, string> = {
+    self: `/api/needs?limit=${limit}&offset=${offset}`,
+    first: `/api/needs?limit=${limit}&offset=0`,
+    last: `/api/needs?limit=${limit}&offset=${lastOffset}`
+  }
+  if (offset + limit < total) links.next = `/api/needs?limit=${limit}&offset=${offset + limit}`
+  if (offset > 0) links.prev = `/api/needs?limit=${limit}&offset=${Math.max(0, offset - limit)}`
+
+  return { items, total, limit, offset, links }
 })

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Column, Row, SortingState, Table } from '@tanstack/table-core'
 import type { User } from '~/types'
 import type { AuthSession } from '~/composables/useAuth'
@@ -36,9 +35,23 @@ const sorting = ref<SortingState>([])
 const selectedActorTypes = ref<string[]>([])
 const ACTOR_TYPES: User['actorType'][] = ['Mecenas', 'Negócio', 'Instituição', 'Cidadão']
 
-const { data, status, refresh } = await useFetch<User[]>('/api/customers', {
-  lazy: true
-})
+const serverLimit = 25
+const serverOffset = ref(0)
+
+const customersUrl = computed(() => `/api/customers?limit=${serverLimit}&offset=${serverOffset.value}`)
+
+const { data: rawCustomersData, status, refresh } = await useFetch<{ items: User[], total: number, limit: number, offset: number }>(
+  customersUrl,
+  { lazy: true }
+)
+
+const data = computed<User[]>(() => rawCustomersData.value?.items ?? [])
+const serverTotal = computed(() => rawCustomersData.value?.total ?? 0)
+const serverPage = computed(() => Math.floor(serverOffset.value / serverLimit) + 1)
+
+function loadCustomersPage(page: number) {
+  serverOffset.value = (page - 1) * serverLimit
+}
 
 const session = useCookie<AuthSession | null>('auth-session')
 const authHeader = computed(() =>
@@ -448,11 +461,6 @@ const columns: TableColumn<User>[] = [
     }
   }
 ]
-
-const pagination = ref({
-  pageIndex: 0,
-  pageSize: 10
-})
 </script>
 
 <template>
@@ -544,10 +552,6 @@ const pagination = ref({
         v-model:column-visibility="columnVisibility"
         v-model:row-selection="rowSelection"
         v-model:sorting="sorting"
-        v-model:pagination="pagination"
-        :pagination-options="{
-          getPaginationRowModel: getPaginationRowModel()
-        }"
         class="shrink-0"
         :data="data"
         :columns="columns"
@@ -563,23 +567,19 @@ const pagination = ref({
       />
 
       <div
+        v-if="serverTotal > 0"
         class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
       >
         <div class="text-sm text-muted">
-          {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }}
-          de
-          {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s)
-          selecionados.
+          {{ serverTotal }} utilizador(es) · página {{ serverPage }} de {{ Math.ceil(serverTotal / serverLimit) || 1 }}
         </div>
 
         <div class="flex items-center gap-1.5">
           <UPagination
-            :default-page="
-              (table?.tableApi?.getState().pagination.pageIndex || 0) + 1
-            "
-            :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-            :total="table?.tableApi?.getFilteredRowModel().rows.length"
-            @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+            :page="serverPage"
+            :items-per-page="serverLimit"
+            :total="serverTotal"
+            @update:page="loadCustomersPage"
           />
         </div>
       </div>

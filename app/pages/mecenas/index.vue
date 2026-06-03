@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { type Column, type Row, type SortingState, type Table, getPaginationRowModel } from '@tanstack/table-core'
+import type { Column, Row, SortingState, Table } from '@tanstack/table-core'
 
 interface Donation {
   id_doacao: number
@@ -27,18 +27,29 @@ const { isAdmin, patronNif } = useAuth()
 const statusModalOpen = ref(false)
 const selectedDonation = ref<Donation | null>(null)
 
-const fetchUrl = computed(() =>
-  isAdmin.value
+const serverLimit = 25
+const serverOffset = ref(0)
+
+const fetchUrl = computed(() => {
+  const base = isAdmin.value
     ? '/api/donations'
     : `/api/patrons/${patronNif.value}/donations`
-)
+  return `${base}?limit=${serverLimit}&offset=${serverOffset.value}`
+})
 
-const { data: rawData, status, refresh } = await useFetch<{ donations: Donation[] }>(
+const { data: rawData, status, refresh } = await useFetch<{ items: Donation[], total: number, limit: number, offset: number }>(
   fetchUrl,
   { lazy: true, server: false }
 )
 
-const donations = computed<Donation[]>(() => rawData.value?.donations ?? [])
+const donations = computed<Donation[]>(() => rawData.value?.items ?? [])
+const serverTotal = computed(() => rawData.value?.total ?? 0)
+
+function loadPage(page: number) {
+  serverOffset.value = (page - 1) * serverLimit
+}
+
+const serverPage = computed(() => Math.floor(serverOffset.value / serverLimit) + 1)
 
 function badgeColor(estado: string): 'warning' | 'success' | 'error' {
   if (estado === 'ACEITE') return 'success'
@@ -246,10 +257,10 @@ const newDonationPath = computed(() => isAdmin.value ? '/mecenas/doacao_manual' 
 
 const stats = computed(() => {
   const list = donations.value
-  const total = list.filter(d => d.estado === 'ACEITE').reduce((s, d) => s + Number(d.valor_transacao), 0)
+  const totalAceite = list.filter(d => d.estado === 'ACEITE').reduce((s, d) => s + Number(d.valor_transacao), 0)
   return {
-    total: formatEUR(total),
-    count: list.length,
+    total: formatEUR(totalAceite),
+    count: serverTotal.value,
     aceites: list.filter(d => d.estado === 'ACEITE').length,
     pendentes: list.filter(d => d.estado === 'PENDENTE').length,
     rejeitadas: list.filter(d => d.estado === 'REJEITADO').length
@@ -268,8 +279,6 @@ const statCards = computed(() => [
 const globalFilter = ref('')
 const columnVisibility = ref()
 const sorting = ref<SortingState>([{ id: 'data', desc: true }])
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
-const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
 const tableRef = useTemplateRef<DonationTableRef>('tableRef')
 
 const hideableColumns = computed(() => {
@@ -291,7 +300,7 @@ const hideableColumns = computed(() => {
 })
 
 watch(globalFilter, () => {
-  pagination.value = { ...pagination.value, pageIndex: 0 }
+  serverOffset.value = 0
 })
 </script>
 
@@ -355,10 +364,8 @@ watch(globalFilter, () => {
           v-model:global-filter="globalFilter"
           v-model:column-visibility="columnVisibility"
           v-model:sorting="sorting"
-          v-model:pagination="pagination"
           :data="donations"
           :columns="columns"
-          :pagination-options="paginationOptions"
           :loading="status === 'pending'"
           class="shrink-0"
           :ui="{
@@ -372,19 +379,19 @@ watch(globalFilter, () => {
         />
 
         <div
-          v-if="donations.length > 0"
+          v-if="serverTotal > 0"
           class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
         >
           <div class="text-sm text-muted">
-            {{ tableRef?.tableApi?.getFilteredRowModel().rows.length || 0 }} registo(s)
+            {{ serverTotal }} registo(s) · página {{ serverPage }} de {{ Math.ceil(serverTotal / serverLimit) || 1 }}
           </div>
 
           <div class="flex items-center gap-1.5">
             <UPagination
-              :default-page="(tableRef?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-              :items-per-page="tableRef?.tableApi?.getState().pagination.pageSize"
-              :total="tableRef?.tableApi?.getFilteredRowModel().rows.length"
-              @update:page="(p: number) => tableRef?.tableApi?.setPageIndex(p - 1)"
+              :page="serverPage"
+              :items-per-page="serverLimit"
+              :total="serverTotal"
+              @update:page="loadPage"
             />
           </div>
         </div>

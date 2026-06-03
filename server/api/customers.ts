@@ -60,7 +60,7 @@ function citizenToUser(c: BackendCitizen): User {
   }
 }
 
-export default defineEventHandler(async (event): Promise<User[] | unknown> => {
+export default defineEventHandler(async (event): Promise<unknown> => {
   const config = useRuntimeConfig()
   const base = config.backendBase
 
@@ -86,6 +86,10 @@ export default defineEventHandler(async (event): Promise<User[] | unknown> => {
     }
   }
 
+  const query = getQuery(event)
+  const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 200)
+  const offset = Math.max(0, parseInt(String(query.offset)) || 0)
+
   const safeFetch = async <T>(path: string): Promise<T | null> => {
     try {
       return await authBackendFetch<T>(event, `${base}${path}`)
@@ -96,26 +100,39 @@ export default defineEventHandler(async (event): Promise<User[] | unknown> => {
     }
   }
 
-  // Citizens can be a bare array (older backend) or { data: [...] } (new backend);
-  // entities are always { data: [...] }.
+  // Fetch all entities with a high limit for combining; pagination applied to combined result
   const [patrons, businesses, institutions, citizensRes] = await Promise.all([
-    safeFetch<{ data?: BackendEntity[] } | BackendEntity[]>('/patrons'),
-    safeFetch<{ data?: BackendEntity[] } | BackendEntity[]>('/business'),
-    safeFetch<{ data?: BackendEntity[] } | BackendEntity[]>('/institutions'),
-    safeFetch<{ data?: BackendCitizen[] } | BackendCitizen[]>('/citizens')
+    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>('/patrons?limit=500'),
+    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>('/business?limit=500'),
+    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>('/institutions?limit=500'),
+    safeFetch<{ items?: BackendCitizen[] } | BackendCitizen[]>('/citizens?limit=500')
   ])
 
-  const toArray = <T>(v: { data?: T[] } | T[] | null): T[] => {
+  const toArray = <T>(v: { items?: T[], data?: T[] } | T[] | null): T[] => {
     if (!v) return []
-    return Array.isArray(v) ? v : (v.data ?? [])
+    if (Array.isArray(v)) return v
+    return v.items ?? v.data ?? []
   }
 
-  const users: User[] = []
-  for (const p of toArray<BackendEntity>(patrons)) users.push(entityToUser(p, 'patron', 'Mecenas'))
-  for (const b of toArray<BackendEntity>(businesses)) users.push(entityToUser(b, 'business', 'Negócio'))
-  for (const i of toArray<BackendEntity>(institutions)) users.push(entityToUser(i, 'institution', 'Instituição'))
-  for (const c of toArray<BackendCitizen>(citizensRes)) users.push(citizenToUser(c))
+  const allUsers: User[] = []
+  for (const p of toArray<BackendEntity>(patrons)) allUsers.push(entityToUser(p, 'patron', 'Mecenas'))
+  for (const b of toArray<BackendEntity>(businesses)) allUsers.push(entityToUser(b, 'business', 'Negócio'))
+  for (const i of toArray<BackendEntity>(institutions)) allUsers.push(entityToUser(i, 'institution', 'Instituição'))
+  for (const c of toArray<BackendCitizen>(citizensRes)) allUsers.push(citizenToUser(c))
 
-  console.log(`[customers] returning ${users.length} users (patrons=${toArray<BackendEntity>(patrons).length}, business=${toArray<BackendEntity>(businesses).length}, institutions=${toArray<BackendEntity>(institutions).length}, citizens=${toArray<BackendCitizen>(citizensRes).length})`)
-  return users
+  const total = allUsers.length
+  const items = allUsers.slice(offset, offset + limit)
+
+  console.log(`[customers] total=${total}, returning ${items.length} users (offset=${offset}, limit=${limit})`)
+
+  const lastOffset = total > 0 ? Math.max(0, (Math.ceil(total / limit) - 1) * limit) : 0
+  const links: Record<string, string> = {
+    self: `/api/customers?limit=${limit}&offset=${offset}`,
+    first: `/api/customers?limit=${limit}&offset=0`,
+    last: `/api/customers?limit=${limit}&offset=${lastOffset}`
+  }
+  if (offset + limit < total) links.next = `/api/customers?limit=${limit}&offset=${offset + limit}`
+  if (offset > 0) links.prev = `/api/customers?limit=${limit}&offset=${Math.max(0, offset - limit)}`
+
+  return { items, total, limit, offset, links }
 })

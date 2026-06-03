@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Column, SortingState, Table } from '@tanstack/table-core'
 import type { VNode } from 'vue'
 import { useNeeds } from '~/composables/useNeeds'
@@ -38,15 +37,19 @@ type PedidosTableRef = {
 
 const toast = useToast()
 const { isAdmin, isBusiness, businessNif } = useAuth()
-const { needs, businesses, setBusinessResponse } = useNeeds()
+const { needs, needsPagination, loadNeedsPage, businesses, setBusinessResponse } = useNeeds()
 
 const filterState = ref<'TODOS' | BusinessMatchEstado>('TODOS')
 const globalFilter = ref('')
 const columnVisibility = ref()
 const sorting = ref<SortingState>([{ id: 'id_pedido', desc: true }])
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
-const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
 const tableRef = useTemplateRef<PedidosTableRef>('tableRef')
+
+const serverPage = computed(() => Math.floor(needsPagination.value.offset / needsPagination.value.limit) + 1)
+
+function onPageChange(page: number) {
+  loadNeedsPage((page - 1) * needsPagination.value.limit)
+}
 
 const allBusinessPedidos = computed<BusinessPedido[]>(() => {
   const result: BusinessPedido[] = []
@@ -116,7 +119,7 @@ const tabItems = computed(() => [
 ])
 
 watch([globalFilter, filterState], () => {
-  pagination.value = { ...pagination.value, pageIndex: 0 }
+  loadNeedsPage(0)
 })
 
 function estadoBadge(e: BusinessMatchEstado): { color: 'warning' | 'success' | 'error' | 'info', label: string, icon: string } {
@@ -386,10 +389,8 @@ const columns: TableColumn<BusinessPedido>[] = [
           v-model:global-filter="globalFilter"
           v-model:column-visibility="columnVisibility"
           v-model:sorting="sorting"
-          v-model:pagination="pagination"
           :data="visiblePedidos"
           :columns="columns"
-          :pagination-options="paginationOptions"
           class="shrink-0"
           :ui="{
             base: 'table-fixed border-separate border-spacing-0',
@@ -402,19 +403,19 @@ const columns: TableColumn<BusinessPedido>[] = [
         />
 
         <div
-          v-if="visiblePedidos.length > 0"
+          v-if="needsPagination.total > 0"
           class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
         >
           <div class="text-sm text-muted">
-            {{ tableRef?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s)
+            {{ needsPagination.total }} pedido(s) · página {{ serverPage }} de {{ Math.ceil(needsPagination.total / needsPagination.limit) || 1 }}
           </div>
 
           <div class="flex items-center gap-1.5">
             <UPagination
-              :default-page="(tableRef?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-              :items-per-page="tableRef?.tableApi?.getState().pagination.pageSize"
-              :total="tableRef?.tableApi?.getFilteredRowModel().rows.length"
-              @update:page="(p: number) => tableRef?.tableApi?.setPageIndex(p - 1)"
+              :page="serverPage"
+              :items-per-page="needsPagination.limit"
+              :total="needsPagination.total"
+              @update:page="onPageChange"
             />
           </div>
         </div>

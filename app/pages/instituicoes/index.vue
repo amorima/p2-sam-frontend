@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { type Column, type Row, type SortingState, type Table, getPaginationRowModel } from '@tanstack/table-core'
+import type { Column, Row, SortingState, Table } from '@tanstack/table-core'
 import type { Need, NeedItem } from '~/utils/domain'
 import { useNeeds } from '~/composables/useNeeds'
 import { useVouchers } from '~/composables/useVouchers'
@@ -25,7 +25,7 @@ type NeedsTableRef = {
 
 const { isAdmin, isInstitution, institutionNif } = useAuth()
 const toast = useToast()
-const { needs, institutions, approveNeed } = useNeeds()
+const { needs, needsPagination, loadNeedsPage, institutions, approveNeed } = useNeeds()
 
 async function handleApprove(need: Need) {
   await approveNeed(need.id_pedido)
@@ -272,7 +272,7 @@ const newRequestPath = computed(() => isAdmin.value ? '/instituicoes/pedido_manu
 const stats = computed(() => {
   const list = filteredNeeds.value
   return {
-    total: list.length,
+    total: needsPagination.value.total,
     pendentes: list.filter(n => n.estado === 'PENDENTE').length,
     aceites: list.filter(n => n.estado === 'ACEITE').length,
     urgentes: list.filter(n => n.urgente && n.estado === 'PENDENTE').length
@@ -291,9 +291,14 @@ const statCards = computed(() => [
 const globalFilter = ref('')
 const columnVisibility = ref()
 const sorting = ref<SortingState>([{ id: 'id_pedido', desc: true }])
-const pagination = ref({ pageIndex: 0, pageSize: 10 })
-const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
 const tableRef = useTemplateRef<NeedsTableRef>('tableRef')
+
+const serverPage = computed(() => Math.floor(needsPagination.value.offset / needsPagination.value.limit) + 1)
+
+function onPageChange(page: number) {
+  const offset = (page - 1) * needsPagination.value.limit
+  loadNeedsPage(offset)
+}
 
 const hideableColumns = computed<HideableColumnItem[]>(() => {
   return (tableRef.value?.tableApi?.getAllColumns() ?? [])
@@ -311,10 +316,6 @@ const hideableColumns = computed<HideableColumnItem[]>(() => {
         e?.preventDefault()
       }
     }))
-})
-
-watch(globalFilter, () => {
-  pagination.value = { ...pagination.value, pageIndex: 0 }
 })
 </script>
 
@@ -377,10 +378,8 @@ watch(globalFilter, () => {
           v-model:global-filter="globalFilter"
           v-model:column-visibility="columnVisibility"
           v-model:sorting="sorting"
-          v-model:pagination="pagination"
           :data="filteredNeeds"
           :columns="columns"
-          :pagination-options="paginationOptions"
           class="shrink-0"
           :ui="{
             base: 'table-fixed border-separate border-spacing-0',
@@ -393,19 +392,19 @@ watch(globalFilter, () => {
         />
 
         <div
-          v-if="filteredNeeds.length > 0"
+          v-if="needsPagination.total > 0"
           class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
         >
           <div class="text-sm text-muted">
-            {{ tableRef?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s)
+            {{ needsPagination.total }} registo(s) · página {{ serverPage }} de {{ Math.ceil(needsPagination.total / needsPagination.limit) || 1 }}
           </div>
 
           <div class="flex items-center gap-1.5">
             <UPagination
-              :default-page="(tableRef?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-              :items-per-page="tableRef?.tableApi?.getState().pagination.pageSize"
-              :total="tableRef?.tableApi?.getFilteredRowModel().rows.length"
-              @update:page="(p: number) => tableRef?.tableApi?.setPageIndex(p - 1)"
+              :page="serverPage"
+              :items-per-page="needsPagination.limit"
+              :total="needsPagination.total"
+              @update:page="onPageChange"
             />
           </div>
         </div>

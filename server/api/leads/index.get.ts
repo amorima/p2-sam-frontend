@@ -18,18 +18,21 @@ interface BackendLead {
   'nome_entidade': string | null
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
+  const query = getQuery(event)
+  const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 200)
+  const offset = Math.max(0, parseInt(String(query.offset)) || 0)
 
-  let leads: BackendLead[] = []
+  let backendRes: { items: BackendLead[], total: number, limit: number, offset: number }
   try {
-    leads = await internalFetch<BackendLead[]>(`${config.backendBase}/leads`) ?? []
+    backendRes = await internalFetch<typeof backendRes>(`${config.backendBase}/leads?limit=${limit}&offset=${offset}`)
   } catch (err: unknown) {
     console.error('[leads] Backend error:', (err as { message?: string })?.message)
-    return []
+    return { items: [], total: 0, limit, offset, links: {} }
   }
 
-  return leads.map(lead => ({
+  const items = (backendRes.items ?? []).map(lead => ({
     id_lead: lead.id_lead,
     data: lead.data ?? new Date().toISOString(),
     id_painel: lead.id_painel,
@@ -51,4 +54,16 @@ export default defineEventHandler(async () => {
     data_entrega: lead.data_entrega ?? null,
     nome_entidade: lead.nome_entidade ?? undefined
   }))
+
+  const total = backendRes.total ?? 0
+  const lastOffset = total > 0 ? Math.max(0, (Math.ceil(total / limit) - 1) * limit) : 0
+  const links: Record<string, string> = {
+    self: `/api/leads?limit=${limit}&offset=${offset}`,
+    first: `/api/leads?limit=${limit}&offset=0`,
+    last: `/api/leads?limit=${limit}&offset=${lastOffset}`
+  }
+  if (offset + limit < total) links.next = `/api/leads?limit=${limit}&offset=${offset + limit}`
+  if (offset > 0) links.prev = `/api/leads?limit=${limit}&offset=${Math.max(0, offset - limit)}`
+
+  return { items, total, limit, offset, links }
 })

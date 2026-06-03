@@ -40,26 +40,31 @@ interface Offer {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
+  const query = getQuery(event)
+  const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 500)
+  const offset = Math.max(0, parseInt(String(query.offset)) || 0)
 
   let businesses: FlatBusiness[] = []
+  let total = 0
   try {
-    const businessRes = await authBackendFetch<{ data: FlatBusiness[] }>(event, `${config.backendBase}/business`)
-    businesses = businessRes.data ?? []
+    const businessRes = await authBackendFetch<{ items: FlatBusiness[], total: number }>(event, `${config.backendBase}/business?limit=${limit}&offset=${offset}`)
+    businesses = businessRes.items ?? []
+    total = businessRes.total ?? 0
   } catch {
     // Non-admin users get 403 — return empty list gracefully
-    return { data: [] }
+    return { items: [], total: 0, limit, offset, links: {} }
   }
 
   const offersResults = await Promise.allSettled(
     businesses.map(b =>
-      authBackendFetch<{ offers: Offer[] }>(event, `${config.backendBase}/business/${b.nif_nipc}/offers`)
+      authBackendFetch<{ items: Offer[] }>(event, `${config.backendBase}/business/${b.nif_nipc}/offers?limit=200`)
     )
   )
 
-  const data = businesses.map((flat, i) => {
+  const items = businesses.map((flat, i) => {
     const result = offersResults[i]
     const offers: Offer[] = result?.status === 'fulfilled'
-      ? ((result as PromiseFulfilledResult<{ offers: Offer[] }>).value?.offers ?? [])
+      ? ((result as PromiseFulfilledResult<{ items: Offer[] }>).value?.items ?? [])
       : []
 
     const isBlocked = Boolean(flat.blocked)
@@ -94,5 +99,14 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return { data }
+  const lastOffset = total > 0 ? Math.max(0, (Math.ceil(total / limit) - 1) * limit) : 0
+  const links: Record<string, string> = {
+    self: `/api/business?limit=${limit}&offset=${offset}`,
+    first: `/api/business?limit=${limit}&offset=0`,
+    last: `/api/business?limit=${limit}&offset=${lastOffset}`
+  }
+  if (offset + limit < total) links.next = `/api/business?limit=${limit}&offset=${offset + limit}`
+  if (offset > 0) links.prev = `/api/business?limit=${limit}&offset=${Math.max(0, offset - limit)}`
+
+  return { items, total, limit, offset, links }
 })

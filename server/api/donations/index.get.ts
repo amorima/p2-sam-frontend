@@ -16,21 +16,33 @@ interface FlatPatron {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
+  const query = getQuery(event)
+  const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 200)
+  const offset = Math.max(0, parseInt(String(query.offset)) || 0)
 
   const [donationsRes, patronsRes] = await Promise.all([
-    authBackendFetch<{ donations: Donation[] }>(event, `${config.backendBase}/donations`),
-    authBackendFetch<{ data: FlatPatron[] }>(event, `${config.backendBase}/patrons`)
+    authBackendFetch<{ items: Donation[], total: number, limit: number, offset: number }>(event, `${config.backendBase}/donations?limit=${limit}&offset=${offset}`),
+    authBackendFetch<{ items: FlatPatron[] }>(event, `${config.backendBase}/patrons?limit=500`)
   ])
 
-  // Backend returns flat format (nif_nipc and nome_entidade at top level)
   const nameMap = new Map(
-    (patronsRes.data ?? []).map(p => [p.nif_nipc, p.nome_entidade])
+    (patronsRes.items ?? []).map(p => [p.nif_nipc, p.nome_entidade])
   )
 
-  const enriched = (donationsRes.donations ?? []).map(d => ({
+  const items = (donationsRes.items ?? []).map(d => ({
     ...d,
     nome_entidade: nameMap.get(d.mecena_nif_nipc) ?? d.mecena_nif_nipc
   }))
 
-  return { donations: enriched }
+  const total = donationsRes.total ?? 0
+  const lastOffset = total > 0 ? Math.max(0, (Math.ceil(total / limit) - 1) * limit) : 0
+  const links: Record<string, string> = {
+    self: `/api/donations?limit=${limit}&offset=${offset}`,
+    first: `/api/donations?limit=${limit}&offset=0`,
+    last: `/api/donations?limit=${limit}&offset=${lastOffset}`
+  }
+  if (offset + limit < total) links.next = `/api/donations?limit=${limit}&offset=${offset + limit}`
+  if (offset > 0) links.prev = `/api/donations?limit=${limit}&offset=${Math.max(0, offset - limit)}`
+
+  return { items, total, limit, offset, links }
 })

@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { getPaginationRowModel } from '@tanstack/table-core'
 import { useLeads } from '~/composables/useLeads'
 import type { Lead, LeadEstado } from '~/utils/domain'
 import { printPickupReport, type PickupReportLead } from '~/utils/pickupReportPDF'
 
 const UBadge = resolveComponent('UBadge')
 
-const { leads, effectiveEstado, expiresAt, hoursRemaining } = useLeads()
+const { leads, leadsPagination, loadLeadsPage, effectiveEstado, expiresAt, hoursRemaining } = useLeads()
 
 interface TableInstance {
   tableApi?: {
@@ -17,9 +16,13 @@ interface TableInstance {
 
 const filterState = ref<'TODOS' | LeadEstado | 'EXPIRA_BREVE'>('TODOS')
 const globalFilter = ref('')
-const pagination = ref({ pageIndex: 0, pageSize: 20 })
-const paginationOptions = { getPaginationRowModel: getPaginationRowModel() }
 const tableRef = useTemplateRef<TableInstance>('tableRef')
+
+const serverPage = computed(() => Math.floor(leadsPagination.value.offset / leadsPagination.value.limit) + 1)
+
+function onPageChange(page: number) {
+  loadLeadsPage((page - 1) * leadsPagination.value.limit)
+}
 
 interface EnrichedLead extends Lead {
   estadoEfetivo: LeadEstado
@@ -47,16 +50,14 @@ const filteredLeads = computed<EnrichedLead[]>(() => {
   return [...result].sort((a, b) => b.id_lead - a.id_lead)
 })
 
-const filteredCount = computed<number>(() => tableRef.value?.tableApi?.getFilteredRowModel().rows.length ?? filteredLeads.value.length)
-
 watch([globalFilter, filterState], () => {
-  pagination.value = { ...pagination.value, pageIndex: 0 }
+  loadLeadsPage(0)
 })
 
 const stats = computed(() => {
   const list = enrichedLeads.value
   return {
-    total: list.length,
+    total: leadsPagination.value.total,
     entregues: list.filter(l => l.estadoEfetivo === 'ENTREGUE').length,
     pendentes: list.filter(l => l.estadoEfetivo === 'PENDENTE').length,
     expirados: list.filter(l => l.estadoEfetivo === 'EXPIRADO').length,
@@ -274,10 +275,8 @@ function downloadReport() {
         <UTable
           ref="tableRef"
           v-model:global-filter="globalFilter"
-          v-model:pagination="pagination"
           :data="filteredLeads"
           :columns="columns"
-          :pagination-options="paginationOptions"
           :ui="{
             base: 'table-fixed border-separate border-spacing-0',
             thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
@@ -287,11 +286,20 @@ function downloadReport() {
           }"
         />
 
-        <TablePagination
-          v-if="filteredLeads.length > 0"
-          v-model="pagination"
-          :total="filteredCount"
-        />
+        <div
+          v-if="leadsPagination.total > 0"
+          class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
+        >
+          <div class="text-sm text-muted">
+            {{ leadsPagination.total }} registo(s) · página {{ serverPage }} de {{ Math.ceil(leadsPagination.total / leadsPagination.limit) || 1 }}
+          </div>
+          <UPagination
+            :page="serverPage"
+            :items-per-page="leadsPagination.limit"
+            :total="leadsPagination.total"
+            @update:page="onPageChange"
+          />
+        </div>
 
         <div
           v-if="filteredLeads.length === 0"
