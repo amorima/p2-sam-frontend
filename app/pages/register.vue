@@ -57,19 +57,11 @@ const { goodsServices } = useNeeds()
 const offers = ref<DraftOffer[]>([])
 const showAddOffer = ref(false)
 const newOfferCategory = ref('')
+const newOfferTipo = ref<'BEM' | 'SERVICO'>('SERVICO')
 const newOfferDescricao = ref('')
 const newOfferValor = ref<number | undefined>(undefined)
 const newOfferDesconto = ref<number>(100)
 const isProBono = computed(() => newOfferDesconto.value === 100)
-
-const categoryOptions = computed(() =>
-  goodsServices.value
-    .filter(g => g.tipo_bem === 'SERVICO')
-    .map(g => ({
-      label: g.tipo_bem_servico,
-      value: g.tipo_bem_servico
-    }))
-)
 
 function addOfferDraft() {
   const cat = newOfferCategory.value.trim()
@@ -81,15 +73,20 @@ function addOfferDraft() {
     toast.add({ title: 'Categoria já adicionada', icon: 'i-lucide-alert-circle', color: 'warning' })
     return
   }
+  const existingService = goodsServices.value.find(g => g.tipo_bem_servico === cat)
+  const tipo_bem = existingService
+    ? existingService.tipo_bem as 'bem' | 'servico'
+    : (newOfferTipo.value === 'BEM' ? 'bem' : 'servico')
   offers.value.push({
     tipo_bem_servico: cat,
     descricao: newOfferDescricao.value.trim(),
     valor_total: newOfferValor.value,
     desconto: newOfferDesconto.value,
-    tipo_bem: 'servico'
+    tipo_bem
   })
   showAddOffer.value = false
   newOfferCategory.value = ''
+  newOfferTipo.value = 'SERVICO'
   newOfferDescricao.value = ''
   newOfferValor.value = undefined
   newOfferDesconto.value = 100
@@ -672,15 +669,15 @@ async function onStep4Submit() {
             Nova Categoria / Oferta
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <UFormField label="Categoria (serviço)">
-              <USelectMenu
+            <UFormField
+              label="Categoria"
+              help="Escolha uma categoria existente ou crie uma nova."
+            >
+              <NegociosCategoryField
                 v-model="newOfferCategory"
-                :items="categoryOptions"
-                value-key="value"
-                label-key="label"
-                search-placeholder="Pesquisar serviço..."
-                placeholder="Escolher..."
-                class="w-full"
+                v-model:tipo="newOfferTipo"
+                :goods-services="goodsServices"
+                :exclude="offers.map(o => o.tipo_bem_servico)"
               />
             </UFormField>
             <UFormField label="Valor Base (€)">
