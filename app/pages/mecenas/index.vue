@@ -14,6 +14,14 @@ interface Donation {
   estado: 'ACEITE' | 'REJEITADO' | 'PENDENTE'
 }
 
+interface DonationStats {
+  total: number
+  totalAceite: number
+  aceites: number
+  pendentes: number
+  rejeitadas: number
+}
+
 type DonationTableRef = {
   tableApi?: Table<Donation>
 }
@@ -30,17 +38,42 @@ const selectedDonation = ref<Donation | null>(null)
 const serverLimit = 25
 const serverOffset = ref(0)
 
-const fetchUrl = computed(() => {
-  const base = isAdmin.value
-    ? '/api/donations'
-    : `/api/patrons/${patronNif.value}/donations`
-  return `${base}?limit=${serverLimit}&offset=${serverOffset.value}`
+// Search term (debounced) — drives a SERVER-side search so it matches across
+// the whole dataset, not just the current page.
+const globalFilter = ref('')
+const debouncedQ = refDebounced(globalFilter, 350)
+
+// Only admins (all donations) and patrons (their own) have a donations list.
+// Guarding the URL also avoids the malformed `/api/patrons//donations` request
+// when a non-patron lands here with an empty nif.
+const canFetch = computed(() => isAdmin.value || !!patronNif.value)
+
+const fetchUrl = computed<string | null>(() => {
+  if (!canFetch.value) return null
+  const base = isAdmin.value ? '/api/donations' : `/api/patrons/${patronNif.value}/donations`
+  const qParam = debouncedQ.value.trim() ? `&q=${encodeURIComponent(debouncedQ.value.trim())}` : ''
+  return `${base}?limit=${serverLimit}&offset=${serverOffset.value}${qParam}`
 })
 
 const { data: rawData, status, refresh } = await useFetch<{ items: Donation[], total: number, limit: number, offset: number }>(
-  fetchUrl,
-  { lazy: true, server: false }
+  () => fetchUrl.value ?? '',
+  { lazy: true, server: false, immediate: false, watch: false, default: () => ({ items: [], total: 0, limit: serverLimit, offset: 0 }) }
 )
+watch(fetchUrl, (url) => {
+  if (url) refresh()
+}, { immediate: true })
+
+// Aggregate cards (admin) — independent of pagination, honouring the search term.
+const statsUrl = computed<string | null>(() =>
+  isAdmin.value ? `/api/donations/stats${debouncedQ.value.trim() ? `?q=${encodeURIComponent(debouncedQ.value.trim())}` : ''}` : null
+)
+const { data: statsData, refresh: refreshStats } = await useFetch<DonationStats | null>(
+  () => statsUrl.value ?? '',
+  { lazy: true, server: false, immediate: false, watch: false, default: () => null }
+)
+watch(statsUrl, (url) => {
+  if (url) refreshStats()
+}, { immediate: true })
 
 const donations = computed<Donation[]>(() => rawData.value?.items ?? [])
 const serverTotal = computed(() => rawData.value?.total ?? 0)
@@ -256,8 +289,20 @@ const pageTitle = computed(() => isAdmin.value ? 'Gestão de Doações' : 'As Mi
 const newDonationPath = computed(() => isAdmin.value ? '/mecenas/doacao_manual' : '/mecenas/doacao')
 
 const stats = computed(() => {
+  // Admin: use the server aggregate (whole filtered dataset).
+  const s = statsData.value
+  if (s) {
+    return {
+      total: formatEUR(s.totalAceite),
+      count: s.total,
+      aceites: s.aceites,
+      pendentes: s.pendentes,
+      rejeitadas: s.rejeitadas
+    }
+  }
+  // Patron: derive from the loaded page (a patron's dataset is small).
   const list = donations.value
-  const totalAceite = list.filter(d => d.estado === 'ACEITE').reduce((s, d) => s + Number(d.valor_transacao), 0)
+  const totalAceite = list.filter(d => d.estado === 'ACEITE').reduce((sum, d) => sum + Number(d.valor_transacao), 0)
   return {
     total: formatEUR(totalAceite),
     count: serverTotal.value,
@@ -276,7 +321,6 @@ const statCards = computed(() => [
   { title: 'Pendentes', icon: 'i-lucide-clock', value: stats.value.pendentes, color: 'text-warning' }
 ])
 
-const globalFilter = ref('')
 const columnVisibility = ref()
 const sorting = ref<SortingState>([{ id: 'data', desc: true }])
 const tableRef = useTemplateRef<DonationTableRef>('tableRef')
@@ -361,7 +405,6 @@ watch(globalFilter, () => {
 
         <UTable
           ref="tableRef"
-          v-model:global-filter="globalFilter"
           v-model:column-visibility="columnVisibility"
           v-model:sorting="sorting"
           :data="donations"
@@ -420,7 +463,7 @@ watch(globalFilter, () => {
       <MecenasDonationStatusModal
         v-model:open="statusModalOpen"
         :donation="selectedDonation"
-        @updated="refresh()"
+        @updated="() => { refresh(); refreshStats() }"
       />
     </template>
   </UDashboardPanel>

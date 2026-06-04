@@ -49,9 +49,11 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 500)
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
+  const q = typeof query.q === 'string' ? query.q.trim() : ''
+  const qs = q ? `&q=${encodeURIComponent(q)}` : ''
 
   const res = await internalFetch<{ items: FlatInstitution[], total: number, limit: number, offset: number }>(
-    `${config.backendBase}/institutions?limit=${limit}&offset=${offset}`
+    `${config.backendBase}/institutions?limit=${limit}&offset=${offset}${qs}`
   )
 
   const items = (res.items ?? []).map(toNestedInstitution)

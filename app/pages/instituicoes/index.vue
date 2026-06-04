@@ -25,7 +25,7 @@ type NeedsTableRef = {
 
 const { isAdmin, isInstitution, institutionNif } = useAuth()
 const toast = useToast()
-const { needs, needsPagination, loadNeedsPage, institutions, approveNeed } = useNeeds()
+const { needs, needsPagination, loadNeedsPage, searchNeeds, institutions, approveNeed } = useNeeds()
 
 async function handleApprove(need: Need) {
   await approveNeed(need.id_pedido)
@@ -289,6 +289,10 @@ const statCards = computed(() => [
 ])
 
 const globalFilter = ref('')
+// Server-side search (debounced): matches NIF + institution name across the
+// whole dataset, not just the loaded page.
+const debouncedQ = refDebounced(globalFilter, 350)
+watch(debouncedQ, q => searchNeeds(q))
 const columnVisibility = ref()
 const sorting = ref<SortingState>([{ id: 'id_pedido', desc: true }])
 const tableRef = useTemplateRef<NeedsTableRef>('tableRef')
@@ -375,7 +379,6 @@ const hideableColumns = computed<HideableColumnItem[]>(() => {
 
         <UTable
           ref="tableRef"
-          v-model:global-filter="globalFilter"
           v-model:column-visibility="columnVisibility"
           v-model:sorting="sorting"
           :data="filteredNeeds"

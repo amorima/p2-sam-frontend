@@ -12,8 +12,10 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 500)
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
+  const q = typeof query.q === 'string' ? query.q.trim() : ''
+  const qs = q ? `&q=${encodeURIComponent(q)}` : ''
 
-  const res = await authBackendFetch<{ items: FlatPatron[], total: number }>(event, `${config.backendBase}/patrons?limit=${limit}&offset=${offset}`)
+  const res = await authBackendFetch<{ items: FlatPatron[], total: number }>(event, `${config.backendBase}/patrons?limit=${limit}&offset=${offset}${qs}`)
 
   const items = (res.items ?? []).map(p => ({
     resource: { nif_nipc: p.nif_nipc },

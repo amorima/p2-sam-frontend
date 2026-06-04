@@ -51,22 +51,35 @@ interface PaginatedResponse<T> {
 }
 
 const _useNeeds = () => {
+  const { businessNif } = useAuth()
   const needs = useState<Need[]>('needs.list', () => [])
   const needsPagination = useState<PaginationMeta>('needs.pagination', () => ({ total: 0, limit: 25, offset: 0 }))
   const institutions = useState<Institution[]>('needs.institutions', () => [])
   const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [])
   const businesses = useState<Business[]>('needs.businesses', () => [])
   const panels = useState<Panel[]>('needs.panels', () => [DEFAULT_PANEL])
+  // Server-side search term for the pedidos list (matches NIF + institution name
+  // across the whole dataset, not just the loaded page).
+  const needsSearch = useState<string>('needs.search', () => '')
 
   async function loadNeedsPage(offset: number) {
     const limit = needsPagination.value.limit
+    const q = needsSearch.value.trim()
+    const qs = q ? `&q=${encodeURIComponent(q)}` : ''
     try {
-      const res = await $fetch<PaginatedResponse<Need>>(`/api/needs?limit=${limit}&offset=${offset}`)
+      const res = await $fetch<PaginatedResponse<Need>>(`/api/needs?limit=${limit}&offset=${offset}${qs}`)
       needs.value = res.items ?? []
       needsPagination.value = { total: res.total, limit: res.limit, offset: res.offset }
     } catch (e) {
       console.error('[useNeeds] Failed to load needs page:', e)
     }
+  }
+
+  // Set the search term and reload from the first page.
+  async function searchNeeds(q: string) {
+    needsSearch.value = q
+    needsPagination.value = { ...needsPagination.value, offset: 0 }
+    await loadNeedsPage(0)
   }
 
   // Fetch all data from API (deduped by key — runs once per SSR + once on client if needed)
@@ -75,7 +88,13 @@ const _useNeeds = () => {
       const [needsRes, institutionsRes, businessRes, goodsRes] = await Promise.all([
         $fetch<PaginatedResponse<Need>>('/api/needs?limit=25&offset=0'),
         $fetch<PaginatedResponse<Institution>>('/api/institutions?limit=500'),
-        $fetch<PaginatedResponse<Business>>('/api/business?limit=500').catch(() => ({ items: [] as Business[], total: 0, limit: 500, offset: 0 })),
+        // A business user can't hit the admin-only GET /api/business list; load
+        // its own record via the self endpoint instead so "O Meu Negócio" works.
+        businessNif.value
+          ? $fetch<Business>(`/api/business/${businessNif.value}`)
+              .then(b => ({ items: [b], total: 1, limit: 1, offset: 0 }))
+              .catch(() => ({ items: [] as Business[], total: 0, limit: 500, offset: 0 }))
+          : $fetch<PaginatedResponse<Business>>('/api/business?limit=500').catch(() => ({ items: [] as Business[], total: 0, limit: 500, offset: 0 })),
         $fetch<PaginatedResponse<GoodsService>>('/api/goods-services?limit=500').catch(() => ({ items: [] as GoodsService[], total: 0, limit: 500, offset: 0 }))
       ])
 
@@ -509,6 +528,8 @@ const _useNeeds = () => {
     needs,
     needsPagination,
     loadNeedsPage,
+    searchNeeds,
+    needsSearch,
     institutions,
     goodsServices,
     businesses,

@@ -29,6 +29,8 @@ const router = useRouter()
 const table = useTemplateRef<CustomersTableRef>('table')
 
 const globalFilter = ref('')
+// Server-side search (debounced) so it matches across the whole dataset.
+const debouncedQ = refDebounced(globalFilter, 350)
 const columnVisibility = ref()
 const rowSelection = ref<Record<string, boolean>>({})
 const sorting = ref<SortingState>([])
@@ -38,7 +40,10 @@ const ACTOR_TYPES: User['actorType'][] = ['Mecenas', 'Negócio', 'Instituição'
 const serverLimit = 25
 const serverOffset = ref(0)
 
-const customersUrl = computed(() => `/api/customers?limit=${serverLimit}&offset=${serverOffset.value}`)
+const customersUrl = computed(() => {
+  const qParam = debouncedQ.value.trim() ? `&q=${encodeURIComponent(debouncedQ.value.trim())}` : ''
+  return `/api/customers?limit=${serverLimit}&offset=${serverOffset.value}${qParam}`
+})
 
 const { data: rawCustomersData, status, refresh } = await useFetch<{ items: User[], total: number, limit: number, offset: number }>(
   customersUrl,
@@ -52,6 +57,11 @@ const serverPage = computed(() => Math.floor(serverOffset.value / serverLimit) +
 function loadCustomersPage(page: number) {
   serverOffset.value = (page - 1) * serverLimit
 }
+
+// Reset to the first page whenever the search term changes.
+watch(debouncedQ, () => {
+  serverOffset.value = 0
+})
 
 const session = useCookie<AuthSession | null>('auth-session')
 const authHeader = computed(() =>
@@ -548,7 +558,6 @@ const columns: TableColumn<User>[] = [
 
       <UTable
         ref="table"
-        v-model:global-filter="globalFilter"
         v-model:column-visibility="columnVisibility"
         v-model:row-selection="rowSelection"
         v-model:sorting="sorting"

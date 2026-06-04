@@ -36,9 +36,11 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 200)
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
+  const q = typeof query.q === 'string' ? query.q.trim() : ''
+  const qs = q ? `&q=${encodeURIComponent(q)}` : ''
 
   const [needsRes, institutionsRes, leadsRes] = await Promise.all([
-    internalFetch<{ items: BackendNeed[], total: number, limit: number, offset: number }>(`${config.backendBase}/needs?limit=${limit}&offset=${offset}`),
+    internalFetch<{ items: BackendNeed[], total: number, limit: number, offset: number }>(`${config.backendBase}/needs?limit=${limit}&offset=${offset}${qs}`),
     internalFetch<{ items: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions?limit=500`),
     internalFetch<{ items: BackendLead[] }>(`${config.backendBase}/leads?limit=1000`).catch(() => ({ items: [] as BackendLead[] }))
   ])

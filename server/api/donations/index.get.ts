@@ -19,9 +19,11 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 200)
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
+  const q = typeof query.q === 'string' ? query.q.trim() : ''
+  const qs = q ? `&q=${encodeURIComponent(q)}` : ''
 
   const [donationsRes, patronsRes] = await Promise.all([
-    authBackendFetch<{ items: Donation[], total: number, limit: number, offset: number }>(event, `${config.backendBase}/donations?limit=${limit}&offset=${offset}`),
+    authBackendFetch<{ items: Donation[], total: number, limit: number, offset: number }>(event, `${config.backendBase}/donations?limit=${limit}&offset=${offset}${qs}`),
     authBackendFetch<{ items: FlatPatron[] }>(event, `${config.backendBase}/patrons?limit=500`)
   ])
 

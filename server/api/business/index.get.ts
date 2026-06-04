@@ -43,11 +43,13 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 500)
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
+  const q = typeof query.q === 'string' ? query.q.trim() : ''
+  const qs = q ? `&q=${encodeURIComponent(q)}` : ''
 
   let businesses: FlatBusiness[] = []
   let total = 0
   try {
-    const businessRes = await authBackendFetch<{ items: FlatBusiness[], total: number }>(event, `${config.backendBase}/business?limit=${limit}&offset=${offset}`)
+    const businessRes = await authBackendFetch<{ items: FlatBusiness[], total: number }>(event, `${config.backendBase}/business?limit=${limit}&offset=${offset}${qs}`)
     businesses = businessRes.items ?? []
     total = businessRes.total ?? 0
   } catch {

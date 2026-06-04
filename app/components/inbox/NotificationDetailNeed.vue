@@ -27,26 +27,25 @@ function estadoLabel(e: string) {
 </script>
 
 <template>
-  <div v-if="!need" class="p-6 space-y-6 animate-pulse">
-    <div class="flex items-start justify-between gap-4">
-      <div class="space-y-2">
-        <USkeleton class="h-3 w-20" />
-        <USkeleton class="h-5 w-44" />
-        <USkeleton class="h-3.5 w-28" />
-      </div>
-      <USkeleton class="h-5 w-16 rounded-full" />
-    </div>
-    <div class="space-y-2">
-      <USkeleton class="h-3 w-28" />
-      <div v-for="i in 3" :key="i" class="flex items-center gap-2 p-2 rounded-md bg-elevated/30">
-        <USkeleton class="size-4 rounded shrink-0" />
-        <USkeleton class="h-3.5 flex-1" />
-        <USkeleton class="h-4 w-12 rounded-full ml-auto" />
-      </div>
-    </div>
-    <div class="flex gap-2 pt-2 border-t border-default">
-      <USkeleton class="h-8 w-28 rounded-md" />
-      <USkeleton class="h-8 w-36 rounded-md" />
+  <!-- Fallback: the need may not be in the in-memory paginated list (it only
+       holds the first page). Instead of an endless skeleton, show the
+       notification's own content plus a link to the full pedido. -->
+  <div v-if="!need" class="p-6 space-y-4">
+    <p class="font-semibold text-highlighted">
+      {{ notification.titulo }}
+    </p>
+    <p class="text-muted text-sm">
+      {{ notification.corpo }}
+    </p>
+    <div v-if="needId" class="pt-2 border-t border-default">
+      <UButton
+        icon="i-lucide-external-link"
+        color="neutral"
+        variant="ghost"
+        :to="`/instituicoes/${needId}`"
+      >
+        Abrir Pedido Completo
+      </UButton>
     </div>
   </div>
 

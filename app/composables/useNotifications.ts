@@ -41,8 +41,11 @@ const _useNotifications = () => {
 
   function addNotification(n: AppNotification) {
     if (!n?._id) return
-    // Update in-place if already present (e.g. telemetry upsert), else prepend
-    const idx = notifications.value.findIndex(x => x._id === n._id)
+    // Update in-place if already present (e.g. telemetry upsert), else prepend.
+    // Compare as strings: the live WS payload and the REST history can carry the
+    // _id in different shapes (ObjectId vs string), which would defeat dedup and
+    // surface the same notification twice.
+    const idx = notifications.value.findIndex(x => String(x._id) === String(n._id))
     if (idx !== -1) {
       notifications.value[idx] = n
     } else {

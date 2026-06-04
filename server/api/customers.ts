@@ -89,6 +89,8 @@ export default defineEventHandler(async (event): Promise<unknown> => {
   const query = getQuery(event)
   const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 200)
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
+  const q = typeof query.q === 'string' ? query.q.trim() : ''
+  const qs = q ? `&q=${encodeURIComponent(q)}` : ''
 
   const safeFetch = async <T>(path: string): Promise<T | null> => {
     try {
@@ -102,10 +104,10 @@ export default defineEventHandler(async (event): Promise<unknown> => {
 
   // Fetch all entities with a high limit for combining; pagination applied to combined result
   const [patrons, businesses, institutions, citizensRes] = await Promise.all([
-    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>('/patrons?limit=500'),
-    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>('/business?limit=500'),
-    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>('/institutions?limit=500'),
-    safeFetch<{ items?: BackendCitizen[] } | BackendCitizen[]>('/citizens?limit=500')
+    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>(`/patrons?limit=500${qs}`),
+    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>(`/business?limit=500${qs}`),
+    safeFetch<{ items?: BackendEntity[] } | BackendEntity[]>(`/institutions?limit=500${qs}`),
+    safeFetch<{ items?: BackendCitizen[] } | BackendCitizen[]>(`/citizens?limit=500${qs}`)
   ])
 
   const toArray = <T>(v: { items?: T[], data?: T[] } | T[] | null): T[] => {
