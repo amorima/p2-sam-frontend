@@ -5,7 +5,7 @@ definePageMeta({ middleware: 'admin-only' })
 
 const toast = useToast()
 
-const { data, status, refresh } = await useFetch<{ items: GoodsService[] }>('/api/goods-services', {
+const { data, status, refresh } = await useFetch<{ items: GoodsService[] }>('/api/goods-services?limit=500', {
   lazy: true, server: false
 })
 
