@@ -20,10 +20,19 @@ interface PaginatedResponse<T> {
   offset: number
 }
 
+interface LeadsStats {
+  total: number
+  entregues: number
+  pendentes: number
+  expirados: number
+  expiraBreve: number
+}
+
 const _useLeads = () => {
   const leads = useState<Lead[]>('leads.list', () => [])
   const smartLockers = useState<SmartLocker[]>('leads.smartLockers', () => [])
   const leadsPagination = useState<PaginationMeta>('leads.pagination', () => ({ total: 0, limit: 25, offset: 0 }))
+  const leadsStats = useState<LeadsStats>('leads.stats', () => ({ total: 0, entregues: 0, pendentes: 0, expirados: 0, expiraBreve: 0 }))
 
   const fetchLeads = async (offset = 0) => {
     const limit = leadsPagination.value.limit
@@ -36,16 +45,24 @@ const _useLeads = () => {
     }
   }
 
+  const fetchLeadsStats = async () => {
+    try {
+      leadsStats.value = await $fetch<LeadsStats>('/api/leads/stats')
+    } catch (e) {
+      console.error('[useLeads] Failed to load stats:', e)
+    }
+  }
+
   async function loadLeadsPage(offset: number) {
     await fetchLeads(offset)
   }
 
   // Initial load (client-only — no SSR needed for admin dashboard)
-  useAsyncData('leads-initial-data', () => fetchLeads(0), { server: false })
+  useAsyncData('leads-initial-data', () => Promise.all([fetchLeads(0), fetchLeadsStats()]), { server: false })
 
   // Poll every 30 seconds so new leads from the panel appear automatically
   if (import.meta.client) {
-    const interval = setInterval(() => fetchLeads(leadsPagination.value.offset), 30000)
+    const interval = setInterval(() => Promise.all([fetchLeads(leadsPagination.value.offset), fetchLeadsStats()]), 30000)
     onScopeDispose(() => clearInterval(interval))
   }
 
@@ -69,6 +86,7 @@ const _useLeads = () => {
     leads,
     smartLockers,
     leadsPagination,
+    leadsStats,
     loadLeadsPage,
     effectiveEstado,
     expiresAt,

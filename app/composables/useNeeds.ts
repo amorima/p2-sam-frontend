@@ -50,10 +50,18 @@ interface PaginatedResponse<T> {
   offset: number
 }
 
+interface NeedsStats {
+  total: number
+  pendentes: number
+  aceites: number
+  urgentes: number
+}
+
 const _useNeeds = () => {
   const { businessNif } = useAuth()
   const needs = useState<Need[]>('needs.list', () => [])
   const needsPagination = useState<PaginationMeta>('needs.pagination', () => ({ total: 0, limit: 25, offset: 0 }))
+  const needsStats = useState<NeedsStats>('needs.stats', () => ({ total: 0, pendentes: 0, aceites: 0, urgentes: 0 }))
   const institutions = useState<Institution[]>('needs.institutions', () => [])
   const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [])
   const businesses = useState<Business[]>('needs.businesses', () => [])
@@ -82,8 +90,17 @@ const _useNeeds = () => {
     await loadNeedsPage(0)
   }
 
+  async function loadNeedsStats() {
+    try {
+      needsStats.value = await $fetch<NeedsStats>('/api/needs/stats')
+    } catch (e) {
+      console.error('[useNeeds] Failed to load stats:', e)
+    }
+  }
+
   // Fetch all data from API (deduped by key — runs once per SSR + once on client if needed)
   useAsyncData('needs-initial-data', async () => {
+    loadNeedsStats().catch(() => {})
     try {
       const [needsRes, institutionsRes, businessRes, goodsRes] = await Promise.all([
         $fetch<PaginatedResponse<Need>>('/api/needs?limit=25&offset=0'),
@@ -527,6 +544,7 @@ const _useNeeds = () => {
   return {
     needs,
     needsPagination,
+    needsStats,
     loadNeedsPage,
     searchNeeds,
     needsSearch,

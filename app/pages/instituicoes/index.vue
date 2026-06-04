@@ -25,7 +25,7 @@ type NeedsTableRef = {
 
 const { isAdmin, isInstitution, institutionNif } = useAuth()
 const toast = useToast()
-const { needs, needsPagination, loadNeedsPage, searchNeeds, institutions, approveNeed } = useNeeds()
+const { needs, needsPagination, needsStats, loadNeedsPage, searchNeeds, institutions, approveNeed } = useNeeds()
 
 async function handleApprove(need: Need) {
   await approveNeed(need.id_pedido)
@@ -270,6 +270,14 @@ const pageTitle = computed(() => isAdmin.value ? 'Gestão de Pedidos' : 'Os Meus
 const newRequestPath = computed(() => isAdmin.value ? '/instituicoes/pedido_manual' : '/instituicoes/pedido')
 
 const stats = computed(() => {
+  if (isAdmin.value) {
+    return {
+      total: needsStats.value.total,
+      pendentes: needsStats.value.pendentes,
+      aceites: needsStats.value.aceites,
+      urgentes: needsStats.value.urgentes
+    }
+  }
   const list = filteredNeeds.value
   return {
     total: needsPagination.value.total,

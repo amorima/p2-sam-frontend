@@ -6,7 +6,7 @@ import { printPickupReport, type PickupReportLead } from '~/utils/pickupReportPD
 
 const UBadge = resolveComponent('UBadge')
 
-const { leads, leadsPagination, loadLeadsPage, effectiveEstado, expiresAt, hoursRemaining } = useLeads()
+const { leads, leadsPagination, leadsStats, loadLeadsPage, effectiveEstado, expiresAt, hoursRemaining } = useLeads()
 
 interface TableInstance {
   tableApi?: {
@@ -54,16 +54,13 @@ watch([globalFilter, filterState], () => {
   loadLeadsPage(0)
 })
 
-const stats = computed(() => {
-  const list = enrichedLeads.value
-  return {
-    total: leadsPagination.value.total,
-    entregues: list.filter(l => l.estadoEfetivo === 'ENTREGUE').length,
-    pendentes: list.filter(l => l.estadoEfetivo === 'PENDENTE').length,
-    expirados: list.filter(l => l.estadoEfetivo === 'EXPIRADO').length,
-    expiraBreve: list.filter(l => l.estadoEfetivo === 'PENDENTE' && l.horas_restantes < 24).length
-  }
-})
+const stats = computed(() => ({
+  total: leadsStats.value.total,
+  entregues: leadsStats.value.entregues,
+  pendentes: leadsStats.value.pendentes,
+  expirados: leadsStats.value.expirados,
+  expiraBreve: leadsStats.value.expiraBreve
+}))
 
 const cardUi = { container: 'gap-y-1.5', wrapper: 'items-start', leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25', title: 'font-normal text-muted text-xs uppercase' }
 
