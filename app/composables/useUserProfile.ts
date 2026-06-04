@@ -45,11 +45,15 @@ export const useUserProfile = () => {
     authCookie.value = { ...session, profile_pic: fileName }
   }
 
-  // React to account switches (login/logout) — nif changes when a different
-  // account is loaded, so watching it is sufficient to reload the avatar.
+  // React to account switches (login/logout) — always reset first so the
+  // previous account's avatar never bleeds into the new session.
   watch(
     () => authCookie.value?.nif,
-    () => { if (import.meta.client) loadStoredAvatar() },
+    () => {
+      if (!import.meta.client) return
+      avatar.value = '/user.svg'
+      loadStoredAvatar()
+    },
     { immediate: true }
   )
 
