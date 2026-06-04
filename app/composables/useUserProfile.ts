@@ -32,8 +32,6 @@ export const useUserProfile = () => {
   }
 
   // updateAvatar receives the fileName returned by whichever upload endpoint was used.
-  // DB persistence is handled server-side by `PATCH /api/auth/avatar` for entity users;
-  // for admins (no entity row) the avatar lives in localStorage only.
   function updateAvatar(fileName: string) {
     avatar.value = toProxyUrl(fileName)
 
@@ -44,9 +42,7 @@ export const useUserProfile = () => {
       localStorage.setItem(`sam_avatar_${session.nif}`, fileName)
     }
 
-    if (session.role !== 'admin') {
-      authCookie.value = { ...session, profile_pic: fileName }
-    }
+    authCookie.value = { ...session, profile_pic: fileName }
   }
 
   // React to account switches (login/logout) — nif changes when a different

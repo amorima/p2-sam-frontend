@@ -139,9 +139,6 @@ async function onFileChange(e: Event) {
     const formData = new FormData()
     formData.append('file', file)
 
-    // Entity users go through PATCH /api/auth/avatar so the previous MinIO object
-    // is removed and `entidade.profile_pic` is updated atomically server-side.
-    // Admin has no entity row, so we keep the legacy upload path for them.
     const uploadUrl = isAdmin.value
       ? `/api/upload/avatar?nome=${encodeURIComponent(file.name)}`
       : `/api/auth/avatar`
@@ -151,6 +148,13 @@ async function onFileChange(e: Event) {
       method: uploadMethod,
       body: formData
     })
+
+    if (isAdmin.value) {
+      await $fetch('/api/auth/profile-pic', {
+        method: 'PATCH',
+        body: { profile_pic: uploadData.fileName }
+      })
+    }
 
     updateAvatar(uploadData.fileName)
 
