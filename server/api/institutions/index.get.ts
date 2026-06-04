@@ -50,8 +50,7 @@ export default defineEventHandler(async (event) => {
   const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 500)
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
 
-  const res = await authBackendFetch<{ items: FlatInstitution[], total: number, limit: number, offset: number }>(
-    event,
+  const res = await internalFetch<{ items: FlatInstitution[], total: number, limit: number, offset: number }>(
     `${config.backendBase}/institutions?limit=${limit}&offset=${offset}`
   )
 
