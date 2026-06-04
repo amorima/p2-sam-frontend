@@ -87,12 +87,13 @@ const _useNeeds = () => {
   async function searchNeeds(q: string) {
     needsSearch.value = q
     needsPagination.value = { ...needsPagination.value, offset: 0 }
-    await loadNeedsPage(0)
+    await Promise.all([loadNeedsPage(0), loadNeedsStats(q)])
   }
 
-  async function loadNeedsStats() {
+  async function loadNeedsStats(q?: string) {
     try {
-      needsStats.value = await $fetch<NeedsStats>('/api/needs/stats')
+      const qs = q?.trim() ? `?q=${encodeURIComponent(q.trim())}` : ''
+      needsStats.value = await $fetch<NeedsStats>(`/api/needs/stats${qs}`)
     } catch (e) {
       console.error('[useNeeds] Failed to load stats:', e)
     }
