@@ -2,6 +2,10 @@ interface BackendNeedItem {
   id_item?: number
   id_pedido: number
   tipo_bem_servico: string
+  match_negocio_nif?: string | null
+  match_negocio_nome?: string | null
+  match_negocio_estado?: string | null
+  match_negocio_motivo?: string | null
 }
 
 interface BackendNeed {
@@ -66,18 +70,26 @@ export default defineEventHandler(async (event) => {
     // Sequelize names the hasMany association key using the model name "need item" → "need items"
     const rawItems: BackendNeedItem[] = need['need items'] ?? need.NeedItems ?? need.needItems ?? []
 
-    const mappedItems = rawItems.map(item => ({
-      id_item: item.id_item ?? ++itemCounter,
-      id_pedido: item.id_pedido,
-      tipo_bem_servico: item.tipo_bem_servico,
-      tipo_bem: inferTipoBem(item.tipo_bem_servico),
-      status: (itemLeadStatus.get(item.id_item ?? 0) ?? 'available') as 'available' | 'pending' | 'completed',
-      match_tipo: itemLeadStatus.has(item.id_item ?? 0) ? ('PAINEL' as const) : null,
-      match_ref: null,
-      match_business_nif: null,
-      match_business_estado: null,
-      match_business_motivo: null
-    }))
+    const mappedItems = rawItems.map(item => {
+      const hasLead = itemLeadStatus.has(item.id_item ?? 0)
+      const hasBusinessMatch = !!item.match_negocio_nif
+      return {
+        id_item: item.id_item ?? ++itemCounter,
+        id_pedido: item.id_pedido,
+        tipo_bem_servico: item.tipo_bem_servico,
+        tipo_bem: inferTipoBem(item.tipo_bem_servico),
+        status: (hasLead
+          ? itemLeadStatus.get(item.id_item ?? 0)
+          : hasBusinessMatch
+            ? (item.match_negocio_estado === 'CONCLUIDO' ? 'completed' : 'pending')
+            : 'available') as 'available' | 'pending' | 'completed',
+        match_tipo: hasLead ? ('PAINEL' as const) : hasBusinessMatch ? ('NEGOCIO' as const) : null,
+        match_ref: hasBusinessMatch ? (item.match_negocio_nome ?? item.match_negocio_nif ?? null) : null,
+        match_business_nif: item.match_negocio_nif ?? null,
+        match_business_estado: (item.match_negocio_estado ?? null) as import('~/utils/domain').BusinessMatchEstado | null,
+        match_business_motivo: item.match_negocio_motivo ?? null
+      }
+    })
 
     return {
       id_pedido: need.id_pedido,

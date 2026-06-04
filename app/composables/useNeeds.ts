@@ -58,7 +58,7 @@ interface NeedsStats {
 }
 
 const _useNeeds = () => {
-  const { businessNif } = useAuth()
+  const { businessNif, isAdmin } = useAuth()
   const needs = useState<Need[]>('needs.list', () => [])
   const needsPagination = useState<PaginationMeta>('needs.pagination', () => ({ total: 0, limit: 25, offset: 0 }))
   const needsStats = useState<NeedsStats>('needs.stats', () => ({ total: 0, pendentes: 0, aceites: 0, urgentes: 0 }))
@@ -106,13 +106,15 @@ const _useNeeds = () => {
       const [needsRes, institutionsRes, businessRes, goodsRes] = await Promise.all([
         $fetch<PaginatedResponse<Need>>('/api/needs?limit=25&offset=0'),
         $fetch<PaginatedResponse<Institution>>('/api/institutions?limit=500'),
-        // A business user can't hit the admin-only GET /api/business list; load
-        // its own record via the self endpoint instead so "O Meu Negócio" works.
+        // Only admin can hit GET /api/business (list all). Business users load
+        // their own record; other roles (institution, patron) get an empty list.
         businessNif.value
           ? $fetch<Business>(`/api/business/${businessNif.value}`)
               .then(b => ({ items: [b], total: 1, limit: 1, offset: 0 }))
               .catch(() => ({ items: [] as Business[], total: 0, limit: 500, offset: 0 }))
-          : $fetch<PaginatedResponse<Business>>('/api/business?limit=500').catch(() => ({ items: [] as Business[], total: 0, limit: 500, offset: 0 })),
+          : isAdmin.value
+            ? $fetch<PaginatedResponse<Business>>('/api/business?limit=500').catch(() => ({ items: [] as Business[], total: 0, limit: 500, offset: 0 }))
+            : Promise.resolve({ items: [] as Business[], total: 0, limit: 500, offset: 0 }),
         $fetch<PaginatedResponse<GoodsService>>('/api/goods-services?limit=500').catch(() => ({ items: [] as GoodsService[], total: 0, limit: 500, offset: 0 }))
       ])
 
@@ -285,10 +287,18 @@ const _useNeeds = () => {
       .filter(it => it.match_tipo === 'PAINEL')
       .map(it => it.id_item)
 
+    const businessMatches = need.items
+      .filter(it => it.match_tipo === 'NEGOCIO' && it.match_business_nif)
+      .map(it => ({
+        id_item: it.id_item,
+        negocio_nif: it.match_business_nif!,
+        negocio_nome: it.match_ref ?? null
+      }))
+
     try {
       await $fetch(`/api/needs/${id_pedido}`, {
         method: 'PATCH',
-        body: { estado: 'ACEITE', panelItemIds }
+        body: { estado: 'ACEITE', panelItemIds, businessMatches }
       })
     } catch (e) {
       console.error('[useNeeds] Failed to approve need:', e)
