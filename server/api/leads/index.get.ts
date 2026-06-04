@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
   let backendRes: { items: BackendLead[], total: number, limit: number, offset: number }
   try {
-    backendRes = await internalFetch<typeof backendRes>(`${config.backendBase}/leads?limit=${limit}&offset=${offset}`)
+    backendRes = await authBackendFetch<typeof backendRes>(event, `${config.backendBase}/leads?limit=${limit}&offset=${offset}`)
   } catch (err: unknown) {
     console.error('[leads] Backend error:', (err as { message?: string })?.message)
     return { items: [], total: 0, limit, offset, links: {} }

@@ -38,9 +38,9 @@ export default defineEventHandler(async (event) => {
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
 
   const [needsRes, institutionsRes, leadsRes] = await Promise.all([
-    internalFetch<{ items: BackendNeed[], total: number, limit: number, offset: number }>(`${config.backendBase}/needs?limit=${limit}&offset=${offset}`),
-    internalFetch<{ items: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions?limit=500`),
-    internalFetch<{ items: BackendLead[] }>(`${config.backendBase}/leads?limit=1000`).catch(() => ({ items: [] as BackendLead[] }))
+    authBackendFetch<{ items: BackendNeed[], total: number, limit: number, offset: number }>(event, `${config.backendBase}/needs?limit=${limit}&offset=${offset}`),
+    authBackendFetch<{ items: Array<{ nif_nipc: string, nome_entidade: string }> }>(event, `${config.backendBase}/institutions?limit=500`),
+    authBackendFetch<{ items: BackendLead[] }>(event, `${config.backendBase}/leads?limit=1000`).catch(() => ({ items: [] as BackendLead[] }))
   ])
 
   const nameMap = new Map(
