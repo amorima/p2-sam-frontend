@@ -21,9 +21,12 @@ export default defineEventHandler(async (event) => {
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
   const q = typeof query.q === 'string' ? query.q.trim() : ''
   const qs = q ? `&q=${encodeURIComponent(q)}` : ''
+  const sortBy = typeof query.sort_by === 'string' ? query.sort_by : ''
+  const sortDir = query.sort_dir === 'asc' ? 'asc' : 'desc'
+  const sortQs = sortBy ? `&sort_by=${encodeURIComponent(sortBy)}&sort_dir=${sortDir}` : ''
 
   const [donationsRes, patronsRes] = await Promise.all([
-    authBackendFetch<{ items: Donation[], total: number, limit: number, offset: number }>(event, `${config.backendBase}/donations?limit=${limit}&offset=${offset}${qs}`),
+    authBackendFetch<{ items: Donation[], total: number, limit: number, offset: number }>(event, `${config.backendBase}/donations?limit=${limit}&offset=${offset}${qs}${sortQs}`),
     authBackendFetch<{ items: FlatPatron[] }>(event, `${config.backendBase}/patrons?limit=500`)
   ])
 

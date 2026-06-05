@@ -1,4 +1,5 @@
 import { createSharedComposable } from '@vueuse/core'
+import { usePagination } from './usePagination'
 import type {
   Need,
   NeedItem,
@@ -37,12 +38,6 @@ interface CreateNeedInput {
   items: NewItemInput[]
 }
 
-interface PaginationMeta {
-  total: number
-  limit: number
-  offset: number
-}
-
 interface PaginatedResponse<T> {
   items: T[]
   total: number
@@ -60,8 +55,16 @@ interface NeedsStats {
 const _useNeeds = () => {
   const { businessNif, isAdmin } = useAuth()
   const needs = useState<Need[]>('needs.list', () => [])
-  const needsPagination = useState<PaginationMeta>('needs.pagination', () => ({ total: 0, limit: 25, offset: 0 }))
   const needsStats = useState<NeedsStats>('needs.stats', () => ({ total: 0, pendentes: 0, aceites: 0, urgentes: 0 }))
+
+  const pag = usePagination('needs', 25)
+
+  // Backward-compat wrapper
+  const needsPagination = computed(() => ({
+    total: pag.total.value,
+    limit: pag.limit,
+    offset: pag.offset.value
+  }))
   const institutions = useState<Institution[]>('needs.institutions', () => [])
   const goodsServices = useState<GoodsService[]>('needs.goodsServices', () => [])
   const businesses = useState<Business[]>('needs.businesses', () => [])
@@ -71,13 +74,15 @@ const _useNeeds = () => {
   const needsSearch = useState<string>('needs.search', () => '')
 
   async function loadNeedsPage(offset: number) {
-    const limit = needsPagination.value.limit
     const q = needsSearch.value.trim()
     const qs = q ? `&q=${encodeURIComponent(q)}` : ''
     try {
-      const res = await $fetch<PaginatedResponse<Need>>(`/api/needs?limit=${limit}&offset=${offset}${qs}`)
+      const res = await $fetch<PaginatedResponse<Need>>(
+        `/api/needs?limit=${pag.limit}&offset=${offset}${qs}${pag.sortQs.value}`
+      )
       needs.value = res.items ?? []
-      needsPagination.value = { total: res.total, limit: res.limit, offset: res.offset }
+      pag.total.value = res.total
+      pag.offset.value = offset
     } catch (e) {
       console.error('[useNeeds] Failed to load needs page:', e)
     }
@@ -86,7 +91,7 @@ const _useNeeds = () => {
   // Set the search term and reload from the first page.
   async function searchNeeds(q: string) {
     needsSearch.value = q
-    needsPagination.value = { ...needsPagination.value, offset: 0 }
+    pag.offset.value = 0
     await Promise.all([loadNeedsPage(0), loadNeedsStats(q)])
   }
 
@@ -119,7 +124,7 @@ const _useNeeds = () => {
       ])
 
       needs.value = needsRes.items ?? []
-      needsPagination.value = { total: needsRes.total, limit: needsRes.limit, offset: needsRes.offset }
+      pag.total.value = needsRes.total
       institutions.value = institutionsRes.items ?? []
       businesses.value = businessRes.items ?? []
 
@@ -561,6 +566,10 @@ const _useNeeds = () => {
     needs,
     needsPagination,
     needsStats,
+    page: pag.page,
+    sortBy: pag.sortBy,
+    sortDir: pag.sortDir,
+    setSort: pag.setSort,
     loadNeedsPage,
     searchNeeds,
     needsSearch,

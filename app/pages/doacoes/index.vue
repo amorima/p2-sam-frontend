@@ -5,8 +5,26 @@ import type { Lead, LeadEstado } from '~/utils/domain'
 import { printPickupReport, type PickupReportLead } from '~/utils/pickupReportPDF'
 
 const UBadge = resolveComponent('UBadge')
+const UButton = resolveComponent('UButton')
 
-const { leads, leadsPagination, leadsStats, loadLeadsPage, effectiveEstado, expiresAt, hoursRemaining } = useLeads()
+const { leads, leadsPagination, leadsStats, page: leadsPage, sortBy, sortDir, setSort, loadLeadsPage, effectiveEstado, expiresAt, hoursRemaining } = useLeads()
+
+function renderSortableHeader(field: string, label: string) {
+  const isActive = sortBy.value === field
+  const dir = isActive ? sortDir.value : null
+  return h(UButton, {
+    color: 'neutral',
+    variant: 'ghost',
+    label,
+    icon: dir === 'asc'
+      ? 'i-lucide-arrow-up-narrow-wide'
+      : dir === 'desc'
+        ? 'i-lucide-arrow-down-wide-narrow'
+        : 'i-lucide-arrow-up-down',
+    class: '-mx-2.5',
+    onClick: () => setSort(field, isActive && dir === 'desc' ? 'asc' : 'desc')
+  })
+}
 
 interface TableInstance {
   tableApi?: {
@@ -17,8 +35,6 @@ interface TableInstance {
 const filterState = ref<'TODOS' | LeadEstado | 'EXPIRA_BREVE'>('TODOS')
 const globalFilter = ref('')
 const tableRef = useTemplateRef<TableInstance>('tableRef')
-
-const serverPage = computed(() => Math.floor(leadsPagination.value.offset / leadsPagination.value.limit) + 1)
 
 function onPageChange(page: number) {
   loadLeadsPage((page - 1) * leadsPagination.value.limit)
@@ -111,7 +127,7 @@ const columns: TableColumn<EnrichedLead>[] = [
   },
   {
     accessorKey: 'item_pedido',
-    header: 'Bem Requisitado',
+    header: () => renderSortableHeader('item_pedido', 'Bem Requisitado'),
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium text-highlighted' }, row.original.item_pedido),
@@ -120,7 +136,7 @@ const columns: TableColumn<EnrichedLead>[] = [
   },
   {
     accessorKey: 'nome_cidadao',
-    header: 'Cidadão',
+    header: () => renderSortableHeader('nome_cidadao', 'Cidadão'),
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium' }, row.original.nome_cidadao),
@@ -129,7 +145,7 @@ const columns: TableColumn<EnrichedLead>[] = [
   },
   {
     accessorKey: 'data',
-    header: 'Data',
+    header: () => renderSortableHeader('data', 'Data'),
     cell: ({ row }) => h('span', { class: 'text-sm text-muted tabular-nums' }, formatDate(row.original.data))
   },
   {
@@ -143,7 +159,7 @@ const columns: TableColumn<EnrichedLead>[] = [
   },
   {
     accessorKey: 'pin_entrega',
-    header: 'PIN',
+    header: () => renderSortableHeader('pin_entrega', 'PIN'),
     cell: ({ row }) => {
       const expired = row.original.estadoEfetivo === 'EXPIRADO'
       return h('span', {
@@ -288,10 +304,10 @@ function downloadReport() {
           class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
         >
           <div class="text-sm text-muted">
-            {{ leadsPagination.total }} registo(s) · página {{ serverPage }} de {{ Math.ceil(leadsPagination.total / leadsPagination.limit) || 1 }}
+            {{ leadsPagination.total }} registo(s) · página {{ leadsPage }} de {{ Math.ceil(leadsPagination.total / leadsPagination.limit) || 1 }}
           </div>
           <UPagination
-            :page="serverPage"
+            :page="leadsPage"
             :items-per-page="leadsPagination.limit"
             :total="leadsPagination.total"
             @update:page="onPageChange"

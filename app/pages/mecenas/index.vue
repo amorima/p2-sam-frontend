@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { Column, Row, SortingState, Table } from '@tanstack/table-core'
+import type { Column, Row, Table } from '@tanstack/table-core'
 
 interface Donation {
   id_doacao: number
@@ -35,29 +35,23 @@ const { isAdmin, patronNif } = useAuth()
 const statusModalOpen = ref(false)
 const selectedDonation = ref<Donation | null>(null)
 
-const serverLimit = 25
-const serverOffset = ref(0)
+const { offset, total, page, limit, goToPage, setSort, sortBy, sortDir, sortQs } = usePagination('donations', 25)
 
-// Search term (debounced) — drives a SERVER-side search so it matches across
-// the whole dataset, not just the current page.
 const globalFilter = ref('')
 const debouncedQ = refDebounced(globalFilter, 350)
 
-// Only admins (all donations) and patrons (their own) have a donations list.
-// Guarding the URL also avoids the malformed `/api/patrons//donations` request
-// when a non-patron lands here with an empty nif.
 const canFetch = computed(() => isAdmin.value || !!patronNif.value)
 
 const fetchUrl = computed<string | null>(() => {
   if (!canFetch.value) return null
   const base = isAdmin.value ? '/api/donations' : `/api/patrons/${patronNif.value}/donations`
   const qParam = debouncedQ.value.trim() ? `&q=${encodeURIComponent(debouncedQ.value.trim())}` : ''
-  return `${base}?limit=${serverLimit}&offset=${serverOffset.value}${qParam}`
+  return `${base}?limit=${limit}&offset=${offset.value}${qParam}${sortQs.value}`
 })
 
 const { data: rawData, status, refresh } = await useFetch<{ items: Donation[], total: number, limit: number, offset: number }>(
   () => fetchUrl.value ?? '',
-  { lazy: true, server: false, immediate: false, watch: false, default: () => ({ items: [], total: 0, limit: serverLimit, offset: 0 }) }
+  { lazy: true, server: false, immediate: false, watch: false, default: () => ({ items: [], total: 0, limit, offset: 0 }) }
 )
 watch(fetchUrl, (url) => {
   if (url) refresh()
@@ -76,13 +70,9 @@ watch(statsUrl, (url) => {
 }, { immediate: true })
 
 const donations = computed<Donation[]>(() => rawData.value?.items ?? [])
-const serverTotal = computed(() => rawData.value?.total ?? 0)
-
-function loadPage(page: number) {
-  serverOffset.value = (page - 1) * serverLimit
-}
-
-const serverPage = computed(() => Math.floor(serverOffset.value / serverLimit) + 1)
+watch(rawData, (d) => {
+  if (d?.total != null) total.value = d.total
+})
 
 function badgeColor(estado: string): 'warning' | 'success' | 'error' {
   if (estado === 'ACEITE') return 'success'
@@ -109,19 +99,20 @@ function formatModo(tipo: string) {
   return modoLabel[tipo] ?? tipo
 }
 
-function renderSortableHeader<T>(column: Column<T, unknown>, label: string) {
-  const isSorted = column.getIsSorted()
+function renderSortableHeader(field: string, label: string) {
+  const isActive = sortBy.value === field
+  const dir = isActive ? sortDir.value : null
   return h(UButton, {
     color: 'neutral',
     variant: 'ghost',
     label,
-    icon: isSorted
-      ? isSorted === 'asc'
-        ? 'i-lucide-arrow-up-narrow-wide'
-        : 'i-lucide-arrow-down-wide-narrow'
-      : 'i-lucide-arrow-up-down',
+    icon: dir === 'asc'
+      ? 'i-lucide-arrow-up-narrow-wide'
+      : dir === 'desc'
+        ? 'i-lucide-arrow-down-wide-narrow'
+        : 'i-lucide-arrow-up-down',
     class: '-mx-2.5',
-    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+    onClick: () => setSort(field, isActive && dir === 'desc' ? 'asc' : 'desc')
   })
 }
 
@@ -190,12 +181,12 @@ function getRowItems(row: Row<Donation>) {
 const adminColumns: TableColumn<Donation>[] = [
   {
     accessorKey: 'id_doacao',
-    header: ({ column }) => renderSortableHeader(column, 'N.º'),
+    header: () => renderSortableHeader('id_doacao', 'N.º'),
     cell: ({ row }) => h('span', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_doacao}`)
   },
   {
     accessorKey: 'nome_entidade',
-    header: ({ column }) => renderSortableHeader(column, 'Mecenas'),
+    header: 'Mecenas',
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium text-highlighted' }, row.original.nome_entidade ?? row.original.mecena_nif_nipc),
@@ -204,17 +195,17 @@ const adminColumns: TableColumn<Donation>[] = [
   },
   {
     accessorKey: 'data',
-    header: ({ column }) => renderSortableHeader(column, 'Data'),
+    header: () => renderSortableHeader('data', 'Data'),
     cell: ({ row }) => h('span', undefined, formatDate(row.original.data))
   },
   {
     accessorKey: 'valor_transacao',
-    header: ({ column }) => renderSortableHeader(column, 'Valor'),
+    header: () => renderSortableHeader('valor_transacao', 'Valor'),
     cell: ({ row }) => h('span', { class: 'font-semibold tabular-nums' }, formatEUR(row.original.valor_transacao))
   },
   {
     accessorKey: 'tipo_donativo',
-    header: ({ column }) => renderSortableHeader(column, 'Modo'),
+    header: () => renderSortableHeader('tipo_donativo', 'Modo'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' },
         () => formatModo(row.original.tipo_donativo)
@@ -222,7 +213,7 @@ const adminColumns: TableColumn<Donation>[] = [
   },
   {
     accessorKey: 'estado',
-    header: ({ column }) => renderSortableHeader(column, 'Estado'),
+    header: () => renderSortableHeader('estado', 'Estado'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: badgeColor(row.original.estado), size: 'sm' },
         () => row.original.estado
@@ -243,22 +234,22 @@ const adminColumns: TableColumn<Donation>[] = [
 const patronColumns: TableColumn<Donation>[] = [
   {
     accessorKey: 'id_doacao',
-    header: ({ column }) => renderSortableHeader(column, 'N.º'),
+    header: () => renderSortableHeader('id_doacao', 'N.º'),
     cell: ({ row }) => h('span', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_doacao}`)
   },
   {
     accessorKey: 'data',
-    header: ({ column }) => renderSortableHeader(column, 'Data'),
+    header: () => renderSortableHeader('data', 'Data'),
     cell: ({ row }) => h('span', undefined, formatDate(row.original.data))
   },
   {
     accessorKey: 'valor_transacao',
-    header: ({ column }) => renderSortableHeader(column, 'Valor'),
+    header: () => renderSortableHeader('valor_transacao', 'Valor'),
     cell: ({ row }) => h('span', { class: 'font-semibold tabular-nums' }, formatEUR(row.original.valor_transacao))
   },
   {
     accessorKey: 'tipo_donativo',
-    header: ({ column }) => renderSortableHeader(column, 'Modo'),
+    header: () => renderSortableHeader('tipo_donativo', 'Modo'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' },
         () => formatModo(row.original.tipo_donativo)
@@ -266,7 +257,7 @@ const patronColumns: TableColumn<Donation>[] = [
   },
   {
     accessorKey: 'estado',
-    header: ({ column }) => renderSortableHeader(column, 'Estado'),
+    header: () => renderSortableHeader('estado', 'Estado'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: badgeColor(row.original.estado), size: 'sm' },
         () => row.original.estado
@@ -305,7 +296,7 @@ const stats = computed(() => {
   const totalAceite = list.filter(d => d.estado === 'ACEITE').reduce((sum, d) => sum + Number(d.valor_transacao), 0)
   return {
     total: formatEUR(totalAceite),
-    count: serverTotal.value,
+    count: total.value,
     aceites: list.filter(d => d.estado === 'ACEITE').length,
     pendentes: list.filter(d => d.estado === 'PENDENTE').length,
     rejeitadas: list.filter(d => d.estado === 'REJEITADO').length
@@ -322,7 +313,6 @@ const statCards = computed(() => [
 ])
 
 const columnVisibility = ref()
-const sorting = ref<SortingState>([{ id: 'data', desc: true }])
 const tableRef = useTemplateRef<DonationTableRef>('tableRef')
 
 const hideableColumns = computed(() => {
@@ -344,7 +334,7 @@ const hideableColumns = computed(() => {
 })
 
 watch(globalFilter, () => {
-  serverOffset.value = 0
+  offset.value = 0
 })
 </script>
 
@@ -406,7 +396,6 @@ watch(globalFilter, () => {
         <UTable
           ref="tableRef"
           v-model:column-visibility="columnVisibility"
-          v-model:sorting="sorting"
           :data="donations"
           :columns="columns"
           :loading="status === 'pending'"
@@ -422,19 +411,19 @@ watch(globalFilter, () => {
         />
 
         <div
-          v-if="serverTotal > 0"
+          v-if="total > 0"
           class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
         >
           <div class="text-sm text-muted">
-            {{ serverTotal }} registo(s) · página {{ serverPage }} de {{ Math.ceil(serverTotal / serverLimit) || 1 }}
+            {{ total }} registo(s) · página {{ page }} de {{ Math.ceil(total / limit) || 1 }}
           </div>
 
           <div class="flex items-center gap-1.5">
             <UPagination
-              :page="serverPage"
-              :items-per-page="serverLimit"
-              :total="serverTotal"
-              @update:page="loadPage"
+              :page="page"
+              :items-per-page="limit"
+              :total="total"
+              @update:page="goToPage"
             />
           </div>
         </div>

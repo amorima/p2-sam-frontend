@@ -42,9 +42,12 @@ export default defineEventHandler(async (event) => {
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
   const q = typeof query.q === 'string' ? query.q.trim() : ''
   const qs = q ? `&q=${encodeURIComponent(q)}` : ''
+  const sortBy = typeof query.sort_by === 'string' ? query.sort_by : ''
+  const sortDir = query.sort_dir === 'asc' ? 'asc' : 'desc'
+  const sortQs = sortBy ? `&sort_by=${encodeURIComponent(sortBy)}&sort_dir=${sortDir}` : ''
 
   const [needsRes, institutionsRes, leadsRes] = await Promise.all([
-    internalFetch<{ items: BackendNeed[], total: number, limit: number, offset: number }>(`${config.backendBase}/needs?limit=${limit}&offset=${offset}${qs}`),
+    internalFetch<{ items: BackendNeed[], total: number, limit: number, offset: number }>(`${config.backendBase}/needs?limit=${limit}&offset=${offset}${qs}${sortQs}`),
     internalFetch<{ items: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions?limit=500`),
     internalFetch<{ items: BackendLead[] }>(`${config.backendBase}/leads?limit=1000`).catch(() => ({ items: [] as BackendLead[] }))
   ])
@@ -70,7 +73,7 @@ export default defineEventHandler(async (event) => {
     // Sequelize names the hasMany association key using the model name "need item" → "need items"
     const rawItems: BackendNeedItem[] = need['need items'] ?? need.NeedItems ?? need.needItems ?? []
 
-    const mappedItems = rawItems.map(item => {
+    const mappedItems = rawItems.map((item) => {
       const hasLead = itemLeadStatus.has(item.id_item ?? 0)
       const hasBusinessMatch = !!item.match_negocio_nif
       return {

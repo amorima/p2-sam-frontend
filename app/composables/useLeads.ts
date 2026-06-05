@@ -4,14 +4,9 @@ import {
   type Lead,
   type SmartLocker
 } from '~/utils/domain'
+import { usePagination } from './usePagination'
 
 const HOUR = 3_600_000
-
-interface PaginationMeta {
-  total: number
-  limit: number
-  offset: number
-}
 
 interface PaginatedResponse<T> {
   items: T[]
@@ -31,15 +26,25 @@ interface LeadsStats {
 const _useLeads = () => {
   const leads = useState<Lead[]>('leads.list', () => [])
   const smartLockers = useState<SmartLocker[]>('leads.smartLockers', () => [])
-  const leadsPagination = useState<PaginationMeta>('leads.pagination', () => ({ total: 0, limit: 25, offset: 0 }))
   const leadsStats = useState<LeadsStats>('leads.stats', () => ({ total: 0, entregues: 0, pendentes: 0, expirados: 0, expiraBreve: 0 }))
 
+  const pag = usePagination('leads', 25)
+
+  // Backward-compat wrapper so pages using leadsPagination.value.{total,limit,offset} still work
+  const leadsPagination = computed(() => ({
+    total: pag.total.value,
+    limit: pag.limit,
+    offset: pag.offset.value
+  }))
+
   const fetchLeads = async (offset = 0) => {
-    const limit = leadsPagination.value.limit
     try {
-      const data = await $fetch<PaginatedResponse<Lead>>(`/api/leads?limit=${limit}&offset=${offset}`)
+      const data = await $fetch<PaginatedResponse<Lead>>(
+        `/api/leads?limit=${pag.limit}&offset=${offset}${pag.sortQs.value}`
+      )
       leads.value = data.items ?? []
-      leadsPagination.value = { total: data.total, limit: data.limit, offset: data.offset }
+      pag.total.value = data.total
+      pag.offset.value = offset
     } catch (e) {
       console.error('[useLeads] Failed to load leads:', e)
     }
@@ -57,12 +62,15 @@ const _useLeads = () => {
     await fetchLeads(offset)
   }
 
-  // Initial load (client-only — no SSR needed for admin dashboard)
+  // Initial load (client-only)
   useAsyncData('leads-initial-data', () => Promise.all([fetchLeads(0), fetchLeadsStats()]), { server: false })
 
-  // Poll every 30 seconds so new leads from the panel appear automatically
+  // Poll every 30 seconds
   if (import.meta.client) {
-    const interval = setInterval(() => Promise.all([fetchLeads(leadsPagination.value.offset), fetchLeadsStats()]), 30000)
+    const interval = setInterval(
+      () => Promise.all([fetchLeads(pag.offset.value), fetchLeadsStats()]),
+      30000
+    )
     onScopeDispose(() => clearInterval(interval))
   }
 
@@ -87,6 +95,10 @@ const _useLeads = () => {
     smartLockers,
     leadsPagination,
     leadsStats,
+    page: pag.page,
+    sortBy: pag.sortBy,
+    sortDir: pag.sortDir,
+    setSort: pag.setSort,
     loadLeadsPage,
     effectiveEstado,
     expiresAt,

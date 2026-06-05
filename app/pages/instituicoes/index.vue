@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { Column, Row, SortingState, Table } from '@tanstack/table-core'
+import type { Column, Row, Table } from '@tanstack/table-core'
 import type { Need, NeedItem } from '~/utils/domain'
 import { useNeeds } from '~/composables/useNeeds'
 import { useVouchers } from '~/composables/useVouchers'
@@ -25,7 +25,7 @@ type NeedsTableRef = {
 
 const { isAdmin, isInstitution, institutionNif } = useAuth()
 const toast = useToast()
-const { needs, needsPagination, needsStats, loadNeedsPage, searchNeeds, institutions, approveNeed } = useNeeds()
+const { needs, needsPagination, needsStats, page: needsPage, sortBy, sortDir, setSort, loadNeedsPage, searchNeeds, institutions, approveNeed } = useNeeds()
 
 async function handleApprove(need: Need) {
   await approveNeed(need.id_pedido)
@@ -52,19 +52,20 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString('pt-PT')
 }
 
-function renderSortableHeader<T>(column: Column<T, unknown>, label: string) {
-  const isSorted = column.getIsSorted()
+function renderSortableHeader(field: string, label: string) {
+  const isActive = sortBy.value === field
+  const dir = isActive ? sortDir.value : null
   return h(UButton, {
     color: 'neutral',
     variant: 'ghost',
     label,
-    icon: isSorted
-      ? isSorted === 'asc'
-        ? 'i-lucide-arrow-up-narrow-wide'
-        : 'i-lucide-arrow-down-wide-narrow'
-      : 'i-lucide-arrow-up-down',
+    icon: dir === 'asc'
+      ? 'i-lucide-arrow-up-narrow-wide'
+      : dir === 'desc'
+        ? 'i-lucide-arrow-down-wide-narrow'
+        : 'i-lucide-arrow-up-down',
     class: '-mx-2.5',
-    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+    onClick: () => setSort(field, isActive && dir === 'desc' ? 'asc' : 'desc')
   })
 }
 
@@ -150,12 +151,12 @@ function getRowItems(row: Row<Need>) {
 const adminColumns: TableColumn<Need>[] = [
   {
     accessorKey: 'id_pedido',
-    header: ({ column }) => renderSortableHeader(column, 'N.º'),
+    header: () => renderSortableHeader('id_pedido', 'N.º'),
     cell: ({ row }) => h('span', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_pedido}`)
   },
   {
     accessorKey: 'nome_entidade',
-    header: ({ column }) => renderSortableHeader(column, 'Instituição'),
+    header: 'Instituição',
     cell: ({ row }) =>
       h('div', undefined, [
         h('p', { class: 'font-medium text-highlighted' }, row.original.nome_entidade ?? nomeInstituicao(row.original.nif_nipc)),
@@ -164,19 +165,19 @@ const adminColumns: TableColumn<Need>[] = [
   },
   {
     accessorKey: 'data',
-    header: ({ column }) => renderSortableHeader(column, 'Data'),
+    header: () => renderSortableHeader('data', 'Data'),
     cell: ({ row }) => h('span', undefined, formatDate(row.original.data))
   },
   {
     id: 'items',
     accessorFn: row => row.items.length,
-    header: ({ column }) => renderSortableHeader(column, 'Itens'),
+    header: 'Itens',
     cell: ({ row }) =>
       h('span', { class: 'tabular-nums' }, `${row.original.items.length}`)
   },
   {
     accessorKey: 'urgente',
-    header: ({ column }) => renderSortableHeader(column, 'Urgente'),
+    header: () => renderSortableHeader('urgente', 'Urgente'),
     cell: ({ row }) =>
       row.original.urgente
         ? h(UBadge, { variant: 'subtle', color: 'error', size: 'sm', icon: 'i-lucide-zap' }, () => 'Urgente')
@@ -184,7 +185,7 @@ const adminColumns: TableColumn<Need>[] = [
   },
   {
     accessorKey: 'estado',
-    header: ({ column }) => renderSortableHeader(column, 'Estado'),
+    header: () => renderSortableHeader('estado', 'Estado'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: badgeColor(row.original.estado), size: 'sm' },
         () => row.original.estado
@@ -205,23 +206,23 @@ const adminColumns: TableColumn<Need>[] = [
 const institutionColumns: TableColumn<Need>[] = [
   {
     accessorKey: 'id_pedido',
-    header: ({ column }) => renderSortableHeader(column, 'N.º'),
+    header: () => renderSortableHeader('id_pedido', 'N.º'),
     cell: ({ row }) => h('span', { class: 'font-mono text-sm text-muted' }, `#${row.original.id_pedido}`)
   },
   {
     accessorKey: 'data',
-    header: ({ column }) => renderSortableHeader(column, 'Data'),
+    header: () => renderSortableHeader('data', 'Data'),
     cell: ({ row }) => h('span', undefined, formatDate(row.original.data))
   },
   {
     id: 'items',
     accessorFn: row => row.items.length,
-    header: ({ column }) => renderSortableHeader(column, 'Itens'),
+    header: 'Itens',
     cell: ({ row }) => h('span', { class: 'tabular-nums' }, `${row.original.items.length}`)
   },
   {
     accessorKey: 'urgente',
-    header: ({ column }) => renderSortableHeader(column, 'Urgente'),
+    header: () => renderSortableHeader('urgente', 'Urgente'),
     cell: ({ row }) =>
       row.original.urgente
         ? h(UBadge, { variant: 'subtle', color: 'error', size: 'sm', icon: 'i-lucide-zap' }, () => 'Urgente')
@@ -229,7 +230,7 @@ const institutionColumns: TableColumn<Need>[] = [
   },
   {
     accessorKey: 'estado',
-    header: ({ column }) => renderSortableHeader(column, 'Estado'),
+    header: () => renderSortableHeader('estado', 'Estado'),
     cell: ({ row }) =>
       h(UBadge, { variant: 'subtle', color: badgeColor(row.original.estado), size: 'sm' },
         () => row.original.estado
@@ -302,14 +303,10 @@ const globalFilter = ref('')
 const debouncedQ = refDebounced(globalFilter, 350)
 watch(debouncedQ, q => searchNeeds(q))
 const columnVisibility = ref()
-const sorting = ref<SortingState>([{ id: 'id_pedido', desc: true }])
 const tableRef = useTemplateRef<NeedsTableRef>('tableRef')
 
-const serverPage = computed(() => Math.floor(needsPagination.value.offset / needsPagination.value.limit) + 1)
-
 function onPageChange(page: number) {
-  const offset = (page - 1) * needsPagination.value.limit
-  loadNeedsPage(offset)
+  loadNeedsPage((page - 1) * needsPagination.value.limit)
 }
 
 const hideableColumns = computed<HideableColumnItem[]>(() => {
@@ -388,7 +385,6 @@ const hideableColumns = computed<HideableColumnItem[]>(() => {
         <UTable
           ref="tableRef"
           v-model:column-visibility="columnVisibility"
-          v-model:sorting="sorting"
           :data="filteredNeeds"
           :columns="columns"
           class="shrink-0"
@@ -407,12 +403,12 @@ const hideableColumns = computed<HideableColumnItem[]>(() => {
           class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto"
         >
           <div class="text-sm text-muted">
-            {{ needsPagination.total }} registo(s) · página {{ serverPage }} de {{ Math.ceil(needsPagination.total / needsPagination.limit) || 1 }}
+            {{ needsPagination.total }} registo(s) · página {{ needsPage }} de {{ Math.ceil(needsPagination.total / needsPagination.limit) || 1 }}
           </div>
 
           <div class="flex items-center gap-1.5">
             <UPagination
-              :page="serverPage"
+              :page="needsPage"
               :items-per-page="needsPagination.limit"
               :total="needsPagination.total"
               @update:page="onPageChange"

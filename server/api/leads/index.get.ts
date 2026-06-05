@@ -24,9 +24,13 @@ export default defineEventHandler(async (event) => {
   const limit = Math.min(Math.max(1, parseInt(String(query.limit)) || 25), 200)
   const offset = Math.max(0, parseInt(String(query.offset)) || 0)
 
+  const sortBy = typeof query.sort_by === 'string' ? query.sort_by : ''
+  const sortDir = query.sort_dir === 'asc' ? 'asc' : 'desc'
+  const sortQs = sortBy ? `&sort_by=${encodeURIComponent(sortBy)}&sort_dir=${sortDir}` : ''
+
   let backendRes: { items: BackendLead[], total: number, limit: number, offset: number }
   try {
-    backendRes = await internalFetch<typeof backendRes>(`${config.backendBase}/leads?limit=${limit}&offset=${offset}`)
+    backendRes = await internalFetch<typeof backendRes>(`${config.backendBase}/leads?limit=${limit}&offset=${offset}${sortQs}`)
   } catch (err: unknown) {
     console.error('[leads] Backend error:', (err as { message?: string })?.message)
     return { items: [], total: 0, limit, offset, links: {} }
