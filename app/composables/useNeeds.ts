@@ -151,6 +151,13 @@ const _useNeeds = () => {
     return null
   }, { server: false })
 
+  // Re-fetch when sort changes (client-only — composable loads with server: false)
+  if (import.meta.client) {
+    watch([pag.sortBy, pag.sortDir], () => {
+      loadNeedsPage(0)
+    })
+  }
+
   function ensureGoodsService(item: NewItemInput) {
     const exists = goodsServices.value.some(g => g.tipo_bem_servico === item.tipo_bem_servico)
     if (!exists) {
