@@ -45,8 +45,8 @@ async function addItem() {
     showForm.value = false
     await refresh()
   } catch (err: unknown) {
-    const e = err as { data?: { errors?: Array<Record<string, string>> } }
-    const msg = e?.data?.errors?.[0]?.tipo_bem_servico ?? 'Erro ao adicionar'
+    const e = err as { data?: { statusMessage?: string } }
+    const msg = e?.data?.statusMessage ?? 'Erro ao adicionar'
     toast.add({ title: msg, color: 'error' })
   } finally {
     isSubmitting.value = false
@@ -68,8 +68,8 @@ async function confirmDelete() {
     pendingDelete.value = null
     await refresh()
   } catch (err: unknown) {
-    const e = err as { data?: { errors?: Array<Record<string, string>> } }
-    const msg = e?.data?.errors?.[0]?.tipo_bem_servico ?? 'Erro ao eliminar'
+    const e = err as { data?: { statusMessage?: string } }
+    const msg = e?.data?.statusMessage ?? 'Erro ao eliminar'
     toast.add({ title: msg, color: 'error' })
   } finally {
     isDeleting.value = false

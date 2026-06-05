@@ -35,7 +35,7 @@ export function internalFetch<T = unknown>(
 interface FetchErrorLike {
   response?: { status?: number }
   statusCode?: number
-  data?: { description?: string, message?: string, error?: string }
+  data?: { description?: string, message?: string, error?: string, errors?: unknown }
   message?: string
 }
 
@@ -83,7 +83,9 @@ export async function authBackendFetch<T = unknown>(
       }
     }
 
-    const message = e?.data?.description ?? e?.data?.message ?? e?.data?.error ?? e?.message ?? 'Erro inesperado'
+    const errors = e?.data?.errors as Array<Record<string, string>> | undefined
+    const firstErrorMsg = errors?.[0] ? Object.values(errors[0])[0] as string : undefined
+    const message = firstErrorMsg ?? e?.data?.description ?? e?.data?.message ?? e?.data?.error ?? e?.message ?? 'Erro inesperado'
     console.error(`[backendFetch] ${status ?? 'NET_ERR'} ${url}:`, JSON.stringify(e?.data ?? e?.message))
     throw createError({ statusCode: status ?? 500, statusMessage: message })
   }
