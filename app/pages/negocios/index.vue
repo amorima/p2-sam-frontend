@@ -41,7 +41,9 @@ const { needs, needsPagination, loadNeedsPage, businesses, setBusinessResponse }
 
 const filterState = ref<'TODOS' | BusinessMatchEstado>('TODOS')
 const globalFilter = ref('')
-const columnVisibility = ref()
+const columnVisibility = ref<Record<string, boolean>>(
+  isBusiness.value ? { business: false, urgente: false } : {}
+)
 const sorting = ref<SortingState>([{ id: 'id_pedido', desc: true }])
 const tableRef = useTemplateRef<PedidosTableRef>('tableRef')
 

@@ -99,7 +99,7 @@ const _useNeeds = () => {
     }
   }
 
-  // Fetch all data from API (deduped by key — runs once per SSR + once on client if needed)
+  // Fetch all data from API — client-only to avoid SSR cookie-forwarding issues
   useAsyncData('needs-initial-data', async () => {
     loadNeedsStats().catch(() => {})
     try {
@@ -144,7 +144,7 @@ const _useNeeds = () => {
       console.error('[useNeeds] Failed to load initial data:', e)
     }
     return null
-  })
+  }, { server: false })
 
   function ensureGoodsService(item: NewItemInput) {
     const exists = goodsServices.value.some(g => g.tipo_bem_servico === item.tipo_bem_servico)
@@ -264,6 +264,11 @@ const _useNeeds = () => {
     if (estado === 'CONCLUIDO') item.status = 'completed'
     else if (estado === 'RECUSADO') item.status = 'available'
     else item.status = 'pending'
+
+    $fetch(`/api/needs/${id_pedido}/business-response`, {
+      method: 'PATCH',
+      body: { id_item, estado, motivo: motivo ?? null }
+    }).catch(e => console.error('[useNeeds] Failed to persist business response:', e))
   }
 
   async function approveNeed(id_pedido: number) {
