@@ -67,8 +67,10 @@ async function confirmDelete() {
     confirmOpen.value = false
     pendingDelete.value = null
     await refresh()
-  } catch {
-    toast.add({ title: 'Erro ao eliminar', color: 'error' })
+  } catch (err: unknown) {
+    const e = err as { data?: { errors?: Array<Record<string, string>> } }
+    const msg = e?.data?.errors?.[0]?.tipo_bem_servico ?? 'Erro ao eliminar'
+    toast.add({ title: msg, color: 'error' })
   } finally {
     isDeleting.value = false
   }
