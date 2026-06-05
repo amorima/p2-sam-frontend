@@ -4,7 +4,8 @@ export default defineEventHandler(async (event) => {
 
   if (!tipo) throw createError({ statusCode: 400, statusMessage: 'Tipo obrigatório' })
 
-  return await authBackendFetch(event, `${config.backendBase}/goods-services/${encodeURIComponent(tipo)}`, {
+  const tipoDecoded = decodeURIComponent(tipo)
+  return await authBackendFetch(event, `${config.backendBase}/goods-services/${encodeURIComponent(tipoDecoded)}`, {
     method: 'DELETE'
   })
 })

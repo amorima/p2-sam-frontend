@@ -18,6 +18,10 @@ const newNome = ref('')
 const newTipo = ref<'BEM' | 'SERVICO'>('SERVICO')
 const isSubmitting = ref(false)
 
+const confirmOpen = ref(false)
+const pendingDelete = ref<string | null>(null)
+const isDeleting = ref(false)
+
 const tipoOptions = [
   { label: 'Serviço', value: 'SERVICO' },
   { label: 'Bem', value: 'BEM' }
@@ -49,14 +53,24 @@ async function addItem() {
   }
 }
 
-async function removeItem(tipo_bem_servico: string) {
-  if (!confirm(`Eliminar "${tipo_bem_servico}"?`)) return
+function removeItem(tipo_bem_servico: string) {
+  pendingDelete.value = tipo_bem_servico
+  confirmOpen.value = true
+}
+
+async function confirmDelete() {
+  if (!pendingDelete.value) return
+  isDeleting.value = true
   try {
-    await $fetch(`/api/goods-services/${encodeURIComponent(tipo_bem_servico)}`, { method: 'DELETE' })
-    toast.add({ title: 'Eliminado', color: 'success' })
+    await $fetch(`/api/goods-services/${encodeURIComponent(pendingDelete.value)}`, { method: 'DELETE' })
+    toast.add({ title: 'Eliminado', description: pendingDelete.value, color: 'success' })
+    confirmOpen.value = false
+    pendingDelete.value = null
     await refresh()
   } catch {
     toast.add({ title: 'Erro ao eliminar', color: 'error' })
+  } finally {
+    isDeleting.value = false
   }
 }
 </script>
@@ -193,4 +207,29 @@ async function removeItem(tipo_bem_servico: string) {
       </div>
     </template>
   </UDashboardPanel>
+
+  <UModal
+    v-model:open="confirmOpen"
+    title="Eliminar item"
+    :description="`Tens a certeza que queres eliminar &quot;${pendingDelete}&quot;? Esta ação não pode ser anulada.`"
+  >
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton
+          label="Cancelar"
+          color="neutral"
+          variant="subtle"
+          :disabled="isDeleting"
+          @click="confirmOpen = false"
+        />
+        <UButton
+          label="Eliminar"
+          color="error"
+          variant="solid"
+          :loading="isDeleting"
+          @click="confirmDelete"
+        />
+      </div>
+    </template>
+  </UModal>
 </template>
