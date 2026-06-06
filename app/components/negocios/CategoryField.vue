@@ -27,7 +27,6 @@ const filtered = computed(() => {
   return available.value.filter(g => g.tipo_bem_servico.toLowerCase().includes(q))
 })
 
-// Reset highlight when the list changes
 watch(filtered, () => {
   highlightedIndex.value = -1
 })
@@ -58,7 +57,6 @@ function onArrowUp() {
 
 function onEnter() {
   if (open.value && highlightedIndex.value >= 0 && filtered.value[highlightedIndex.value]) {
-    // Select the highlighted item
     choose(filtered.value[highlightedIndex.value]!)
     emit('confirm')
     return

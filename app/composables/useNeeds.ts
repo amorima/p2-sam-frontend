@@ -88,7 +88,6 @@ const _useNeeds = () => {
     }
   }
 
-  // Set the search term and reload from the first page.
   async function searchNeeds(q: string) {
     needsSearch.value = q
     pag.offset.value = 0
@@ -128,12 +127,10 @@ const _useNeeds = () => {
       institutions.value = institutionsRes.items ?? []
       businesses.value = businessRes.items ?? []
 
-      // Start with the canonical goods services from the backend
       const gsMap = new Map<string, GoodsService>()
       for (const g of (goodsRes.items ?? [])) {
         gsMap.set(g.tipo_bem_servico, { tipo_bem_servico: g.tipo_bem_servico, tipo_bem: g.tipo_bem })
       }
-      // Augment with anything referenced in needs that might be missing
       for (const need of (needsRes.items ?? [])) {
         for (const item of need.items) {
           if (!gsMap.has(item.tipo_bem_servico)) {
@@ -151,7 +148,6 @@ const _useNeeds = () => {
     return null
   }, { server: false })
 
-  // Re-fetch when sort changes (client-only — composable loads with server: false)
   if (import.meta.client) {
     watch([pag.sortBy, pag.sortDir], () => {
       loadNeedsPage(0)

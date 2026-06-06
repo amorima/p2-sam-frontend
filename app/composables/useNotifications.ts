@@ -120,7 +120,6 @@ const _useNotifications = () => {
     // Don't reconnect if already connected with the same auth state
     if (socket?.connected && authed === !!token) return
 
-    // Disconnect any existing socket before creating a new one
     if (socket) {
       socket.disconnect()
       socket = null

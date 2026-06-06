@@ -62,16 +62,13 @@ const _useLeads = () => {
     await fetchLeads(offset)
   }
 
-  // Initial load (client-only)
   useAsyncData('leads-initial-data', () => Promise.all([fetchLeads(0), fetchLeadsStats()]), { server: false })
 
   if (import.meta.client) {
-    // Re-fetch when sort changes
     watch([pag.sortBy, pag.sortDir], () => {
       fetchLeads(0)
     })
 
-    // Poll every 30 seconds
     const interval = setInterval(
       () => Promise.all([fetchLeads(pag.offset.value), fetchLeadsStats()]),
       30000

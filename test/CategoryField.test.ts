@@ -39,7 +39,8 @@ describe('CategoryField', () => {
     const w = mountField('')
     await w.find('input.u-input').trigger('focus')
     await w.setProps({ modelValue: 'lei' })
-    const options = w.findAll('button.u-button').map(b => b.text())
+    // Options are native <button> elements inside the z-20 dropdown container
+    const options = w.findAll('div.z-20 button').map(b => b.text())
     expect(options.some(t => t.includes('Leite'))).toBe(true)
     expect(options.some(t => t.includes('Sabonete'))).toBe(false)
   })
@@ -58,7 +59,7 @@ describe('CategoryField', () => {
     const w = mountField('')
     await w.find('input.u-input').trigger('focus')
     await w.setProps({ modelValue: 'lei' })
-    const leiteBtn = w.findAll('button.u-button').find(b => b.text().includes('Leite'))!
+    const leiteBtn = w.findAll('div.z-20 button').find(b => b.text().includes('Leite'))!
     await leiteBtn.trigger('mousedown')
     expect(w.emitted('update:modelValue')?.at(-1)).toEqual(['Leite'])
     expect(w.emitted('update:tipo')?.at(-1)).toEqual(['BEM'])

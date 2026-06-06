@@ -63,7 +63,6 @@ function cancel() {
     :title="title"
   >
     <template #body>
-      <!-- Unblock mode: show existing reason read-only -->
       <template v-if="mode === 'unblock'">
         <p class="text-sm text-muted mb-2">
           Motivo do bloqueio:
@@ -88,7 +87,6 @@ function cancel() {
         </div>
       </template>
 
-      <!-- Block mode: textarea for reason -->
       <template v-else>
         <p class="text-sm text-muted mb-2">
           Indica o motivo da suspensão. Esta nota fica visível no perfil do utilizador.
