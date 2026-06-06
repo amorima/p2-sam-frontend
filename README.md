@@ -281,5 +281,5 @@ Projeto em desenvolvimento. Algumas funcionalidades do front-end aguardam integr
 ---
 
 <div align="center">
-  <sub>Desenvolvido para fins académicos · ESMAD - Politécnico do Porto · 2024/2025</sub>
+  <sub>Desenvolvido para fins académicos · ESMAD - Politécnico do Porto · 2025/2026</sub>
 </div>

@@ -106,44 +106,47 @@ const patchPatronResponse = `{
 const getDonationsCurl = `curl -H "Authorization: Bearer <token>" \\
   https://apisam.netdw.tech/patrons/123456789/donations`
 
-const getDonationsResponse = `[
-  {
-    "id_doacao": 42,
-    "tipo": "NUMERARIO",
-    "valor": 500.00,
-    "data": "2025-03-15T10:00:00.000Z",
-    "estado": "ACEITE",
-    "nif_nipc": "123456789"
-  },
-  {
-    "id_doacao": 43,
-    "tipo": "ESPECIE",
-    "valor": null,
-    "data": "2025-04-01T09:00:00.000Z",
-    "estado": "PENDENTE",
-    "nif_nipc": "123456789"
-  }
-]`
+const getDonationsResponse = `{
+  "items": [
+    {
+      "id_doacao": 42,
+      "mecena_nif_nipc": "123456789",
+      "tipo_donativo": "NUMERARIO",
+      "valor_transacao": 500.00,
+      "data": "2025-03-15T10:00:00.000Z",
+      "estado": "ACEITE",
+      "anonimo": false,
+      "url_comprovativo": "https://cdn.exemplo.pt/comp42.pdf"
+    }
+  ],
+  "total": 1,
+  "limit": 25,
+  "offset": 0
+}`
 
 const postDonationBody = `{
-  "tipo": "NUMERARIO",
-  "valor": 250.00,
   "data": "2025-05-31T12:00:00.000Z",
-  "nif_nipc": "123456789"
+  "valor_transacao": 250.00,
+  "tipo_donativo": "NUMERARIO",
+  "url_comprovativo": "https://cdn.exemplo.pt/comp.pdf"
 }`
 
 const postDonationCurl = `curl -X POST https://apisam.netdw.tech/patrons/123456789/donations \\
   -H "Authorization: Bearer <token>" \\
   -H "Content-Type: application/json" \\
-  -d '{"tipo":"NUMERARIO","valor":250.00,"data":"2025-05-31T12:00:00.000Z","nif_nipc":"123456789"}'`
+  -d '{"data":"2025-05-31T12:00:00.000Z","valor_transacao":250.00,"tipo_donativo":"NUMERARIO","url_comprovativo":"https://cdn.exemplo.pt/comp.pdf"}'`
 
 const postDonationResponse = `{
-  "id_doacao": 44,
-  "tipo": "NUMERARIO",
-  "valor": 250.00,
-  "data": "2025-05-31T12:00:00.000Z",
-  "estado": "PENDENTE",
-  "nif_nipc": "123456789"
+  "donation": {
+    "id_doacao": 44,
+    "mecena_nif_nipc": "123456789",
+    "tipo_donativo": "NUMERARIO",
+    "valor_transacao": 250.00,
+    "data": "2025-05-31T12:00:00.000Z",
+    "estado": "PENDENTE",
+    "anonimo": false,
+    "url_comprovativo": "https://cdn.exemplo.pt/comp.pdf"
+  }
 }`
 
 // Institutions
@@ -166,28 +169,45 @@ const getInstitutionResponse = `{
 }`
 
 const getNeedsCurl = `curl -H "Authorization: Bearer <token>" \\
-  "https://apisam.netdw.tech/needs?nif=500123456"`
+  https://apisam.netdw.tech/institutions/500123456/needs`
 
-const getNeedsResponse = `[
-  {
+const getNeedsResponse = `{
+  "items": [
+    {
+      "id_pedido": 10,
+      "nif_nipc": "500123456",
+      "data": "2025-05-20T08:00:00.000Z",
+      "estado": "PENDENTE",
+      "urgente": true,
+      "NeedItems": [
+        { "id_item": 5, "id_pedido": 10, "tipo_bem_servico": "Alimentos enlatados", "tipo_bem": "BEM" },
+        { "id_item": 6, "id_pedido": 10, "tipo_bem_servico": "Transporte de mercadorias", "tipo_bem": "SERVICO" }
+      ]
+    }
+  ],
+  "total": 1,
+  "limit": 25,
+  "offset": 0
+}`
+
+const getNeedByIdCurl = `curl -H "Authorization: Bearer <token>" \\
+  https://apisam.netdw.tech/institutions/500123456/needs/10`
+
+const getNeedByIdResponse = `{
+  "need": {
     "id_pedido": 10,
     "nif_nipc": "500123456",
-    "nome_entidade": "Banco Alimentar do Porto",
     "data": "2025-05-20T08:00:00.000Z",
     "estado": "PENDENTE",
     "urgente": true,
-    "items": [
-      { "id": 5, "tipo_bem_servico": "Alimentos enlatados", "tipo_bem": "BEM" },
-      { "id": 6, "tipo_bem_servico": "Transporte de mercadorias", "tipo_bem": "SERVICO" }
+    "NeedItems": [
+      { "id_item": 5, "id_pedido": 10, "tipo_bem_servico": "Alimentos enlatados", "tipo_bem": "BEM" },
+      { "id_item": 6, "id_pedido": 10, "tipo_bem_servico": "Transporte de mercadorias", "tipo_bem": "SERVICO" }
     ]
   }
-]`
+}`
 
 const postNeedBody = `{
-  "nif_nipc": "500123456",
-  "nome_entidade": "Banco Alimentar do Porto",
-  "data": "2025-06-01T00:00:00.000Z",
-  "estado": "PENDENTE",
   "urgente": false,
   "items": [
     { "tipo_bem_servico": "Roupas de inverno", "tipo_bem": "BEM" },
@@ -195,20 +215,21 @@ const postNeedBody = `{
   ]
 }`
 
-const postNeedCurl = `curl -X POST https://apisam.netdw.tech/needs \\
+const postNeedCurl = `curl -X POST https://apisam.netdw.tech/institutions/500123456/needs \\
   -H "Authorization: Bearer <token>" \\
   -H "Content-Type: application/json" \\
-  -d '{"nif_nipc":"500123456","nome_entidade":"Banco Alimentar do Porto","data":"2025-06-01T00:00:00.000Z","estado":"PENDENTE","urgente":false,"items":[{"tipo_bem_servico":"Roupas de inverno","tipo_bem":"BEM"}]}'`
+  -d '{"urgente":false,"items":[{"tipo_bem_servico":"Roupas de inverno","tipo_bem":"BEM"}]}'`
 
 const postNeedResponse = `{
-  "id_pedido": 11,
-  "nif_nipc": "500123456",
-  "nome_entidade": "Banco Alimentar do Porto",
-  "data": "2025-06-01T00:00:00.000Z",
-  "estado": "PENDENTE",
-  "urgente": false,
+  "need": {
+    "id_pedido": 11,
+    "nif_nipc": "500123456",
+    "estado": "PENDENTE",
+    "urgente": false,
+    "data": "2025-06-01T00:00:00.000Z"
+  },
   "items": [
-    { "id": 7, "tipo_bem_servico": "Roupas de inverno", "tipo_bem": "BEM" }
+    { "id_item": 7, "id_pedido": 11, "tipo_bem_servico": "Roupas de inverno", "tipo_bem": "BEM" }
   ]
 }`
 
@@ -216,16 +237,23 @@ const patchNeedBody = `{
   "estado": "ACEITE"
 }`
 
-const patchNeedCurl = `curl -X PATCH https://apisam.netdw.tech/needs/11 \\
+const patchNeedCurl = `curl -X PATCH https://apisam.netdw.tech/institutions/500123456/needs/11 \\
   -H "Authorization: Bearer <token>" \\
   -H "Content-Type: application/json" \\
   -d '{"estado": "ACEITE"}'`
 
 const patchNeedResponse = `{
-  "id_pedido": 11,
-  "estado": "ACEITE",
-  "urgente": false
+  "need": {
+    "id_pedido": 11,
+    "nif_nipc": "500123456",
+    "estado": "ACEITE",
+    "urgente": false,
+    "data": "2025-06-01T00:00:00.000Z"
+  }
 }`
+
+const deleteNeedCurl = `curl -X DELETE https://apisam.netdw.tech/institutions/500123456/needs/11 \\
+  -H "Authorization: Bearer <token>"`
 
 // Business
 const getBusinessCurl = `curl -H "Authorization: Bearer <token>" \\
@@ -313,48 +341,60 @@ const deleteOfferCurl = `curl -X DELETE https://apisam.netdw.tech/business/50123
 
 // Notifications
 const getNotificationsCurl = `curl -H "Authorization: Bearer <token>" \\
-  https://apisam.netdw.tech/notifications/inbox`
+  https://apisam.netdw.tech/notifications/me/inbox`
 
 const getNotificationsResponse = `[
   {
-    "id": 101,
+    "_id": "665a1f2e3b4c5d6e7f8a9b0c",
     "tipo": "DOACAO_ACEITE",
     "titulo": "Doação aceite",
     "corpo": "A sua doação de 250,00€ foi aceite pela instituição.",
     "lida": false,
-    "data_criacao": "2025-05-30T14:22:00.000Z",
-    "dados": { "id_doacao": 44 }
+    "data_envio": "2025-05-30T14:22:00.000Z",
+    "destinatario": "123456789",
+    "payload": { "id_doacao": 44 }
   },
   {
-    "id": 100,
+    "_id": "665a1f2e3b4c5d6e7f8a9b0b",
     "tipo": "PEDIDO_NOVO",
     "titulo": "Novo pedido de necessidade",
     "corpo": "O Banco Alimentar do Porto criou um novo pedido urgente.",
     "lida": true,
-    "data_criacao": "2025-05-29T09:10:00.000Z",
-    "dados": null
+    "data_envio": "2025-05-29T09:10:00.000Z",
+    "destinatario": "123456789",
+    "payload": null
   }
 ]`
 
-const patchNotificationBody = `{
-  "lida": true
-}`
-
-const patchNotificationCurl = `curl -X PATCH https://apisam.netdw.tech/notifications/101 \\
-  -H "Authorization: Bearer <token>" \\
-  -H "Content-Type: application/json" \\
-  -d '{"lida": true}'`
+const patchNotificationCurl = `curl -X PATCH https://apisam.netdw.tech/notifications/665a1f2e3b4c5d6e7f8a9b0c/read \\
+  -H "Authorization: Bearer <token>"`
 
 const patchNotificationResponse = `{
-  "id": 101,
-  "lida": true
+  "_id": "665a1f2e3b4c5d6e7f8a9b0c",
+  "tipo": "DOACAO_ACEITE",
+  "titulo": "Doação aceite",
+  "corpo": "A sua doação de 250,00€ foi aceite pela instituição.",
+  "lida": true,
+  "data_envio": "2025-05-30T14:22:00.000Z",
+  "destinatario": "123456789"
 }`
 
-const deleteNotificationCurl = `curl -X DELETE https://apisam.netdw.tech/notifications/101 \\
+const patchReadAllCurl = `curl -X PATCH https://apisam.netdw.tech/notifications/me/read-all \\
   -H "Authorization: Bearer <token>"`
 
-const deleteReadAllCurl = `curl -X DELETE https://apisam.netdw.tech/notifications/read-all \\
+const patchReadAllResponse = `{
+  "ok": true
+}`
+
+const deleteNotificationCurl = `curl -X DELETE https://apisam.netdw.tech/notifications/665a1f2e3b4c5d6e7f8a9b0c \\
   -H "Authorization: Bearer <token>"`
+
+const deleteReadAllCurl = `curl -X DELETE https://apisam.netdw.tech/notifications/me/read-all \\
+  -H "Authorization: Bearer <token>"`
+
+const deleteReadAllResponse = `{
+  "deleted": 3
+}`
 
 // Auth profile
 const getProfileCurl = `curl -H "Authorization: Bearer <token>" \\
@@ -368,23 +408,8 @@ const getProfileResponse = `{
   "iban": "PT50000201231234567890154"
 }`
 
-const patchProfileBody = `{
-  "nome_entidade": "João Manuel Silva",
-  "iban": "PT50000201231234567890154"
-}`
-
-const patchProfileCurl = `curl -X PATCH https://apisam.netdw.tech/users/profile \\
-  -H "Authorization: Bearer <token>" \\
-  -H "Content-Type: application/json" \\
-  -d '{"nome_entidade": "João Manuel Silva"}'`
-
-const patchProfileResponse = `{
-  "nif_nipc": "123456789",
-  "nome_entidade": "João Manuel Silva",
-  "email_login": "joao@exemplo.pt",
-  "role": "patron",
-  "iban": "PT50000201231234567890154"
-}`
+const logoutCurl = `curl -X POST https://apisam.netdw.tech/users/logout \\
+  -H "Authorization: Bearer <token>"`
 
 const changePasswordBody = `{
   "currentPassword": "password-atual",
@@ -1034,17 +1059,16 @@ const changePasswordResponse = `{
                   </div>
                 </div>
 
-                <!-- GET /needs -->
+                <!-- GET /institutions/:nif/needs -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
                     <UBadge color="info" variant="solid" size="sm">
                       GET
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/needs</code>
-                    <span class="text-xs text-muted">query: ?nif=</span>
+                    <code class="font-mono text-sm break-all min-w-0">/institutions/:nif/needs</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
-                    Lista os pedidos de necessidade. Filtrar por instituição com o parâmetro <code class="bg-elevated px-1 rounded text-xs font-mono">?nif=&lt;nif&gt;</code>.
+                    Lista os pedidos de necessidade da instituição. Suporta paginação com <code class="bg-elevated px-1 rounded text-xs font-mono">?limit=</code> e <code class="bg-elevated px-1 rounded text-xs font-mono">?offset=</code>.
                   </p>
                   <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
                     Cabeçalhos obrigatórios
@@ -1077,16 +1101,58 @@ const changePasswordResponse = `{
                   </div>
                 </div>
 
-                <!-- POST /needs -->
+                <!-- GET /institutions/:nif/needs/:id -->
+                <div>
+                  <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
+                    <UBadge color="info" variant="solid" size="sm">
+                      GET
+                    </UBadge>
+                    <code class="font-mono text-sm break-all min-w-0">/institutions/:nif/needs/:id</code>
+                  </div>
+                  <p class="text-sm text-muted mb-3">
+                    Obtém um pedido de necessidade específico da instituição, incluindo todos os itens.
+                  </p>
+                  <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
+                    Cabeçalhos obrigatórios
+                  </p>
+                  <div class="p-2 bg-elevated rounded border border-default mb-3 text-xs font-mono overflow-x-auto break-all">
+                    Authorization: Bearer &lt;token&gt;
+                  </div>
+                  <p class="text-xs text-muted font-semibold uppercase mb-1">
+                    Resposta (200)
+                  </p>
+                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden mb-3 max-w-full">
+                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
+                      <span class="text-xs text-zinc-400 font-mono">json</span>
+                    </div>
+                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ getNeedByIdResponse }}</code></pre>
+                  </div>
+                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden max-w-full">
+                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
+                      <span class="text-xs text-zinc-400 font-mono">bash</span>
+                      <UButton
+                        icon="i-lucide-copy"
+                        color="neutral"
+                        variant="ghost"
+                        size="xs"
+                        class="text-zinc-400 hover:text-zinc-100"
+                        @click="copyCode(getNeedByIdCurl)"
+                      />
+                    </div>
+                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ getNeedByIdCurl }}</code></pre>
+                  </div>
+                </div>
+
+                <!-- POST /institutions/:nif/needs -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
                     <UBadge color="success" variant="solid" size="sm">
                       POST
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/needs</code>
+                    <code class="font-mono text-sm break-all min-w-0">/institutions/:nif/needs</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
-                    Cria um novo pedido de necessidade com uma lista de itens (bens ou serviços). O estado inicial deve ser <code class="bg-elevated px-1 rounded text-xs font-mono">PENDENTE</code>.
+                    Cria um novo pedido de necessidade com uma lista de itens (bens ou serviços). O NIF da instituição é retirado do URL.
                   </p>
                   <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
                     Cabeçalhos obrigatórios
@@ -1134,10 +1200,10 @@ const changePasswordResponse = `{
                     <UBadge color="warning" variant="solid" size="sm">
                       PATCH
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/needs/:id</code>
+                    <code class="font-mono text-sm break-all min-w-0">/institutions/:nif/needs/:id</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
-                    Atualiza o estado de um pedido. Os estados possíveis são <code class="bg-elevated px-1 rounded text-xs font-mono">PENDENTE</code>, <code class="bg-elevated px-1 rounded text-xs font-mono">ACEITE</code> e <code class="bg-elevated px-1 rounded text-xs font-mono">REJEITADO</code>.
+                    Atualiza o estado ou itens de um pedido. Os estados possíveis são <code class="bg-elevated px-1 rounded text-xs font-mono">PENDENTE</code>, <code class="bg-elevated px-1 rounded text-xs font-mono">ACEITE</code> e <code class="bg-elevated px-1 rounded text-xs font-mono">REJEITADO</code>.
                   </p>
                   <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
                     Cabeçalhos obrigatórios
@@ -1176,6 +1242,39 @@ const changePasswordResponse = `{
                       />
                     </div>
                     <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ patchNeedCurl }}</code></pre>
+                  </div>
+                </div>
+
+                <!-- DELETE /institutions/:nif/needs/:id -->
+                <div>
+                  <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
+                    <UBadge color="error" variant="solid" size="sm">
+                      DELETE
+                    </UBadge>
+                    <code class="font-mono text-sm break-all min-w-0">/institutions/:nif/needs/:id</code>
+                  </div>
+                  <p class="text-sm text-muted mb-3">
+                    Elimina um pedido de necessidade e os seus itens. Devolve 204 sem corpo.
+                  </p>
+                  <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
+                    Cabeçalhos obrigatórios
+                  </p>
+                  <div class="p-2 bg-elevated rounded border border-default mb-3 text-xs font-mono overflow-x-auto break-all">
+                    Authorization: Bearer &lt;token&gt;
+                  </div>
+                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden max-w-full">
+                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
+                      <span class="text-xs text-zinc-400 font-mono">bash</span>
+                      <UButton
+                        icon="i-lucide-copy"
+                        color="neutral"
+                        variant="ghost"
+                        size="xs"
+                        class="text-zinc-400 hover:text-zinc-100"
+                        @click="copyCode(deleteNeedCurl)"
+                      />
+                    </div>
+                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ deleteNeedCurl }}</code></pre>
                   </div>
                 </div>
               </div>
@@ -1437,16 +1536,16 @@ const changePasswordResponse = `{
                   Disponível para todas as entidades autenticadas. As notificações são enviadas automaticamente pelo sistema quando ocorrem eventos relevantes.
                 </p>
 
-                <!-- GET /notifications/inbox -->
+                <!-- GET /notifications/me/inbox -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
                     <UBadge color="info" variant="solid" size="sm">
                       GET
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/notifications/inbox</code>
+                    <code class="font-mono text-sm break-all min-w-0">/notifications/me/inbox</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
-                    Lista todas as notificações do utilizador autenticado, por ordem decrescente de data.
+                    Lista as notificações do utilizador autenticado, por ordem decrescente de data. Devolve até 100 resultados.
                   </p>
                   <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
                     Cabeçalhos obrigatórios
@@ -1479,31 +1578,22 @@ const changePasswordResponse = `{
                   </div>
                 </div>
 
-                <!-- PATCH /notifications/:id -->
+                <!-- PATCH /notifications/:id/read -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
                     <UBadge color="warning" variant="solid" size="sm">
                       PATCH
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/notifications/:id</code>
+                    <code class="font-mono text-sm break-all min-w-0">/notifications/:id/read</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
-                    Marca uma notificação como lida.
+                    Marca uma notificação específica como lida. Não requer corpo — a ação é expressa no caminho.
                   </p>
                   <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
                     Cabeçalhos obrigatórios
                   </p>
                   <div class="p-2 bg-elevated rounded border border-default mb-3 text-xs font-mono overflow-x-auto break-all">
-                    Authorization: Bearer &lt;token&gt;<br>Content-Type: application/json
-                  </div>
-                  <p class="text-xs text-muted font-semibold uppercase mb-1">
-                    Corpo do pedido
-                  </p>
-                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden mb-3 max-w-full">
-                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
-                      <span class="text-xs text-zinc-400 font-mono">json</span>
-                    </div>
-                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ patchNotificationBody }}</code></pre>
+                    Authorization: Bearer &lt;token&gt;
                   </div>
                   <p class="text-xs text-muted font-semibold uppercase mb-1">
                     Resposta (200)
@@ -1527,6 +1617,48 @@ const changePasswordResponse = `{
                       />
                     </div>
                     <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ patchNotificationCurl }}</code></pre>
+                  </div>
+                </div>
+
+                <!-- PATCH /notifications/me/read-all -->
+                <div>
+                  <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
+                    <UBadge color="warning" variant="solid" size="sm">
+                      PATCH
+                    </UBadge>
+                    <code class="font-mono text-sm break-all min-w-0">/notifications/me/read-all</code>
+                  </div>
+                  <p class="text-sm text-muted mb-3">
+                    Marca todas as notificações não lidas do utilizador como lidas. Não elimina nenhuma notificação.
+                  </p>
+                  <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
+                    Cabeçalhos obrigatórios
+                  </p>
+                  <div class="p-2 bg-elevated rounded border border-default mb-3 text-xs font-mono overflow-x-auto break-all">
+                    Authorization: Bearer &lt;token&gt;
+                  </div>
+                  <p class="text-xs text-muted font-semibold uppercase mb-1">
+                    Resposta (200)
+                  </p>
+                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden mb-3 max-w-full">
+                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
+                      <span class="text-xs text-zinc-400 font-mono">json</span>
+                    </div>
+                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ patchReadAllResponse }}</code></pre>
+                  </div>
+                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden max-w-full">
+                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
+                      <span class="text-xs text-zinc-400 font-mono">bash</span>
+                      <UButton
+                        icon="i-lucide-copy"
+                        color="neutral"
+                        variant="ghost"
+                        size="xs"
+                        class="text-zinc-400 hover:text-zinc-100"
+                        @click="copyCode(patchReadAllCurl)"
+                      />
+                    </div>
+                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ patchReadAllCurl }}</code></pre>
                   </div>
                 </div>
 
@@ -1563,22 +1695,31 @@ const changePasswordResponse = `{
                   </div>
                 </div>
 
-                <!-- DELETE /notifications/read-all -->
+                <!-- DELETE /notifications/me/read-all -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
                     <UBadge color="error" variant="solid" size="sm">
                       DELETE
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/notifications/read-all</code>
+                    <code class="font-mono text-sm break-all min-w-0">/notifications/me/read-all</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
-                    Elimina todas as notificações já lidas do utilizador autenticado. Devolve 204 sem corpo.
+                    Elimina todas as notificações já lidas do utilizador autenticado. Devolve o número de notificações eliminadas.
                   </p>
                   <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
                     Cabeçalhos obrigatórios
                   </p>
                   <div class="p-2 bg-elevated rounded border border-default mb-3 text-xs font-mono overflow-x-auto break-all">
                     Authorization: Bearer &lt;token&gt;
+                  </div>
+                  <p class="text-xs text-muted font-semibold uppercase mb-1">
+                    Resposta (200)
+                  </p>
+                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden mb-3 max-w-full">
+                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
+                      <span class="text-xs text-zinc-400 font-mono">json</span>
+                    </div>
+                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ deleteReadAllResponse }}</code></pre>
                   </div>
                   <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden max-w-full">
                     <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
@@ -1609,6 +1750,10 @@ const changePasswordResponse = `{
                 </h2>
               </template>
               <div class="flex flex-col gap-8 mt-2 min-w-0">
+                <p class="text-sm text-muted">
+                  Endpoints de sessão disponíveis para todas as entidades. Para atualizar dados de perfil (nome, IBAN, etc.) use os endpoints específicos da entidade — <code class="bg-elevated px-1 rounded text-xs font-mono">PATCH /patrons/:nif</code>, <code class="bg-elevated px-1 rounded text-xs font-mono">PATCH /institutions/:nif</code> ou <code class="bg-elevated px-1 rounded text-xs font-mono">PATCH /business/:nif</code>.
+                </p>
+
                 <!-- GET /users/profile -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
@@ -1651,40 +1796,22 @@ const changePasswordResponse = `{
                   </div>
                 </div>
 
-                <!-- PATCH /users/profile -->
+                <!-- POST /users/logout -->
                 <div>
                   <div class="flex flex-wrap items-center gap-2 mb-2 min-w-0">
-                    <UBadge color="warning" variant="solid" size="sm">
-                      PATCH
+                    <UBadge color="success" variant="solid" size="sm">
+                      POST
                     </UBadge>
-                    <code class="font-mono text-sm break-all min-w-0">/users/profile</code>
+                    <code class="font-mono text-sm break-all min-w-0">/users/logout</code>
                   </div>
                   <p class="text-sm text-muted mb-3">
-                    Atualiza dados gerais do utilizador. Aceita <code class="bg-elevated px-1 rounded text-xs font-mono">nome_entidade</code> e <code class="bg-elevated px-1 rounded text-xs font-mono">iban</code> (ambos opcionais).
+                    Invalida a sessão atual. Devolve 204 sem corpo.
                   </p>
                   <p class="text-xs text-zinc-500 mb-1 font-semibold uppercase">
                     Cabeçalhos obrigatórios
                   </p>
                   <div class="p-2 bg-elevated rounded border border-default mb-3 text-xs font-mono overflow-x-auto break-all">
-                    Authorization: Bearer &lt;token&gt;<br>Content-Type: application/json
-                  </div>
-                  <p class="text-xs text-muted font-semibold uppercase mb-1">
-                    Corpo do pedido
-                  </p>
-                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden mb-3 max-w-full">
-                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
-                      <span class="text-xs text-zinc-400 font-mono">json</span>
-                    </div>
-                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ patchProfileBody }}</code></pre>
-                  </div>
-                  <p class="text-xs text-muted font-semibold uppercase mb-1">
-                    Resposta (200)
-                  </p>
-                  <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden mb-3 max-w-full">
-                    <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
-                      <span class="text-xs text-zinc-400 font-mono">json</span>
-                    </div>
-                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ patchProfileResponse }}</code></pre>
+                    Authorization: Bearer &lt;token&gt;
                   </div>
                   <div class="rounded-lg bg-zinc-900 dark:bg-zinc-950 border border-zinc-700 overflow-hidden max-w-full">
                     <div class="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
@@ -1695,10 +1822,10 @@ const changePasswordResponse = `{
                         variant="ghost"
                         size="xs"
                         class="text-zinc-400 hover:text-zinc-100"
-                        @click="copyCode(patchProfileCurl)"
+                        @click="copyCode(logoutCurl)"
                       />
                     </div>
-                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ patchProfileCurl }}</code></pre>
+                    <pre class="p-4 text-sm text-zinc-100 overflow-x-auto font-mono leading-relaxed"><code>{{ logoutCurl }}</code></pre>
                   </div>
                 </div>
 
