@@ -13,7 +13,7 @@ Object.assign(globalThis, {
   onBeforeUnmount: vue.onBeforeUnmount,
   nextTick: vue.nextTick,
   toRef: vue.toRef,
-  toRefs: vue.toRefs,
+  toRefs: vue.toRefs
 })
 
 // Per-test state store so each test starts with a fresh reactive state.
@@ -48,7 +48,7 @@ Object.assign(globalThis, {
   navigateTo: vi.fn(),
 
   // Lifecycle stubs
-  onScopeDispose: vi.fn(),
+  onScopeDispose: vi.fn()
 })
 
 // Reset shared state and mocks before every test to prevent cross-test bleed.
