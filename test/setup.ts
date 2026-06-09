@@ -51,6 +51,12 @@ Object.assign(globalThis, {
   onScopeDispose: vi.fn()
 })
 
+// Expose composables that Nuxt auto-imports but Vitest does not know about.
+// Each composable that calls another (e.g. useNeeds → useAuth) needs its
+// dependency available as a global so the module resolves correctly.
+import { useAuth } from '../app/composables/useAuth'
+Object.assign(globalThis, { useAuth })
+
 // Reset shared state and mocks before every test to prevent cross-test bleed.
 beforeEach(() => {
   _stateStore.clear()
