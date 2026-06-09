@@ -38,7 +38,7 @@ const REQUIREMENTS = {
   RNF04: { prioridade: 2, categoria: 'Não Funcional', descricao: 'Utilizador não familiarizado completa uma doação no painel digital em menos de 60 segundos' },
   RNF05: { prioridade: 2, categoria: 'Não Funcional', descricao: 'O PIN de entrega deve expirar automaticamente e ser de uso único' },
   RNF06: { prioridade: 2, categoria: 'Não Funcional', descricao: 'Arquitetura suporta aumento de dispositivos IoT e utilizadores simultâneos sem degradação' },
-  RNF07: { prioridade: 2, categoria: 'Não Funcional', descricao: 'Manter registo imutável de todas as transações críticas para auditoria' },
+  RNF07: { prioridade: 2, categoria: 'Não Funcional', descricao: 'Manter registo imutável de todas as transações críticas para auditoria' }
 }
 
 // ── Extrai IDs de requisito dos títulos dos testes ────────────────────────────
@@ -109,10 +109,13 @@ for (const fileResult of raw.testResults ?? []) {
     const fullText = `${suiteName} ${testName}`
     const reqIds = extractReqIds(fullText)
 
-    const status = assertion.status === 'passed' ? 'PASSOU'
-      : assertion.status === 'failed' ? 'FALHOU'
-      : assertion.status === 'skipped' ? 'IGNORADO'
-      : 'PENDENTE'
+    const status = assertion.status === 'passed'
+      ? 'PASSOU'
+      : assertion.status === 'failed'
+        ? 'FALHOU'
+        : assertion.status === 'skipped'
+          ? 'IGNORADO'
+          : 'PENDENTE'
 
     const duration = typeof assertion.duration === 'number'
       ? assertion.duration.toFixed(2)

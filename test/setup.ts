@@ -3,6 +3,11 @@
 import * as vue from 'vue'
 import { vi } from 'vitest'
 
+// Expose composables that Nuxt auto-imports but Vitest does not know about.
+// Each composable that calls another (e.g. useNeeds → useAuth) needs its
+// dependency available as a global so the module resolves correctly.
+import { useAuth } from '../app/composables/useAuth'
+
 Object.assign(globalThis, {
   ref: vue.ref,
   computed: vue.computed,
@@ -50,11 +55,6 @@ Object.assign(globalThis, {
   // Lifecycle stubs
   onScopeDispose: vi.fn()
 })
-
-// Expose composables that Nuxt auto-imports but Vitest does not know about.
-// Each composable that calls another (e.g. useNeeds → useAuth) needs its
-// dependency available as a global so the module resolves correctly.
-import { useAuth } from '../app/composables/useAuth'
 Object.assign(globalThis, { useAuth })
 
 // Reset shared state and mocks before every test to prevent cross-test bleed.

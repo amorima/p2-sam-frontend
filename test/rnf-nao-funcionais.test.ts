@@ -108,13 +108,13 @@ describe('[RNF07] Auditabilidade — registo imutável de transações críticas
     }
     // All critical audit fields must be present and non-null
     expect(lead.id_lead).toBeDefined()
-    expect(lead.data).toBeDefined()           // timestamp de criação
-    expect(lead.pin_entrega).toBeDefined()    // PIN gerado (RF08)
-    expect(lead.estado).toBeDefined()          // estado da transação (RF10)
-    expect(lead.id_painel).toBeDefined()       // dispositivo de origem (RF07)
-    expect(lead.id_locker).toBeDefined()       // dispositivo de entrega (RF09)
-    expect(lead.data_entrega).toBeDefined()    // timestamp de entrega (RF10)
-    expect(lead.item_pedido).toBeDefined()     // bem/serviço doado (RF02)
+    expect(lead.data).toBeDefined() // timestamp de criação
+    expect(lead.pin_entrega).toBeDefined() // PIN gerado (RF08)
+    expect(lead.estado).toBeDefined() // estado da transação (RF10)
+    expect(lead.id_painel).toBeDefined() // dispositivo de origem (RF07)
+    expect(lead.id_locker).toBeDefined() // dispositivo de entrega (RF09)
+    expect(lead.data_entrega).toBeDefined() // timestamp de entrega (RF10)
+    expect(lead.item_pedido).toBeDefined() // bem/serviço doado (RF02)
   })
 
   it('PIN de entrega é sempre registado com a transação (rastreabilidade da geração)', () => {
@@ -164,7 +164,7 @@ describe('[RNF07] Auditabilidade — registo imutável de transações críticas
 
   it('estados do lead cobrem todo o ciclo de vida da transação auditável', () => {
     const estados: Lead['estado'][] = ['PENDENTE', 'ENTREGUE', 'EXPIRADO']
-    expect(estados).toContain('PENDENTE')  // criado, aguarda entrega
+    expect(estados).toContain('PENDENTE') // criado, aguarda entrega
     expect(estados).toContain('ENTREGUE') // depósito confirmado
     expect(estados).toContain('EXPIRADO') // prazo excedido
     expect(new Set(estados).size).toBe(3)
