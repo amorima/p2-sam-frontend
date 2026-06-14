@@ -2,8 +2,9 @@
 import type { TableColumn } from '@nuxt/ui'
 
 interface TelemetryStatus {
-  sensor_porta: string
-  numpad: string
+  sensor_porta?: string
+  numpad?: string
+  ecra_tatil?: string
 }
 
 interface TelemetryPing {
@@ -44,6 +45,30 @@ onUnmounted(() => pause())
 const pings = computed<TelemetryPing[]>(() => data.value?.pings ?? [])
 const latestPing = computed(() => pings.value[0] ?? null)
 
+// Estado "atual" robusto: usa o registo mais recente, mas preenche cada métrica
+// com o primeiro valor não-nulo (eventos de porta não trazem bateria/temp/sinal,
+// senão apareceria 0% / ERRO logo a seguir a uma abertura).
+function firstDefined<T>(get: (p: TelemetryPing) => T | null | undefined): T | undefined {
+  for (const p of pings.value) {
+    const v = get(p)
+    if (v !== null && v !== undefined) return v
+  }
+  return undefined
+}
+const current = computed(() => {
+  const head = latestPing.value
+  if (!head) return null
+  return {
+    tipo: head.tipo,
+    evento: head.evento,
+    aviso: head.aviso ?? null,
+    bateria_estado: firstDefined(p => p.bateria_estado) ?? 0,
+    cpu_temperatura: firstDefined(p => p.cpu_temperatura) ?? 0,
+    dnb_sinal: firstDefined(p => p.dnb_sinal) ?? 0,
+    status: firstDefined(p => p.status) ?? null
+  }
+})
+
 const globalFilter = ref('')
 
 function formatDate(d: string) {
@@ -66,7 +91,7 @@ function eventoColor(evento: string): 'neutral' | 'info' | 'warning' | 'error' {
 }
 
 const saudeAtual = computed(() => {
-  const p = latestPing.value
+  const p = current.value
   if (!p) return { color: 'neutral' as const, label: 'Desligado' }
   const { bateria_estado: b, cpu_temperatura: t, dnb_sinal: s, aviso } = p
   if (b < 20 || t > 85 || s === 0) return { color: 'error' as const, label: 'Erros' }
@@ -137,11 +162,12 @@ const columns: TableColumn<TelemetryPing>[] = [
     header: 'Sensores',
     cell: ({ row }) => {
       const s = row.original.status
-      if (!s) return h('span', { class: 'text-xs text-muted' }, '—')
-      return h('div', { class: 'space-y-0.5' }, [
-        h('p', { class: 'text-xs text-muted' }, `Porta: ${s.sensor_porta ?? '—'}`),
-        h('p', { class: 'text-xs text-muted' }, `Numpad: ${s.numpad ?? '—'}`)
-      ])
+      // Cada tipo de equipamento tem sensores diferentes: o painel tem ecrã
+      // táctil; o cacifo tem sensor de porta.
+      const value = row.original.tipo === 'painel'
+        ? (s?.ecra_tatil ? `Ecrã táctil: ${s.ecra_tatil}` : null)
+        : (s?.sensor_porta ? `Porta: ${s.sensor_porta}` : null)
+      return h('span', { class: 'text-xs text-muted' }, value ?? '—')
     }
   },
   {
@@ -175,7 +201,7 @@ const columns: TableColumn<TelemetryPing>[] = [
     <template #body>
       <!-- Current status cards -->
       <div
-        v-if="latestPing"
+        v-if="current"
         class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6"
       >
         <UPageCard variant="subtle" class="p-4">
@@ -192,9 +218,9 @@ const columns: TableColumn<TelemetryPing>[] = [
           </p>
           <p
             class="text-xl font-bold font-mono"
-            :class="latestPing.bateria_estado < 20 ? 'text-error' : latestPing.bateria_estado < 50 ? 'text-warning' : 'text-success'"
+            :class="current.bateria_estado < 20 ? 'text-error' : current.bateria_estado < 50 ? 'text-warning' : 'text-success'"
           >
-            {{ latestPing.bateria_estado }}%
+            {{ current.bateria_estado }}%
           </p>
         </UPageCard>
         <UPageCard variant="subtle" class="p-4">
@@ -203,9 +229,9 @@ const columns: TableColumn<TelemetryPing>[] = [
           </p>
           <p
             class="text-xl font-bold font-mono"
-            :class="latestPing.cpu_temperatura > 85 ? 'text-error' : latestPing.cpu_temperatura > 70 ? 'text-warning' : 'text-highlighted'"
+            :class="current.cpu_temperatura > 85 ? 'text-error' : current.cpu_temperatura > 70 ? 'text-warning' : 'text-highlighted'"
           >
-            {{ latestPing.cpu_temperatura }}°C
+            {{ current.cpu_temperatura }}°C
           </p>
         </UPageCard>
         <UPageCard variant="subtle" class="p-4">
@@ -214,21 +240,21 @@ const columns: TableColumn<TelemetryPing>[] = [
           </p>
           <div
             class="flex items-center gap-2"
-            :class="latestPing.dnb_sinal === 0 ? 'text-error' : latestPing.dnb_sinal < 3 ? 'text-warning' : 'text-success'"
+            :class="current.dnb_sinal === 0 ? 'text-error' : current.dnb_sinal < 3 ? 'text-warning' : 'text-success'"
           >
-            <UIcon :name="sinalIcon(latestPing.dnb_sinal)" class="size-5" />
-            <span class="text-xl font-bold font-mono">{{ latestPing.dnb_sinal }}</span>
+            <UIcon :name="sinalIcon(current.dnb_sinal)" class="size-5" />
+            <span class="text-xl font-bold font-mono">{{ current.dnb_sinal }}</span>
           </div>
         </UPageCard>
       </div>
 
       <!-- Aviso banner -->
       <UAlert
-        v-if="latestPing?.aviso"
+        v-if="current?.aviso"
         icon="i-lucide-triangle-alert"
         color="warning"
         variant="subtle"
-        :title="latestPing.aviso"
+        :title="current.aviso"
         class="mb-6"
       />
 
@@ -273,7 +299,7 @@ const columns: TableColumn<TelemetryPing>[] = [
             Nenhum ping encontrado
           </p>
           <p class="text-sm text-muted mt-1">
-            Ainda não existem dados de telemetria para o Locker #{{ lockerId }}.
+            Ainda não existem dados de telemetria para o equipamento #{{ lockerId }}.
           </p>
         </div>
       </div>

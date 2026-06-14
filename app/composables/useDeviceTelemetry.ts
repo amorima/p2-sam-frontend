@@ -57,7 +57,6 @@ export interface DeviceInfo {
 
 export interface PanelStatus {
   ecra_tatil: string // 'ok' | 'sem_touch'
-  impressora: string // 'ok' | 'offline' | 'erro'
 }
 
 export interface DeviceTelemetrySample {
@@ -94,9 +93,7 @@ export function useDeviceTelemetry() {
   const tempBaseline = 42 + Math.random() * 4
   const tempOffset = ref(0)
   let tempJitterTimer: ReturnType<typeof setInterval> | null = null
-  let printerProbeTimer: ReturnType<typeof setInterval> | null = null
   const bootTimestamp = import.meta.client ? performance.now() : 0
-  const printerOnline = ref<boolean | null>(null)
 
   const setupBattery = async () => {
     if (!import.meta.client) return
@@ -105,31 +102,6 @@ export function useDeviceTelemetry() {
     try {
       battery.value = await nav.getBattery()
     } catch { /* not supported */ }
-  }
-
-  const probePrinter = async () => {
-    if (!import.meta.client) return
-    try {
-      const r = await fetch('http://127.0.0.1:9191/health', {
-        signal: AbortSignal.timeout(1500)
-      })
-      printerOnline.value = r.ok
-    } catch {
-      printerOnline.value = false
-    }
-  }
-
-  const startPrinterProbe = () => {
-    if (!import.meta.client || printerProbeTimer) return
-    probePrinter()
-    printerProbeTimer = setInterval(probePrinter, 10000)
-  }
-
-  const stopPrinterProbe = () => {
-    if (printerProbeTimer) {
-      clearInterval(printerProbeTimer)
-      printerProbeTimer = null
-    }
   }
 
   const detectTouch = (): boolean => {
@@ -219,18 +191,12 @@ export function useDeviceTelemetry() {
     }
 
     const ecra_tatil = detectTouch() ? 'ok' : 'sem_touch'
-    const impressora = printerOnline.value === null
-      ? 'desconhecido'
-      : printerOnline.value
-        ? 'ok'
-        : 'offline'
 
     let aviso: string | null = null
     if (bateria_estado < 20) aviso = 'bateria baixa'
     else if (cpu_temperatura > 80) aviso = 'temperatura elevada'
     else if (dnb_sinal === 0) aviso = 'sem sinal'
     else if (device.online === false) aviso = 'offline'
-    else if (impressora === 'offline') aviso = 'impressora offline'
 
     return {
       bateria_estado,
@@ -239,7 +205,7 @@ export function useDeviceTelemetry() {
       aviso,
       evento: aviso ? 'warn' : 'ping',
       versao: APP_VERSION,
-      status: { ecra_tatil, impressora },
+      status: { ecra_tatil },
       device
     }
   }
@@ -247,12 +213,10 @@ export function useDeviceTelemetry() {
   const init = async () => {
     await setupBattery()
     startTempSim()
-    startPrinterProbe()
   }
 
   const dispose = () => {
     stopTempSim()
-    stopPrinterProbe()
   }
 
   return { init, dispose, sample }

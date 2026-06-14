@@ -31,36 +31,48 @@ export default defineEventHandler(async () => {
     return { lockers: [] }
   }
 
-  // Group events by locker_id and keep only the latest per locker
-  const latestByLocker = new Map<number, TelemetryEvent & { ts: number }>()
-
+  // Group all events by locker_id.
+  const byLocker = new Map<number, (TelemetryEvent & { ts: number })[]>()
   for (const ev of events) {
     const ts = new Date(ev.timestamp ?? ev.createdAt ?? 0).getTime()
-    const existing = latestByLocker.get(ev.locker_id)
-    if (!existing || ts > existing.ts) {
-      latestByLocker.set(ev.locker_id, { ...ev, ts })
+    const arr = byLocker.get(ev.locker_id) ?? []
+    arr.push({ ...ev, ts })
+    byLocker.set(ev.locker_id, arr)
+  }
+
+  // Pega o primeiro valor não-nulo (registos mais recentes primeiro). Eventos de
+  // porta não trazem bateria/temperatura/sinal — sem isto, o cacifo apareceria a
+  // 0% / ERRO logo após uma abertura, em vez do último valor real.
+  const pick = <T>(docs: (TelemetryEvent & { ts: number })[], get: (d: TelemetryEvent) => T | null | undefined): T | undefined => {
+    for (const d of docs) {
+      const v = get(d)
+      if (v !== null && v !== undefined) return v
     }
+    return undefined
   }
 
   const now = Date.now()
-  const lockers = Array.from(latestByLocker.values()).map((ev) => {
-    const ultimoPing = new Date(ev.ts).toISOString()
-    const ageSinceLastPingMs = now - ev.ts
-    const saude = computeSaude(ev.bateria_estado, ev.cpu_temperatura, ev.dnb_sinal, ev.evento, ageSinceLastPingMs)
+  const lockers = Array.from(byLocker.values()).map((docs) => {
+    docs.sort((a, b) => b.ts - a.ts)
+    const head = docs[0]!
+    const bateria = pick(docs, d => d.bateria_estado) ?? 0
+    const temp = pick(docs, d => d.cpu_temperatura) ?? 0
+    const sinal = pick(docs, d => d.dnb_sinal) ?? 0
+    const ageSinceLastPingMs = now - head.ts
 
     return {
-      locker_id: ev.locker_id,
-      tipo: ev.tipo ?? 'inteligente',
-      geo_latitude: ev.geo_latitude,
-      geo_longitude: ev.geo_longitude,
-      bateria_estado: ev.bateria_estado,
-      cpu_temperatura: ev.cpu_temperatura,
-      dnb_sinal: ev.dnb_sinal,
-      aviso: ev.aviso,
-      evento: ev.evento,
-      versao: ev.versao,
-      ultimo_ping: ultimoPing,
-      saude
+      locker_id: head.locker_id,
+      tipo: pick(docs, d => d.tipo) ?? 'inteligente',
+      geo_latitude: pick(docs, d => d.geo_latitude) ?? 0,
+      geo_longitude: pick(docs, d => d.geo_longitude) ?? 0,
+      bateria_estado: bateria,
+      cpu_temperatura: temp,
+      dnb_sinal: sinal,
+      aviso: head.aviso ?? null,
+      evento: head.evento,
+      versao: pick(docs, d => d.versao) ?? '—',
+      ultimo_ping: new Date(head.ts).toISOString(),
+      saude: computeSaude(bateria, temp, sinal, head.evento, ageSinceLastPingMs)
     }
   })
 
