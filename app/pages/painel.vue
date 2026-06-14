@@ -7,8 +7,9 @@ definePageMeta({
   layout: false
 })
 
-// ID do cacifo de testes no backend (locker_id usado em locker_telemetry)
-const PANEL_LOCKER_ID = 1
+// ID do PAINEL na telemetria (locker_id em locker_telemetry). Distinto do cacifo
+// físico (locker_id = 1), senão os dois colidiam e só aparecia um equipamento.
+const PANEL_LOCKER_ID = 2
 
 const panelLat = ref<number | null>(null)
 const panelLng = ref<number | null>(null)
