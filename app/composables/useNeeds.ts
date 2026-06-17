@@ -209,7 +209,7 @@ const _useNeeds = () => {
   }
 
   async function updateNeedStatus(id: number, estado: EstadoPedido, motivo_recusa?: string) {
-    needs.value = needs.value.map(n => {
+    needs.value = needs.value.map((n) => {
       if (n.id_pedido !== id) return n
       return {
         ...n,
@@ -236,35 +236,39 @@ const _useNeeds = () => {
 
   function setItemMatch(id_pedido: number, id_item: number, match_tipo: MatchTipo | null, match_ref: string | null) {
     patchNeedItems(id_pedido, items =>
-      items.map(it => it.id_item !== id_item ? it : {
-        ...it,
-        match_tipo,
-        match_ref,
-        match_business_nif: match_tipo !== 'NEGOCIO' ? null : it.match_business_nif,
-        match_business_estado: match_tipo !== 'NEGOCIO' ? null : it.match_business_estado,
-        match_business_motivo: match_tipo !== 'NEGOCIO' ? null : it.match_business_motivo,
-        status: match_tipo === 'VOUCHER' ? 'completed' : match_tipo ? 'pending' : 'available'
-      })
+      items.map(it => it.id_item !== id_item
+        ? it
+        : {
+            ...it,
+            match_tipo,
+            match_ref,
+            match_business_nif: match_tipo !== 'NEGOCIO' ? null : it.match_business_nif,
+            match_business_estado: match_tipo !== 'NEGOCIO' ? null : it.match_business_estado,
+            match_business_motivo: match_tipo !== 'NEGOCIO' ? null : it.match_business_motivo,
+            status: match_tipo === 'VOUCHER' ? 'completed' : match_tipo ? 'pending' : 'available'
+          })
     )
   }
 
   function setBusinessMatch(id_pedido: number, id_item: number, nif: string, label: string) {
     patchNeedItems(id_pedido, items =>
-      items.map(it => it.id_item !== id_item ? it : {
-        ...it,
-        match_tipo: 'NEGOCIO' as const,
-        match_ref: label,
-        match_business_nif: nif,
-        match_business_estado: 'PENDENTE' as const,
-        match_business_motivo: null,
-        status: 'pending' as const
-      })
+      items.map(it => it.id_item !== id_item
+        ? it
+        : {
+            ...it,
+            match_tipo: 'NEGOCIO' as const,
+            match_ref: label,
+            match_business_nif: nif,
+            match_business_estado: 'PENDENTE' as const,
+            match_business_motivo: null,
+            status: 'pending' as const
+          })
     )
   }
 
   function setBusinessResponse(id_pedido: number, id_item: number, estado: 'ACEITE' | 'RECUSADO' | 'CONCLUIDO', motivo?: string) {
     patchNeedItems(id_pedido, items =>
-      items.map(it => {
+      items.map((it) => {
         if (it.id_item !== id_item || it.match_tipo !== 'NEGOCIO') return it
         return {
           ...it,
