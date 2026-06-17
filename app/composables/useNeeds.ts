@@ -231,35 +231,34 @@ const _useNeeds = () => {
   function setItemMatch(id_pedido: number, id_item: number, match_tipo: MatchTipo | null, match_ref: string | null) {
     const need = needs.value.find(n => n.id_pedido === id_pedido)
     if (!need) return
-    const item = need.items.find(i => i.id_item === id_item)
-    if (!item) return
-    item.match_tipo = match_tipo
-    item.match_ref = match_ref
-    if (match_tipo !== 'NEGOCIO') {
-      item.match_business_nif = null
-      item.match_business_estado = null
-      item.match_business_motivo = null
-    }
-    if (match_tipo === 'VOUCHER') {
-      item.status = 'completed'
-    } else if (match_tipo) {
-      item.status = 'pending'
-    } else {
-      item.status = 'available'
+    const idx = need.items.findIndex(i => i.id_item === id_item)
+    if (idx === -1) return
+    const item = need.items[idx]!
+    need.items[idx] = {
+      ...item,
+      match_tipo,
+      match_ref,
+      match_business_nif: match_tipo !== 'NEGOCIO' ? null : item.match_business_nif,
+      match_business_estado: match_tipo !== 'NEGOCIO' ? null : item.match_business_estado,
+      match_business_motivo: match_tipo !== 'NEGOCIO' ? null : item.match_business_motivo,
+      status: match_tipo === 'VOUCHER' ? 'completed' : match_tipo ? 'pending' : 'available'
     }
   }
 
   function setBusinessMatch(id_pedido: number, id_item: number, nif: string, label: string) {
     const need = needs.value.find(n => n.id_pedido === id_pedido)
     if (!need) return
-    const item = need.items.find(i => i.id_item === id_item)
-    if (!item) return
-    item.match_tipo = 'NEGOCIO'
-    item.match_ref = label
-    item.match_business_nif = nif
-    item.match_business_estado = 'PENDENTE'
-    item.match_business_motivo = null
-    item.status = 'pending'
+    const idx = need.items.findIndex(i => i.id_item === id_item)
+    if (idx === -1) return
+    need.items[idx] = {
+      ...need.items[idx]!,
+      match_tipo: 'NEGOCIO',
+      match_ref: label,
+      match_business_nif: nif,
+      match_business_estado: 'PENDENTE',
+      match_business_motivo: null,
+      status: 'pending'
+    }
   }
 
   function setBusinessResponse(id_pedido: number, id_item: number, estado: 'ACEITE' | 'RECUSADO' | 'CONCLUIDO', motivo?: string) {
@@ -285,13 +284,11 @@ const _useNeeds = () => {
     need.estado = 'ACEITE'
     need.motivo_recusa = undefined
     if (need.urgente) {
-      need.items.forEach((it) => {
-        if (it.tipo_bem === 'BEM' && !it.match_tipo) {
-          it.match_tipo = 'VOUCHER'
-          it.match_ref = `VCH-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`
-          it.status = 'completed'
-        }
-      })
+      need.items = need.items.map(it =>
+        it.tipo_bem === 'BEM' && !it.match_tipo
+          ? { ...it, match_tipo: 'VOUCHER' as const, match_ref: `VCH-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`, status: 'completed' as const }
+          : it
+      )
     }
 
     // Persist which items were allocated to the citizen panel so the panel shows
@@ -308,10 +305,17 @@ const _useNeeds = () => {
         negocio_nome: it.match_ref ?? null
       }))
 
+    const voucherMatches = need.items
+      .filter(it => it.match_tipo === 'VOUCHER' && it.match_ref)
+      .map(it => ({
+        id_item: it.id_item,
+        voucher_ref: it.match_ref!
+      }))
+
     try {
       await $fetch(`/api/needs/${id_pedido}`, {
         method: 'PATCH',
-        body: { estado: 'ACEITE', panelItemIds, businessMatches }
+        body: { estado: 'ACEITE', panelItemIds, businessMatches, voucherMatches }
       })
     } catch (e) {
       console.error('[useNeeds] Failed to approve need:', e)

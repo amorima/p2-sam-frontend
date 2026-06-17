@@ -2,6 +2,7 @@ interface BackendNeedItem {
   id_item?: number
   id_pedido: number
   tipo_bem_servico: string
+  publico?: number | null
   match_negocio_nif?: string | null
   match_negocio_nome?: string | null
   match_negocio_estado?: string | null
@@ -22,6 +23,12 @@ interface BackendNeed {
 interface BackendLead {
   id_item: number | null
   estado: string | null
+}
+
+interface BackendItemVoucher {
+  id_item: number
+  id_pedido: number
+  voucher_ref: string
 }
 
 // Known service-type keywords to infer tipo_bem when not available from backend
@@ -46,14 +53,19 @@ export default defineEventHandler(async (event) => {
   const sortDir = query.sort_dir === 'asc' ? 'asc' : 'desc'
   const sortQs = sortBy ? `&sort_by=${encodeURIComponent(sortBy)}&sort_dir=${sortDir}` : ''
 
-  const [needsRes, institutionsRes, leadsRes] = await Promise.all([
+  const [needsRes, institutionsRes, leadsRes, itemVouchersRes] = await Promise.all([
     internalFetch<{ items: BackendNeed[], total: number, limit: number, offset: number }>(`${config.backendBase}/needs?limit=${limit}&offset=${offset}${qs}${sortQs}`),
     internalFetch<{ items: Array<{ nif_nipc: string, nome_entidade: string }> }>(`${config.backendBase}/institutions?limit=500`),
-    internalFetch<{ items: BackendLead[] }>(`${config.backendBase}/leads?limit=1000`).catch(() => ({ items: [] as BackendLead[] }))
+    internalFetch<{ items: BackendLead[] }>(`${config.backendBase}/leads?limit=1000`).catch(() => ({ items: [] as BackendLead[] })),
+    internalFetch<BackendItemVoucher[]>(`${config.backendBase}/needs/item-vouchers`).catch(() => [] as BackendItemVoucher[])
   ])
 
   const nameMap = new Map(
     (institutionsRes.items ?? []).map(i => [i.nif_nipc, i.nome_entidade])
+  )
+
+  const voucherMap = new Map<number, string>(
+    (itemVouchersRes ?? []).map(v => [v.id_item, v.voucher_ref])
   )
 
   // Map each item to its lead status so the admin sees which items are claimed
@@ -74,20 +86,28 @@ export default defineEventHandler(async (event) => {
     const rawItems: BackendNeedItem[] = need['need items'] ?? need.NeedItems ?? need.needItems ?? []
 
     const mappedItems = rawItems.map((item) => {
-      const hasLead = itemLeadStatus.has(item.id_item ?? 0)
+      const id_item = item.id_item ?? ++itemCounter
+      const hasLead = itemLeadStatus.has(id_item)
+      const isPublico = !!item.publico
       const hasBusinessMatch = !!item.match_negocio_nif
+      const voucherRef = voucherMap.get(id_item) ?? null
+      const hasVoucher = !!voucherRef
       return {
-        id_item: item.id_item ?? ++itemCounter,
+        id_item,
         id_pedido: item.id_pedido,
         tipo_bem_servico: item.tipo_bem_servico,
         tipo_bem: inferTipoBem(item.tipo_bem_servico),
-        status: (hasLead
-          ? itemLeadStatus.get(item.id_item ?? 0)
-          : hasBusinessMatch
-            ? (item.match_negocio_estado === 'CONCLUIDO' ? 'completed' : 'pending')
-            : 'available') as 'available' | 'pending' | 'completed',
-        match_tipo: hasLead ? ('PAINEL' as const) : hasBusinessMatch ? ('NEGOCIO' as const) : null,
-        match_ref: hasBusinessMatch ? (item.match_negocio_nome ?? item.match_negocio_nif ?? null) : null,
+        status: (hasVoucher
+          ? 'completed'
+          : hasLead
+            ? itemLeadStatus.get(id_item)
+            : isPublico
+              ? 'pending'
+              : hasBusinessMatch
+                ? (item.match_negocio_estado === 'CONCLUIDO' ? 'completed' : 'pending')
+                : 'available') as 'available' | 'pending' | 'completed',
+        match_tipo: hasVoucher ? ('VOUCHER' as const) : hasLead ? ('PAINEL' as const) : isPublico ? ('PAINEL' as const) : hasBusinessMatch ? ('NEGOCIO' as const) : null,
+        match_ref: hasVoucher ? voucherRef : hasBusinessMatch ? (item.match_negocio_nome ?? item.match_negocio_nif ?? null) : null,
         match_business_nif: item.match_negocio_nif ?? null,
         match_business_estado: (item.match_negocio_estado ?? null) as import('~/utils/domain').BusinessMatchEstado | null,
         match_business_motivo: item.match_negocio_motivo ?? null
