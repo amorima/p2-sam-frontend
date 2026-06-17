@@ -209,14 +209,14 @@ const _useNeeds = () => {
   }
 
   async function updateNeedStatus(id: number, estado: EstadoPedido, motivo_recusa?: string) {
-    const need = needs.value.find(n => n.id_pedido === id)
-    if (!need) return
-    need.estado = estado
-    if (estado === 'REJEITADO') {
-      need.motivo_recusa = motivo_recusa ?? need.motivo_recusa
-    } else {
-      need.motivo_recusa = undefined
-    }
+    needs.value = needs.value.map(n => {
+      if (n.id_pedido !== id) return n
+      return {
+        ...n,
+        estado,
+        motivo_recusa: estado === 'REJEITADO' ? (motivo_recusa ?? n.motivo_recusa) : undefined
+      }
+    })
 
     try {
       await $fetch(`/api/needs/${id}`, {
@@ -228,49 +228,52 @@ const _useNeeds = () => {
     }
   }
 
+  function patchNeedItems(id_pedido: number, patchFn: (items: NeedItem[]) => NeedItem[]) {
+    needs.value = needs.value.map(n =>
+      n.id_pedido === id_pedido ? { ...n, items: patchFn(n.items) } : n
+    )
+  }
+
   function setItemMatch(id_pedido: number, id_item: number, match_tipo: MatchTipo | null, match_ref: string | null) {
-    const need = needs.value.find(n => n.id_pedido === id_pedido)
-    if (!need) return
-    const idx = need.items.findIndex(i => i.id_item === id_item)
-    if (idx === -1) return
-    const item = need.items[idx]!
-    need.items[idx] = {
-      ...item,
-      match_tipo,
-      match_ref,
-      match_business_nif: match_tipo !== 'NEGOCIO' ? null : item.match_business_nif,
-      match_business_estado: match_tipo !== 'NEGOCIO' ? null : item.match_business_estado,
-      match_business_motivo: match_tipo !== 'NEGOCIO' ? null : item.match_business_motivo,
-      status: match_tipo === 'VOUCHER' ? 'completed' : match_tipo ? 'pending' : 'available'
-    }
+    patchNeedItems(id_pedido, items =>
+      items.map(it => it.id_item !== id_item ? it : {
+        ...it,
+        match_tipo,
+        match_ref,
+        match_business_nif: match_tipo !== 'NEGOCIO' ? null : it.match_business_nif,
+        match_business_estado: match_tipo !== 'NEGOCIO' ? null : it.match_business_estado,
+        match_business_motivo: match_tipo !== 'NEGOCIO' ? null : it.match_business_motivo,
+        status: match_tipo === 'VOUCHER' ? 'completed' : match_tipo ? 'pending' : 'available'
+      })
+    )
   }
 
   function setBusinessMatch(id_pedido: number, id_item: number, nif: string, label: string) {
-    const need = needs.value.find(n => n.id_pedido === id_pedido)
-    if (!need) return
-    const idx = need.items.findIndex(i => i.id_item === id_item)
-    if (idx === -1) return
-    need.items[idx] = {
-      ...need.items[idx]!,
-      match_tipo: 'NEGOCIO',
-      match_ref: label,
-      match_business_nif: nif,
-      match_business_estado: 'PENDENTE',
-      match_business_motivo: null,
-      status: 'pending'
-    }
+    patchNeedItems(id_pedido, items =>
+      items.map(it => it.id_item !== id_item ? it : {
+        ...it,
+        match_tipo: 'NEGOCIO' as const,
+        match_ref: label,
+        match_business_nif: nif,
+        match_business_estado: 'PENDENTE' as const,
+        match_business_motivo: null,
+        status: 'pending' as const
+      })
+    )
   }
 
   function setBusinessResponse(id_pedido: number, id_item: number, estado: 'ACEITE' | 'RECUSADO' | 'CONCLUIDO', motivo?: string) {
-    const need = needs.value.find(n => n.id_pedido === id_pedido)
-    if (!need) return
-    const item = need.items.find(i => i.id_item === id_item)
-    if (!item || item.match_tipo !== 'NEGOCIO') return
-    item.match_business_estado = estado
-    item.match_business_motivo = estado === 'RECUSADO' ? (motivo ?? null) : null
-    if (estado === 'CONCLUIDO') item.status = 'completed'
-    else if (estado === 'RECUSADO') item.status = 'available'
-    else item.status = 'pending'
+    patchNeedItems(id_pedido, items =>
+      items.map(it => {
+        if (it.id_item !== id_item || it.match_tipo !== 'NEGOCIO') return it
+        return {
+          ...it,
+          match_business_estado: estado,
+          match_business_motivo: estado === 'RECUSADO' ? (motivo ?? null) : null,
+          status: estado === 'CONCLUIDO' ? 'completed' as const : estado === 'RECUSADO' ? 'available' as const : 'pending' as const
+        }
+      })
+    )
 
     $fetch(`/api/needs/${id_pedido}/business-response`, {
       method: 'PATCH',
@@ -281,23 +284,26 @@ const _useNeeds = () => {
   async function approveNeed(id_pedido: number) {
     const need = needs.value.find(n => n.id_pedido === id_pedido)
     if (!need) return
-    need.estado = 'ACEITE'
-    need.motivo_recusa = undefined
-    if (need.urgente) {
-      need.items = need.items.map(it =>
-        it.tipo_bem === 'BEM' && !it.match_tipo
-          ? { ...it, match_tipo: 'VOUCHER' as const, match_ref: `VCH-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`, status: 'completed' as const }
-          : it
-      )
-    }
 
-    // Persist which items were allocated to the citizen panel so the panel shows
-    // them even when the institution is outside the kiosk's GPS radius.
-    const panelItemIds = need.items
+    const updatedItems = need.urgente
+      ? need.items.map(it =>
+          it.tipo_bem === 'BEM' && !it.match_tipo
+            ? { ...it, match_tipo: 'VOUCHER' as const, match_ref: `VCH-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`, status: 'completed' as const }
+            : it
+        )
+      : need.items
+
+    needs.value = needs.value.map(n =>
+      n.id_pedido !== id_pedido ? n : { ...n, estado: 'ACEITE' as const, motivo_recusa: undefined, items: updatedItems }
+    )
+
+    const approvedNeed = needs.value.find(n => n.id_pedido === id_pedido)!
+
+    const panelItemIds = approvedNeed.items
       .filter(it => it.match_tipo === 'PAINEL')
       .map(it => it.id_item)
 
-    const businessMatches = need.items
+    const businessMatches = approvedNeed.items
       .filter(it => it.match_tipo === 'NEGOCIO' && it.match_business_nif)
       .map(it => ({
         id_item: it.id_item,
@@ -305,7 +311,7 @@ const _useNeeds = () => {
         negocio_nome: it.match_ref ?? null
       }))
 
-    const voucherMatches = need.items
+    const voucherMatches = approvedNeed.items
       .filter(it => it.match_tipo === 'VOUCHER' && it.match_ref)
       .map(it => ({
         id_item: it.id_item,
@@ -323,10 +329,9 @@ const _useNeeds = () => {
   }
 
   async function rejectNeed(id_pedido: number, motivo: string) {
-    const need = needs.value.find(n => n.id_pedido === id_pedido)
-    if (!need) return
-    need.estado = 'REJEITADO'
-    need.motivo_recusa = motivo
+    needs.value = needs.value.map(n =>
+      n.id_pedido !== id_pedido ? n : { ...n, estado: 'REJEITADO' as const, motivo_recusa: motivo }
+    )
 
     try {
       await $fetch(`/api/needs/${id_pedido}`, {
@@ -477,18 +482,14 @@ const _useNeeds = () => {
   async function removeBusiness(nif: string) {
     const previous = businesses.value
     businesses.value = businesses.value.filter(b => b.resource.nif_nipc !== nif)
-    needs.value.forEach((need) => {
-      need.items.forEach((item) => {
-        if (item.match_tipo === 'NEGOCIO' && item.match_business_nif === nif) {
-          item.match_tipo = null
-          item.match_ref = null
-          item.match_business_nif = null
-          item.match_business_estado = null
-          item.match_business_motivo = null
-          item.status = 'available'
-        }
-      })
-    })
+    needs.value = needs.value.map(n => ({
+      ...n,
+      items: n.items.map(it =>
+        it.match_tipo === 'NEGOCIO' && it.match_business_nif === nif
+          ? { ...it, match_tipo: null, match_ref: null, match_business_nif: null, match_business_estado: null, match_business_motivo: null, status: 'available' as const }
+          : it
+      )
+    }))
 
     try {
       await $fetch(`/api/business/${nif}`, { method: 'DELETE' })
