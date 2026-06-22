@@ -165,7 +165,7 @@ export function buildEscPos(d: ReceiptData): Buffer {
     b.push(...line(d.prize))
     b.push(0x1d, 0x21, 0x00) // normal
     b.push(0x1b, 0x45, 0x00) // bold off
-    b.push(...line('Levante o seu premio na apresentacao!'))
+    b.push(...line('Levante o seu premio no fim da apresentacao!'))
     b.push(...separator(W))
   }
   // ── FIM SORTEIO ──
