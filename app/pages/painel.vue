@@ -49,6 +49,9 @@ const weatherData = ref<WeatherData>({
   icon: '02d'
 })
 const thanksOpen = ref(false)
+// ── SORTEIO ── prémio sorteado a mostrar/imprimir (remover após apresentação)
+const { drawPrize } = useRaffle()
+const prize = ref<string | null>(null)
 const currentTime = ref('')
 const currentDate = ref('')
 const now = ref(new Date())
@@ -308,7 +311,8 @@ const printReceipt = async () => {
         goodName,
         date,
         time,
-        pin: pin.value
+        pin: pin.value,
+        prize: prize.value // ── SORTEIO ── (remover após apresentação)
       }
     })
     await agentPrint(result.bytes, printerName)
@@ -342,6 +346,7 @@ const submitDonation = async () => {
     })
 
     pin.value = generatedPin
+    prize.value = drawPrize() // ── SORTEIO ── (remover após apresentação)
     isSubmitting.value = false
     thanksOpen.value = true
     if (modalTimerId) clearTimeout(modalTimerId)
@@ -375,6 +380,7 @@ const resetDonation = () => {
   donorName.value = ''
   donorEmail.value = ''
   pin.value = ''
+  prize.value = null // ── SORTEIO ── (remover após apresentação)
 }
 
 const clearTimers = () => {
@@ -794,6 +800,13 @@ onBeforeUnmount(() => {
             <div class="thanks-pin">
               {{ pin }}
             </div>
+            <!-- ── SORTEIO ── (remover após apresentação) -->
+            <div v-if="prize" class="thanks-prize">
+              <UIcon name="i-fa6-solid-gift" aria-hidden="true" />
+              <span class="thanks-prize-label">Ganhou um prémio!</span>
+              <span class="thanks-prize-value">{{ prize }}</span>
+            </div>
+            <!-- ── FIM SORTEIO ── -->
             <p class="thanks-info">
               Código enviado para {{ donorEmail }}
             </p>
@@ -1567,6 +1580,37 @@ onBeforeUnmount(() => {
   color: rgba(255,255,255,0.6);
   margin: 0 0 8px;
 }
+
+/* ── SORTEIO ── (remover após apresentação) */
+.thanks-prize {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.14), rgba(251, 146, 60, 0.14));
+  border: 1px solid rgba(251, 191, 36, 0.35);
+}
+.thanks-prize :deep(svg) {
+  font-size: 34px;
+  color: #fbbf24;
+  filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.5));
+}
+.thanks-prize-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 600;
+}
+.thanks-prize-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: #fcd34d;
+}
+/* ── FIM SORTEIO ── */
 
 .thanks-note {
   font-size: 13px;

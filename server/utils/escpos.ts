@@ -111,6 +111,7 @@ export interface ReceiptData {
   date: string
   time: string
   pin: string
+  prize?: string // ── SORTEIO ── prémio sorteado (remover após apresentação)
 }
 
 export function buildEscPos(d: ReceiptData): Buffer {
@@ -154,6 +155,20 @@ export function buildEscPos(d: ReceiptData): Buffer {
   b.push(...line(d.pin))
   b.push(0x1d, 0x21, 0x00) // normal
   b.push(...separator(W))
+
+  // ── SORTEIO ── (remover após apresentação)
+  if (d.prize) {
+    b.push(0x1b, 0x61, 0x01) // center
+    b.push(...line('** PREMIO SORTEADO **'))
+    b.push(0x1b, 0x45, 0x01) // bold on
+    b.push(0x1d, 0x21, 0x01) // 2x height
+    b.push(...line(d.prize))
+    b.push(0x1d, 0x21, 0x00) // normal
+    b.push(0x1b, 0x45, 0x00) // bold off
+    b.push(...line('Levante o seu premio na apresentacao!'))
+    b.push(...separator(W))
+  }
+  // ── FIM SORTEIO ──
 
   // QR code
   b.push(...qrCodeBytes(d.pin, 6))
